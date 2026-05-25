@@ -26,9 +26,17 @@ export class AvailabilityRuleController {
     const eventId = objectIdSchema.parse(toParam(req.params.eventId));
     const input = createAvailabilityRuleSchema.parse(req.body);
     const rule = await availabilityRuleService.createRule(eventId, req.auth.id, {
-      ...input,
+      ruleType: input.ruleType,
+      daysOfWeek: input.daysOfWeek,
+      date: input.date,
       rangeStart: input.rangeStart ? new Date(input.rangeStart) : undefined,
-      rangeEnd: input.rangeEnd ? new Date(input.rangeEnd) : undefined
+      rangeEnd: input.rangeEnd ? new Date(input.rangeEnd) : undefined,
+      startTime: input.startTime,
+      endTime: input.endTime,
+      isBlocked: input.isBlocked,
+      maxGuests: input.maxGuests,
+      priority: input.priority,
+      reason: input.reason
     });
     sendSuccess(res, { rule }, 201);
   });
