@@ -10,11 +10,18 @@ import { errorHandler } from "./middleware/error-handler";
 
 export function createApp() {
   const app = express();
+  const allowedOrigins = env.corsOrigin
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean);
 
   app.use(helmet());
   app.use(
     cors({
-      origin: env.corsOrigin === "*" ? true : env.corsOrigin,
+      origin: (origin, callback) => {
+        if (!origin) return callback(null, true);
+        return callback(null, allowedOrigins.includes(origin));
+      },
       credentials: true
     })
   );
