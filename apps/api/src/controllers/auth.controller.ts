@@ -40,13 +40,24 @@ function serializeUser(user: unknown) {
 export class AuthController {
   register = asyncHandler(async (req: Request, res: Response) => {
     const input = registerSchema.parse(req.body);
-    const { user, token } = await authService.register(input);
+    const { user, token } = await authService.register({
+      role: input.role,
+      name: input.name,
+      email: input.email,
+      phone: input.phone,
+      password: input.password,
+      timezone: input.timezone,
+      locale: input.locale
+    });
     sendSuccess(res, { user: serializeUser(user), token }, 201);
   });
 
   login = asyncHandler(async (req: Request, res: Response) => {
     const input = loginSchema.parse(req.body);
-    const { user, token } = await authService.login(input);
+    const { user, token } = await authService.login({
+      email: input.email,
+      password: input.password
+    });
     sendSuccess(res, { user: serializeUser(user), token });
   });
 
