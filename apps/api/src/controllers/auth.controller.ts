@@ -5,7 +5,8 @@ import { asyncHandler, sendSuccess } from "../utils/http";
 
 const authService = new AuthService();
 
-function serializeUser(user: {
+function serializeUser(user: unknown) {
+  const typed = user as {
   _id: { toString(): string };
   role: string;
   name: string;
@@ -18,20 +19,21 @@ function serializeUser(user: {
   lastLoginAt?: Date;
   createdAt: Date;
   updatedAt: Date;
-}) {
+  };
+
   return {
-    id: user._id.toString(),
-    role: user.role,
-    name: user.name,
-    email: user.email,
-    phone: user.phone,
-    status: user.status,
-    locale: user.locale,
-    timezone: user.timezone,
-    avatarUrl: user.avatarUrl,
-    lastLoginAt: user.lastLoginAt,
-    createdAt: user.createdAt,
-    updatedAt: user.updatedAt
+    id: typed._id.toString(),
+    role: typed.role,
+    name: typed.name,
+    email: typed.email,
+    phone: typed.phone,
+    status: typed.status,
+    locale: typed.locale,
+    timezone: typed.timezone,
+    avatarUrl: typed.avatarUrl,
+    lastLoginAt: typed.lastLoginAt,
+    createdAt: typed.createdAt,
+    updatedAt: typed.updatedAt
   };
 }
 

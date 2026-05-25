@@ -69,7 +69,7 @@ export class AuthService {
     return user;
   }
 
-  sign(user: Pick<UserDocument, "_id" | "role" | "email" | "name">): string {
+  sign(user: UserDocument): string {
     const payload: AuthTokenPayload = {
       id: user._id.toString(),
       role: user.role,
@@ -77,8 +77,9 @@ export class AuthService {
       name: user.name
     };
 
+    const expiresIn = env.jwtExpiresIn as jwt.SignOptions["expiresIn"];
     return jwt.sign(payload, env.jwtSecret, {
-      expiresIn: env.jwtExpiresIn,
+      expiresIn,
       issuer: env.jwtIssuer,
       audience: env.jwtAudience,
       subject: user._id.toString()

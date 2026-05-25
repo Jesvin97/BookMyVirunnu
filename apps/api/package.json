@@ -6,8 +6,8 @@
   "main": "dist/server.js",
   "types": "dist/server.d.ts",
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "check": "tsc -p tsconfig.json --noEmit",
+    "build": "tsc -b tsconfig.json",
+    "check": "tsc -b tsconfig.json --noEmit",
     "dev": "node dist/server.js",
     "start": "node dist/server.js"
   },
@@ -26,6 +26,7 @@
   "devDependencies": {
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.1",
+    "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.8",
     "@types/node": "^22.13.10",
     "typescript": "^5.8.2"

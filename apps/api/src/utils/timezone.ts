@@ -73,6 +73,10 @@ export function differenceInMinutes(later: Date, earlier: Date): number {
   return Math.round((later.getTime() - earlier.getTime()) / 60_000);
 }
 
+export function compareDatesAsc(a: Date, b: Date): number {
+  return a.getTime() - b.getTime();
+}
+
 export function zonedDateTimeToUtc(parts: LocalDateParts, timeZone: string): Date {
   let utcMillis = Date.UTC(
     parts.year,

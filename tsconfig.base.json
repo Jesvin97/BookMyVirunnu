@@ -10,9 +10,6 @@
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "declaration": true,
-    "baseUrl": ".",
-    "paths": {
-      "@bookmyvirunnu/shared": ["packages/shared/src/index.ts"]
-    }
+    "baseUrl": "."
   }
 }

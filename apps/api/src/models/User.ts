@@ -31,9 +31,10 @@ UserSchema.index({ email: 1 }, { unique: true });
 
 UserSchema.set("toJSON", {
   transform: (_doc, ret) => {
-    delete ret.passwordHash;
-    delete ret.__v;
-    return ret;
+    const result = ret as unknown as Record<string, unknown>;
+    delete result.passwordHash;
+    delete result.__v;
+    return result;
   }
 });
 

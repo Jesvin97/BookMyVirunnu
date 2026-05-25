@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import { AvailabilityRuleService } from "../services/availability-rule.service";
 import { asyncHandler, sendSuccess } from "../utils/http";
+import { toParam } from "../utils/params";
 import { objectIdSchema } from "../validators/common";
 import { createAvailabilityRuleSchema, updateAvailabilityRuleSchema } from "../validators/availability-rule";
 
@@ -12,8 +13,8 @@ export class AvailabilityRuleController {
       res.status(401).json({ success: false, error: { code: "unauthorized", message: "Missing authentication." } });
       return;
     }
-    objectIdSchema.parse(req.params.eventId);
-    const rules = await availabilityRuleService.listRules(req.params.eventId, req.auth.id);
+    const eventId = objectIdSchema.parse(toParam(req.params.eventId));
+    const rules = await availabilityRuleService.listRules(eventId, req.auth.id);
     sendSuccess(res, { rules });
   });
 
@@ -22,9 +23,9 @@ export class AvailabilityRuleController {
       res.status(401).json({ success: false, error: { code: "unauthorized", message: "Missing authentication." } });
       return;
     }
-    objectIdSchema.parse(req.params.eventId);
+    const eventId = objectIdSchema.parse(toParam(req.params.eventId));
     const input = createAvailabilityRuleSchema.parse(req.body);
-    const rule = await availabilityRuleService.createRule(req.params.eventId, req.auth.id, {
+    const rule = await availabilityRuleService.createRule(eventId, req.auth.id, {
       ...input,
       rangeStart: input.rangeStart ? new Date(input.rangeStart) : undefined,
       rangeEnd: input.rangeEnd ? new Date(input.rangeEnd) : undefined
@@ -37,9 +38,9 @@ export class AvailabilityRuleController {
       res.status(401).json({ success: false, error: { code: "unauthorized", message: "Missing authentication." } });
       return;
     }
-    objectIdSchema.parse(req.params.ruleId);
+    const ruleId = objectIdSchema.parse(toParam(req.params.ruleId));
     const input = updateAvailabilityRuleSchema.parse(req.body);
-    const rule = await availabilityRuleService.updateRule(req.params.ruleId, req.auth.id, {
+    const rule = await availabilityRuleService.updateRule(ruleId, req.auth.id, {
       ...input,
       rangeStart: input.rangeStart ? new Date(input.rangeStart) : undefined,
       rangeEnd: input.rangeEnd ? new Date(input.rangeEnd) : undefined
@@ -52,8 +53,8 @@ export class AvailabilityRuleController {
       res.status(401).json({ success: false, error: { code: "unauthorized", message: "Missing authentication." } });
       return;
     }
-    objectIdSchema.parse(req.params.ruleId);
-    const result = await availabilityRuleService.deleteRule(req.params.ruleId, req.auth.id);
+    const ruleId = objectIdSchema.parse(toParam(req.params.ruleId));
+    const result = await availabilityRuleService.deleteRule(ruleId, req.auth.id);
     sendSuccess(res, result);
   });
 }

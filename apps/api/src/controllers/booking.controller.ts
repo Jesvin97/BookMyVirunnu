@@ -3,6 +3,7 @@ import { Types } from "mongoose";
 import { BookingService } from "../services/booking.service";
 import { EventService } from "../services/event.service";
 import { asyncHandler, sendSuccess } from "../utils/http";
+import { toParam } from "../utils/params";
 import { bookingActionSchema, createBookingSchema, availabilityPreviewSchema } from "../validators/booking";
 import { objectIdSchema } from "../validators/common";
 
@@ -38,8 +39,8 @@ export class BookingController {
   });
 
   getOne = asyncHandler(async (req: Request, res: Response) => {
-    objectIdSchema.parse(req.params.bookingId);
-    const booking = await bookingService.getBookingById(req.params.bookingId, req.auth?.id);
+    const bookingId = objectIdSchema.parse(toParam(req.params.bookingId));
+    const booking = await bookingService.getBookingById(bookingId, req.auth?.id);
     sendSuccess(res, { booking });
   });
 
@@ -48,14 +49,14 @@ export class BookingController {
       res.status(401).json({ success: false, error: { code: "unauthorized", message: "Missing authentication." } });
       return;
     }
-    objectIdSchema.parse(req.params.eventId);
-    const bookings = await bookingService.listBookingsForEvent(req.params.eventId, req.auth.id);
+    const eventId = objectIdSchema.parse(toParam(req.params.eventId));
+    const bookings = await bookingService.listBookingsForEvent(eventId, req.auth.id);
     sendSuccess(res, { bookings });
   });
 
   previewForEvent = asyncHandler(async (req: Request, res: Response) => {
     const query = availabilityPreviewSchema.pick({ rangeStart: true, rangeEnd: true }).parse(req.query);
-    const eventId = objectIdSchema.parse(req.params.eventId);
+    const eventId = objectIdSchema.parse(toParam(req.params.eventId));
     await eventService.getVisibleById(eventId, req.auth?.id);
     const slots = await bookingService.previewAvailability(new Types.ObjectId(eventId), new Date(query.rangeStart), new Date(query.rangeEnd));
     sendSuccess(res, { slots });
@@ -66,8 +67,8 @@ export class BookingController {
       res.status(401).json({ success: false, error: { code: "unauthorized", message: "Missing authentication." } });
       return;
     }
-    objectIdSchema.parse(req.params.bookingId);
-    const booking = await bookingService.confirmBooking(new Types.ObjectId(req.params.bookingId), new Types.ObjectId(req.auth.id));
+    const bookingId = objectIdSchema.parse(toParam(req.params.bookingId));
+    const booking = await bookingService.confirmBooking(new Types.ObjectId(bookingId), new Types.ObjectId(req.auth.id));
     sendSuccess(res, { booking });
   });
 
@@ -76,10 +77,10 @@ export class BookingController {
       res.status(401).json({ success: false, error: { code: "unauthorized", message: "Missing authentication." } });
       return;
     }
-    objectIdSchema.parse(req.params.bookingId);
+    const bookingId = objectIdSchema.parse(toParam(req.params.bookingId));
     const { reason } = bookingActionSchema.parse(req.body);
     const booking = await bookingService.rejectBooking(
-      new Types.ObjectId(req.params.bookingId),
+      new Types.ObjectId(bookingId),
       reason,
       new Types.ObjectId(req.auth.id)
     );
@@ -91,8 +92,8 @@ export class BookingController {
       res.status(401).json({ success: false, error: { code: "unauthorized", message: "Missing authentication." } });
       return;
     }
-    objectIdSchema.parse(req.params.bookingId);
-    const booking = await bookingService.cancelBooking(new Types.ObjectId(req.params.bookingId), new Types.ObjectId(req.auth.id));
+    const bookingId = objectIdSchema.parse(toParam(req.params.bookingId));
+    const booking = await bookingService.cancelBooking(new Types.ObjectId(bookingId), new Types.ObjectId(req.auth.id));
     sendSuccess(res, { booking });
   });
 }

@@ -1,4 +1,4 @@
-import mongoose, { type ClientSession, type Types } from "mongoose";
+import mongoose, { Types, type ClientSession } from "mongoose";
 import { BookingModel, type BookingDocument } from "../models/Booking";
 import { BookingSlotModel, type BookingSlotDocument } from "../models/BookingSlot";
 import { EventModel, type EventDocument } from "../models/Event";

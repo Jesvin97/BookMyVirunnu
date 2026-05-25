@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import { EventService } from "../services/event.service";
 import { asyncHandler, sendSuccess } from "../utils/http";
+import { toParam } from "../utils/params";
 import { createEventSchema, updateEventSchema } from "../validators/event";
 import { objectIdSchema } from "../validators/common";
 
@@ -48,8 +49,8 @@ export class EventController {
   });
 
   getById = asyncHandler(async (req: Request, res: Response) => {
-    objectIdSchema.parse(req.params.eventId);
-    const event = await eventService.getVisibleById(req.params.eventId, req.auth?.id);
+    const eventId = objectIdSchema.parse(toParam(req.params.eventId));
+    const event = await eventService.getVisibleById(eventId, req.auth?.id);
     sendSuccess(res, { event });
   });
 
@@ -58,9 +59,9 @@ export class EventController {
       res.status(401).json({ success: false, error: { code: "unauthorized", message: "Missing authentication." } });
       return;
     }
-    objectIdSchema.parse(req.params.eventId);
+    const eventId = objectIdSchema.parse(toParam(req.params.eventId));
     const input = updateEventSchema.parse(req.body);
-    const event = await eventService.updateEvent(req.params.eventId, req.auth.id, {
+    const event = await eventService.updateEvent(eventId, req.auth.id, {
       ...input,
       startDate: input.startDate ? new Date(input.startDate) : undefined,
       endDate: input.endDate ? new Date(input.endDate) : undefined
@@ -73,8 +74,8 @@ export class EventController {
       res.status(401).json({ success: false, error: { code: "unauthorized", message: "Missing authentication." } });
       return;
     }
-    objectIdSchema.parse(req.params.eventId);
-    const event = await eventService.publishEvent(req.params.eventId, req.auth.id);
+    const eventId = objectIdSchema.parse(toParam(req.params.eventId));
+    const event = await eventService.publishEvent(eventId, req.auth.id);
     sendSuccess(res, { event });
   });
 
@@ -83,8 +84,8 @@ export class EventController {
       res.status(401).json({ success: false, error: { code: "unauthorized", message: "Missing authentication." } });
       return;
     }
-    objectIdSchema.parse(req.params.eventId);
-    const event = await eventService.pauseEvent(req.params.eventId, req.auth.id);
+    const eventId = objectIdSchema.parse(toParam(req.params.eventId));
+    const event = await eventService.pauseEvent(eventId, req.auth.id);
     sendSuccess(res, { event });
   });
 
@@ -93,8 +94,8 @@ export class EventController {
       res.status(401).json({ success: false, error: { code: "unauthorized", message: "Missing authentication." } });
       return;
     }
-    objectIdSchema.parse(req.params.eventId);
-    const event = await eventService.cancelEvent(req.params.eventId, req.auth.id);
+    const eventId = objectIdSchema.parse(toParam(req.params.eventId));
+    const event = await eventService.cancelEvent(eventId, req.auth.id);
     sendSuccess(res, { event });
   });
 }

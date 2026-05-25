@@ -1,4 +1,4 @@
-import type { ClientSession, Types } from "mongoose";
+import { Types, type ClientSession } from "mongoose";
 import { AvailabilityRuleModel, type AvailabilityRuleDocument } from "../models/AvailabilityRule";
 import { BookingSlotModel, type BookingSlotDocument } from "../models/BookingSlot";
 import type { EventDocument } from "../models/Event";
@@ -62,7 +62,7 @@ export class AvailabilityEngine {
       const prior = existingMap.get(key);
       const reservedCount = prior?.reservedCount ?? 0;
       const confirmedCount = prior?.confirmedCount ?? 0;
-      const status =
+      const status: "open" | "locked" =
         prior?.status === "locked" && reservedCount === 0 && confirmedCount === 0
           ? "locked"
           : reservedCount >= slot.capacity
@@ -81,7 +81,7 @@ export class AvailabilityEngine {
               occupiedEndAt: slot.occupiedEndAt,
               capacity: slot.capacity,
               status,
-              sourceRuleIds: slot.sourceRuleIds
+              sourceRuleIds: slot.sourceRuleIds.map((id) => new Types.ObjectId(id))
             },
             $setOnInsert: {
               reservedCount,
@@ -97,17 +97,19 @@ export class AvailabilityEngine {
       .filter((slot) => !expectedKeys.has(this.slotKey(event._id, slot.startAt, slot.endAt)))
       .map((slot) => {
         if (slot.reservedCount > 0 || slot.confirmedCount > 0) {
+          const lockedStatus: "locked" = "locked";
           return {
             updateOne: {
               filter: { _id: slot._id },
-              update: { $set: { status: "locked" } }
+              update: { $set: { status: lockedStatus } }
             }
           };
         }
+        const blockedStatus: "blocked" = "blocked";
         return {
           updateOne: {
             filter: { _id: slot._id, status: { $ne: "blocked" } },
-            update: { $set: { status: "blocked" } }
+            update: { $set: { status: blockedStatus } }
           }
         };
       });
@@ -286,7 +288,7 @@ export class AvailabilityEngine {
               occupiedEndAt,
               dateKey,
               capacity,
-              sourceRuleIds: interval.ruleIds
+              sourceRuleIds: interval.ruleIds.map((id) => id.toString())
             });
           }
 
