@@ -52,6 +52,16 @@ export function createApp() {
     });
   });
 
+  app.get("/", (_req, res) => {
+    res.status(200).send(
+      "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\" /><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" /><title>BookMyVirunnu API</title></head><body style=\"font-family:system-ui,sans-serif;padding:24px;\"><h1>BookMyVirunnu API</h1><p>The API is running. Health check: <a href=\"/health\">/health</a></p></body></html>"
+    );
+  });
+
+  app.get("/favicon.ico", (_req, res) => {
+    res.status(204).end();
+  });
+
   app.use("/api/auth", authRouter);
   app.use("/api/events", eventRouter);
   app.use("/api/availability-rules", availabilityRouter);
