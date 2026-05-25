@@ -28,7 +28,15 @@ export class EventController {
       coverImageUrl: input.coverImageUrl,
       maxGuestsTotal: input.maxGuestsTotal,
       bookingMode: input.bookingMode,
-      bookingRules: input.bookingRules
+      bookingRules: {
+        slotDurationMinutes: input.bookingRules.slotDurationMinutes,
+        minLeadMinutes: input.bookingRules.minLeadMinutes,
+        maxGuestsPerSlot: input.bookingRules.maxGuestsPerSlot,
+        bufferMinutesBefore: input.bookingRules.bufferMinutesBefore,
+        bufferMinutesAfter: input.bookingRules.bufferMinutesAfter,
+        allowWaitlist: input.bookingRules.allowWaitlist,
+        allowAutoApprove: input.bookingRules.allowAutoApprove
+      }
     });
 
     sendSuccess(res, { event }, 201);
@@ -61,11 +69,32 @@ export class EventController {
     }
     const eventId = objectIdSchema.parse(toParam(req.params.eventId));
     const input = updateEventSchema.parse(req.body);
-    const event = await eventService.updateEvent(eventId, req.auth.id, {
-      ...input,
+    const updateInput = {
+      title: input.title,
+      description: input.description,
+      eventType: input.eventType,
+      timezone: input.timezone,
+      visibility: input.visibility,
       startDate: input.startDate ? new Date(input.startDate) : undefined,
-      endDate: input.endDate ? new Date(input.endDate) : undefined
-    });
+      endDate: input.endDate ? new Date(input.endDate) : undefined,
+      venue: input.venue,
+      coverImageUrl: input.coverImageUrl,
+      maxGuestsTotal: input.maxGuestsTotal,
+      bookingMode: input.bookingMode,
+      bookingRules: input.bookingRules
+        ? {
+            slotDurationMinutes: input.bookingRules.slotDurationMinutes,
+            minLeadMinutes: input.bookingRules.minLeadMinutes,
+            maxGuestsPerSlot: input.bookingRules.maxGuestsPerSlot,
+            bufferMinutesBefore: input.bookingRules.bufferMinutesBefore,
+            bufferMinutesAfter: input.bookingRules.bufferMinutesAfter,
+            allowWaitlist: input.bookingRules.allowWaitlist,
+            allowAutoApprove: input.bookingRules.allowAutoApprove
+          }
+        : undefined,
+      status: input.status
+    };
+    const event = await eventService.updateEvent(eventId, req.auth.id, updateInput);
     sendSuccess(res, { event });
   });
 
