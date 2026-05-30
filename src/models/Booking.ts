@@ -9,6 +9,11 @@ export interface BookingDocument extends Document {
   endAt: Date;
   partySize: number;
   specialRequests?: string;
+  venue?: {
+    name?: string;
+    address?: string;
+    phone?: string;
+  };
   status: BookingStatus;
   isActive: boolean;
   idempotencyKey?: string;
@@ -29,6 +34,11 @@ const BookingSchema = new Schema<BookingDocument>(
     endAt: { type: Date, required: true, index: true },
     partySize: { type: Number, required: true, min: 1 },
     specialRequests: { type: String, trim: true, maxlength: 2000 },
+    venue: {
+      name: { type: String, trim: true, maxlength: 500 },
+      address: { type: String, trim: true, maxlength: 2000 },
+      phone: { type: String, trim: true, maxlength: 30 }
+    },
     status: {
       type: String,
       enum: ["pending", "confirmed", "rejected", "cancelled", "waitlisted"],
@@ -37,7 +47,7 @@ const BookingSchema = new Schema<BookingDocument>(
       index: true
     },
     isActive: { type: Boolean, required: true, default: true, index: true },
-    idempotencyKey: { type: String, trim: true, index: true, sparse: true },
+    idempotencyKey: { type: String, trim: true },
     holdExpiresAt: { type: Date, index: true },
     rejectionReason: { type: String, trim: true, maxlength: 500 },
     confirmedAt: { type: Date },

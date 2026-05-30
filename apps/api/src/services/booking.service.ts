@@ -14,6 +14,11 @@ export interface CreateBookingInput {
   partySize: number;
   specialRequests?: string;
   idempotencyKey?: string;
+  venue?: {
+    name?: string;
+    address?: string;
+    phone?: string;
+  };
 }
 
 export interface BookingServiceOptions {
@@ -101,7 +106,8 @@ export class BookingService {
               idempotencyKey: input.idempotencyKey,
               status: confirmed ? "confirmed" : "pending",
               isActive: true,
-              confirmedAt: confirmed ? new Date() : undefined
+              confirmedAt: confirmed ? new Date() : undefined,
+              venue: input.venue
             }
           ],
           { session }

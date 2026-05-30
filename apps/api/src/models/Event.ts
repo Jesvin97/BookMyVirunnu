@@ -8,6 +8,7 @@ export interface EventDocument extends Document, Omit<DomainEvent, "_id" | "host
   bookingRules: BookingRules;
   status: EventStatus;
   visibility: Visibility;
+  dietaryRestrictions?: string[];
 }
 
 const BookingRulesSchema = new Schema<BookingRules>(
@@ -60,7 +61,8 @@ const EventSchema = new Schema<EventDocument>(
       required: true,
       default: "request"
     },
-    bookingRules: { type: BookingRulesSchema, required: true }
+    bookingRules: { type: BookingRulesSchema, required: true },
+    dietaryRestrictions: { type: [String], default: [] }
   },
   { timestamps: true }
 );

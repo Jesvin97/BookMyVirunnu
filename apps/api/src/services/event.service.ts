@@ -19,6 +19,7 @@ export interface CreateEventInput {
   bookingMode: "request" | "instant";
   bookingRules: BookingRules;
   status?: EventDocument["status"];
+  dietaryRestrictions?: string[];
 }
 
 export type UpdateEventInput = Partial<Omit<CreateEventInput, "hostUserId">> & {
@@ -48,7 +49,8 @@ export class EventService {
         maxGuestsTotal: input.maxGuestsTotal,
         bookingMode: input.bookingMode,
         bookingRules: input.bookingRules,
-        status: input.status ?? "draft"
+        status: input.status ?? "draft",
+        dietaryRestrictions: input.dietaryRestrictions ?? []
       }
     ]);
 

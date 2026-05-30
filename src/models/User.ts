@@ -26,9 +26,9 @@ const UserSchema = new Schema<UserDocument>(
       index: true
     },
     name: { type: String, required: true, trim: true, maxlength: 140 },
-    email: { type: String, required: true, trim: true, lowercase: true, index: true, unique: true },
+    email: { type: String, required: true, trim: true, lowercase: true, unique: true },
     phone: { type: String, trim: true, index: true, sparse: true },
-    passwordHash: { type: String, required: true },
+    passwordHash: { type: String, required: false },
     status: {
       type: String,
       enum: ["active", "blocked", "pending_verification"],
@@ -43,6 +43,6 @@ const UserSchema = new Schema<UserDocument>(
   { timestamps: true }
 );
 
-UserSchema.index({ email: 1 }, { unique: true });
+
 
 export const UserModel: Model<UserDocument> = model<UserDocument>("User", UserSchema);

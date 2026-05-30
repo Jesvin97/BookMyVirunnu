@@ -39,6 +39,26 @@ export function authenticate(req: Request, res: Response, next: NextFunction): v
   }
 }
 
+export function optionalAuthenticate(req: Request, res: Response, next: NextFunction): void {
+  const header = req.headers.authorization;
+  if (!header?.startsWith("Bearer ")) {
+    next();
+    return;
+  }
+
+  const token = header.slice("Bearer ".length);
+  try {
+    const decoded = jwt.verify(token, env.jwtSecret, {
+      issuer: env.jwtIssuer,
+      audience: env.jwtAudience
+    }) as AuthenticatedUser;
+    req.auth = decoded;
+    next();
+  } catch {
+    next();
+  }
+}
+
 export function requireRole(...roles: UserRole[]) {
   return (req: Request, res: Response, next: NextFunction): void => {
     if (!req.auth) {

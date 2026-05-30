@@ -5,7 +5,8 @@
     "outDir": "dist",
     "composite": true,
     "moduleResolution": "Node",
-    "baseUrl": "."
+    "baseUrl": ".",
+    "ignoreDeprecations": "6.0"
   },
   "include": ["src/**/*.ts"],
   "references": [

@@ -22,3 +22,21 @@ export const loginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(1)
 });
+
+export const quickRegisterSchema = z.object({
+  coupleName: z.string().min(2).max(140),
+  title: z.string().min(2).max(140).optional(),
+  description: z.string().max(4000).optional(),
+  startDate: z.string(),
+  endDate: z.string(),
+  enableLunch: z.boolean().default(true),
+  enableDinner: z.boolean().default(true),
+  phone: z.string().min(6).max(32).optional(),
+  dietaryRestrictions: z.array(z.string()).optional(),
+  blockedDates: z.array(z.string()).optional()
+});
+
+export const accessIdSchema = z.object({
+  eventId: z.string().regex(/^[a-f\d]{24}$/i, "Invalid MongoDB ObjectId.")
+});
+

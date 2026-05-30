@@ -16,8 +16,8 @@ body {
   margin: 0;
   min-height: 100vh;
   font-family: var(--bv-font-body);
-  background: #06090c;
-  color: #eef2f5;
+  background: #040906; /* Elite extremely dark forest green-black */
+  color: #f3fcf7; /* Sophisticated soft mint-white */
 }
 
 a {
@@ -25,6 +25,81 @@ a {
 }
 
 ::selection {
-  background: rgba(242, 213, 140, 0.35);
+  background: rgba(52, 211, 153, 0.25);
   color: #fff;
 }
+
+/* Premium Wizard Animations & Transitions */
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeOutLeft {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+}
+
+@keyframes scalePop {
+  0% { transform: scale(0.96); opacity: 0; }
+  50% { transform: scale(1.02); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes pulseGlow {
+  0% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(52, 211, 153, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0); }
+}
+
+@keyframes floatParticle {
+  0% {
+    transform: translateY(0) scale(0) rotate(0deg);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+    transform: translateY(-20px) scale(1.2) rotate(15deg);
+  }
+  100% {
+    transform: translateY(-120px) scale(0.6) rotate(-45deg);
+    opacity: 0;
+  }
+}
+
+.animate-fade-in {
+  animation: fadeInRight 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.animate-fade-out {
+  animation: fadeOutLeft 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.animate-scale-pop {
+  animation: scalePop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.gps-pulse {
+  animation: pulseGlow 1.5s infinite;
+}
+
+.celebration-particle {
+  position: absolute;
+  pointer-events: none;
+  z-index: 999;
+  font-size: 1.5rem;
+  animation: floatParticle 1.5s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+}
+

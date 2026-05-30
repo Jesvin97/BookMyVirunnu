@@ -34,12 +34,12 @@ export default function HomePage() {
           private, and easy to coordinate without turning hospitality into a generic SaaS workflow.
         </p>
 
-        <div className={styles.actions}>
-          <Link className={styles.primaryButton} href="#experience">
-            Explore the experience
+        <div className={styles.actions} style={{ display: "flex", gap: "16px", flexWrap: "wrap", justifyContent: "center", marginTop: "24px" }}>
+          <Link className={styles.primaryButton} href="/couple/quick-create" style={{ background: "linear-gradient(135deg, #34d399 0%, #059669 100%)", color: "#03200d", border: 0, textDecoration: "none", fontWeight: 600 }}>
+            Newlyweds: Setup Feast Calendar ✨
           </Link>
-          <Link className={styles.secondaryButton} href="#trust">
-            Read the trust model
+          <Link className={styles.secondaryButton} href="/login" style={{ textDecoration: "none" }}>
+            Access Feast Dashboard 🔑
           </Link>
         </div>
 

@@ -97,6 +97,7 @@ export interface DomainEvent {
   maxGuestsTotal: number;
   bookingMode: BookingMode;
   bookingRules: BookingRules;
+  dietaryRestrictions?: string[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -121,6 +122,11 @@ export interface DomainBooking {
   idempotencyKey?: string;
   holdExpiresAt?: Date;
   rejectionReason?: string;
+  venue?: {
+    name?: string;
+    address?: string;
+    phone?: string;
+  };
   createdAt: Date;
   updatedAt: Date;
   confirmedAt?: Date;

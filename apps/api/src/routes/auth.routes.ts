@@ -15,8 +15,12 @@ const authLimiter = rateLimit({
 
 authRouter.use("/register", authLimiter);
 authRouter.use("/login", authLimiter);
+authRouter.use("/quick-register", authLimiter);
+authRouter.use("/access-id", authLimiter);
 
 authRouter.post("/register", controller.register);
+authRouter.post("/quick-register", controller.quickRegister);
 authRouter.post("/login", controller.login);
+authRouter.post("/access-id", controller.loginWithFeastId);
 authRouter.get("/me", authenticate, controller.me);
 authRouter.post("/logout", authenticate, controller.logout);

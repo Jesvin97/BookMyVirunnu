@@ -3,19 +3,19 @@
   min-height: 100vh;
   overflow: hidden;
   background:
-    radial-gradient(circle at top left, rgba(197, 154, 58, 0.18), transparent 30%),
-    radial-gradient(circle at top right, rgba(51, 91, 65, 0.18), transparent 26%),
-    linear-gradient(180deg, #071016 0%, #0a1117 45%, #06090c 100%);
-  color: #eef2f5;
+    radial-gradient(circle at top left, rgba(16, 185, 129, 0.22), transparent 35%),
+    radial-gradient(circle at top right, rgba(52, 211, 153, 0.16), transparent 30%),
+    linear-gradient(180deg, #040805 0%, #08110b 45%, #030604 100%);
+  color: #f3fcf7;
 }
 
 .backgroundGlow {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.08), transparent 24%),
-    radial-gradient(circle at 80% 30%, rgba(255, 255, 255, 0.05), transparent 18%),
-    radial-gradient(circle at 50% 80%, rgba(199, 154, 58, 0.08), transparent 24%);
+    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.04), transparent 25%),
+    radial-gradient(circle at 80% 30%, rgba(52, 211, 153, 0.05), transparent 20%),
+    radial-gradient(circle at 50% 80%, rgba(16, 185, 129, 0.06), transparent 25%);
   pointer-events: none;
 }
 
@@ -37,10 +37,10 @@
   align-items: center;
   gap: 8px;
   padding: 8px 12px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(52, 211, 153, 0.2);
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.04);
-  color: rgba(238, 242, 245, 0.78);
+  background: rgba(16, 185, 129, 0.06);
+  color: #34d399; /* Vibrant mint green */
   text-transform: uppercase;
   letter-spacing: 0.24em;
   font-size: 0.72rem;
@@ -53,11 +53,14 @@
   font-size: clamp(3.4rem, 8vw, 6.6rem);
   line-height: 0.94;
   letter-spacing: -0.05em;
+  background: linear-gradient(135deg, #ffffff 30%, #e2fced 75%, #86efac 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .lead {
   max-width: 60ch;
-  color: rgba(238, 242, 245, 0.8);
+  color: rgba(243, 252, 247, 0.8);
   font-size: clamp(1.05rem, 2vw, 1.2rem);
   line-height: 1.7;
 }
@@ -75,31 +78,40 @@
   align-items: center;
   justify-content: center;
   min-height: 48px;
-  padding: 0 18px;
+  padding: 0 24px;
   border-radius: 999px;
   text-decoration: none;
+  font-weight: 600;
   transition:
-    transform 180ms ease,
-    border-color 180ms ease,
-    background-color 180ms ease;
+    transform 200ms cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 200ms ease,
+    background-color 200ms ease,
+    box-shadow 200ms ease;
 }
 
 .primaryButton {
-  background: linear-gradient(135deg, #f2d58c, #c79a3a);
-  color: #101317;
-  font-weight: 700;
-  box-shadow: 0 18px 50px rgba(199, 154, 58, 0.24);
+  background: linear-gradient(135deg, #ffffff 0%, #e2fced 45%, #86efac 100%);
+  color: #03200d; /* Deep forest green */
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 12px 35px rgba(52, 211, 153, 0.28);
 }
 
 .secondaryButton {
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(255, 255, 255, 0.04);
-  color: #eef2f5;
+  border: 1px solid rgba(52, 211, 153, 0.25);
+  background: rgba(52, 211, 153, 0.05);
+  color: #f3fcf7;
 }
 
-.primaryButton:hover,
+.primaryButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 45px rgba(52, 211, 153, 0.4);
+  background: linear-gradient(135deg, #ffffff 0%, #d1fae5 45%, #6ee7b7 100%);
+}
+
 .secondaryButton:hover {
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  background: rgba(52, 211, 153, 0.12);
+  border-color: rgba(52, 211, 153, 0.45);
 }
 
 .statsRow {
@@ -113,11 +125,22 @@
 .pillarCard,
 .panel,
 .panelAccent {
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(52, 211, 153, 0.12);
   border-radius: 24px;
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(20px);
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.24);
+  background: rgba(4, 9, 6, 0.45);
+  backdrop-filter: blur(24px);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.4);
+  transition:
+    border-color 250ms ease,
+    transform 250ms cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 250ms ease;
+}
+
+.statCard:hover,
+.pillarCard:hover {
+  border-color: rgba(52, 211, 153, 0.35);
+  transform: translateY(-4px);
+  box-shadow: 0 28px 65px rgba(16, 185, 129, 0.1);
 }
 
 .statCard {
@@ -126,9 +149,11 @@
 
 .statCard span {
   display: block;
-  color: rgba(238, 242, 245, 0.58);
+  color: rgba(52, 211, 153, 0.65);
   font-size: 0.8rem;
   margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
 }
 
 .statCard strong {
@@ -136,6 +161,7 @@
   font-size: 1rem;
   line-height: 1.5;
   font-weight: 600;
+  color: #ffffff;
 }
 
 .section {
@@ -152,10 +178,12 @@
 .panel h2,
 .panelAccent h2 {
   margin: 0;
+  font-family: var(--bv-font-display), Georgia, serif;
   font-size: clamp(1.9rem, 3vw, 3rem);
   line-height: 1.05;
   letter-spacing: -0.04em;
   max-width: 18ch;
+  color: #ffffff;
 }
 
 .pillarGrid {
@@ -171,13 +199,14 @@
 .pillarCard h3 {
   margin: 0 0 12px;
   font-size: 1.1rem;
+  color: #34d399;
 }
 
 .pillarCard p,
 .panel p,
 .panelAccent p {
   margin: 0;
-  color: rgba(238, 242, 245, 0.78);
+  color: rgba(243, 252, 247, 0.78);
   line-height: 1.7;
 }
 
@@ -206,7 +235,7 @@
   gap: 16px;
   align-items: start;
   padding: 16px 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid rgba(52, 211, 153, 0.12);
 }
 
 .stepList li:first-child {
@@ -215,7 +244,7 @@
 }
 
 .stepList span {
-  color: #f2d58c;
+  color: #34d399;
   font-weight: 700;
   letter-spacing: 0.08em;
 }
@@ -226,22 +255,23 @@
 
 .panelAccent {
   background:
-    radial-gradient(circle at top right, rgba(199, 154, 58, 0.12), transparent 36%),
-    rgba(255, 255, 255, 0.05);
+    radial-gradient(circle at top right, rgba(16, 185, 129, 0.14), transparent 40%),
+    rgba(4, 9, 6, 0.45);
 }
 
 .notice {
   margin-top: 20px;
   padding: 14px 16px;
   border-radius: 16px;
-  background: rgba(16, 19, 23, 0.45);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: rgba(238, 242, 245, 0.72);
+  background: rgba(4, 9, 6, 0.6);
+  border: 1px solid rgba(52, 211, 153, 0.18);
+  color: rgba(243, 252, 247, 0.72);
 }
 
 .notice code {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-size: 0.9em;
+  color: #34d399;
 }
 
 @media (max-width: 920px) {

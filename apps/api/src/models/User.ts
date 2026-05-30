@@ -10,9 +10,9 @@ const UserSchema = new Schema<UserDocument>(
   {
     role: { type: String, enum: ["couple", "guest", "admin"], required: true, index: true },
     name: { type: String, required: true, trim: true, maxlength: 140 },
-    email: { type: String, required: true, trim: true, lowercase: true, index: true, unique: true },
+    email: { type: String, required: true, trim: true, lowercase: true, unique: true },
     phone: { type: String, trim: true, index: true, sparse: true },
-    passwordHash: { type: String, required: true, select: false },
+    passwordHash: { type: String, required: false, select: false },
     status: {
       type: String,
       enum: ["active", "blocked", "pending_verification"],
@@ -27,7 +27,7 @@ const UserSchema = new Schema<UserDocument>(
   { timestamps: true }
 );
 
-UserSchema.index({ email: 1 }, { unique: true });
+
 
 UserSchema.set("toJSON", {
   transform: (_doc, ret) => {
