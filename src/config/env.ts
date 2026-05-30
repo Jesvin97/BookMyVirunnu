@@ -21,5 +21,5 @@ export const env: AppEnv = {
   mongoUri: required("MONGODB_URI", "mongodb://127.0.0.1:27017/bookmyvirunnu"),
   jwtSecret: required("JWT_SECRET", defaultJwtSecret),
   jwtExpiresIn: process.env.JWT_EXPIRES_IN ?? "7d",
-  corsOrigin: process.env.CORS_ORIGIN ?? "*"
+  corsOrigin: process.env.CORS_ORIGIN ?? "http://localhost:5173"
 };
