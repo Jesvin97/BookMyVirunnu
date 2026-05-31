@@ -108,7 +108,7 @@ export class AvailabilityEngine {
         const blockedStatus: "blocked" = "blocked";
         return {
           updateOne: {
-            filter: { _id: slot._id, status: { $ne: "blocked" } },
+            filter: { _id: slot._id, status: { $ne: "blocked" as any } },
             update: { $set: { status: blockedStatus } }
           }
         };

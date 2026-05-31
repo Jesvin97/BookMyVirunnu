@@ -11,7 +11,8 @@
     "check": "npm run check -w @bookmyvirunnu/shared && npm run check -w @bookmyvirunnu/api && npm run check -w @bookmyvirunnu/web",
     "dev:api": "npm run dev -w @bookmyvirunnu/api",
     "dev:web": "npm run dev -w @bookmyvirunnu/web",
-    "dev": "npm-run-all --parallel dev:api dev:web"
+    "dev": "npm-run-all --parallel dev:api dev:web",
+    "test:api": "node scripts/api-smoke-test.js"
   },
   "devDependencies": {
     "npm-run-all": "^4.1.5",
