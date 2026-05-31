@@ -56,6 +56,7 @@ export default function QuickCreatePage() {
 
   const [copiedBooking, setCopiedBooking] = useState(false);
   const [copiedDashboard, setCopiedDashboard] = useState(false);
+  const [customDiet, setCustomDiet] = useState("");
 
   // Celebratory particles splash
   const triggerParticles = (clientX: number, clientY: number) => {
@@ -146,6 +147,11 @@ export default function QuickCreatePage() {
     const coupleName = `${husbandName.trim()} & ${wifeName.trim()}`;
     const generatedTitle = `${coupleName}'s Feast Schedule 🍛`;
 
+    const finalDietary = [...selectedDiet];
+    if (customDiet.trim()) {
+      finalDietary.push(customDiet.trim());
+    }
+
     try {
       const response = await api.post<{
         token: string;
@@ -159,7 +165,7 @@ export default function QuickCreatePage() {
         enableLunch,
         enableDinner,
         phone: phone || undefined,
-        dietaryRestrictions: selectedDiet,
+        dietaryRestrictions: finalDietary,
         blockedDates: blockedDates
       });
 
@@ -367,7 +373,15 @@ export default function QuickCreatePage() {
                     required
                     placeholder="e.g. Joyal"
                     value={husbandName}
-                    onChange={(e) => setHusbandName(e.target.value)}
+                    onChange={(e) => {
+                      setHusbandName(e.target.value);
+                      if (e.target.value.length === 1) {
+                        const hostUrl = process.env.NEXT_PUBLIC_API_URL 
+                          ? process.env.NEXT_PUBLIC_API_URL.replace(/\/api$/, "") 
+                          : "http://localhost:4000";
+                        fetch(`${hostUrl}/health`).catch(() => {});
+                      }
+                    }}
                     style={inputStyle}
                     onFocus={(e) => e.target.style.borderColor = "#34d399"}
                     onBlur={(e) => e.target.style.borderColor = "rgba(52, 211, 153, 0.25)"}
@@ -634,6 +648,21 @@ export default function QuickCreatePage() {
                         </button>
                       );
                     })}
+                  </div>
+                  <div style={{ display: "grid", gap: "8px", marginTop: "16px" }}>
+                    <label htmlFor="customDiet" style={{ fontSize: "0.85rem", color: "rgba(243, 252, 247, 0.75)", fontWeight: 500 }}>
+                      Other Dietary Restrictions / Allergies (Optional)
+                    </label>
+                    <input
+                      id="customDiet"
+                      type="text"
+                      placeholder="e.g. Lactose intolerant, Gluten-free, custom notes..."
+                      value={customDiet}
+                      onChange={(e) => setCustomDiet(e.target.value)}
+                      style={inputStyle}
+                      onFocus={(e) => e.target.style.borderColor = "#34d399"}
+                      onBlur={(e) => e.target.style.borderColor = "rgba(52, 211, 153, 0.25)"}
+                    />
                   </div>
                 </div>
 
