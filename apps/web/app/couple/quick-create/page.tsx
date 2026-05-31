@@ -437,7 +437,7 @@ export default function QuickCreatePage() {
               </p>
 
               <div style={{ display: "grid", gap: "24px", marginBottom: "36px" }}>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+                <div className={styles.formTwoCol}>
                   <div style={{ display: "grid", gap: "8px" }}>
                     <label style={labelStyle}>Available From</label>
                     <input
@@ -542,7 +542,7 @@ export default function QuickCreatePage() {
                 </div>
               </div>
 
-              <div style={{ display: "grid", gridTemplateColumns: "100px 1fr", gap: "12px" }}>
+              <div className={styles.wizardButtons}>
                 <button
                   type="button"
                   onClick={() => handleStepTransition(1)}
@@ -576,7 +576,7 @@ export default function QuickCreatePage() {
                 {/* Available Meals */}
                 <div>
                   <label style={{ ...labelStyle, display: "block", marginBottom: "12px" }}>Available Meals 🕒</label>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
+                  <div className={styles.formTwoCol} style={{ gap: "14px" }}>
                     {/* Lunch */}
                     <button
                       type="button"
@@ -676,7 +676,7 @@ export default function QuickCreatePage() {
                 </div>
               </div>
 
-              <div style={{ display: "grid", gridTemplateColumns: "100px 1fr", gap: "12px" }}>
+              <div className={styles.wizardButtons}>
                 <button
                   type="button"
                   onClick={() => handleStepTransition(2)}

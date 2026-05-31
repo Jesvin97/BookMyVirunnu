@@ -311,7 +311,7 @@ export default function CoupleDashboard() {
         </div>
       </header>
 
-      <section className={styles.section} style={{ display: "grid", gridTemplateColumns: events.length > 0 ? "280px 1fr" : "1fr", gap: "32px" }}>
+      <section className={events.length > 0 ? `${styles.section} ${styles.dashboardLayout}` : styles.section}>
         {events.length === 0 ? (
           <div className={styles.panel} style={{ textAlign: "center", padding: "64px 32px" }}>
             <h3 style={{ fontSize: "1.5rem", margin: "0 0 12px", color: "#34d399" }}>No Feast Calendar Created Yet</h3>
@@ -460,7 +460,7 @@ export default function CoupleDashboard() {
                         const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(b.venue?.address || "")}`;
 
                         return (
-                          <div key={b._id} className={styles.panelAccent} style={{ padding: "20px", display: "grid", gridTemplateColumns: "1fr auto", alignItems: "center", gap: "20px", background: "rgba(255,255,255,0.02)" }}>
+                          <div key={b._id} className={`${styles.panelAccent} ${styles.bookingCardLayout}`} style={{ padding: "20px", background: "rgba(255,255,255,0.02)" }}>
                             <div style={{ display: "grid", gap: "6px" }}>
                               <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
                                 <strong style={{ fontSize: "1.15rem", color: "#fff" }}>{b.venue?.name || "Host Family"}</strong>

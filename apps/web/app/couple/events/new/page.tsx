@@ -140,7 +140,7 @@ export default function NewEventPage() {
       <div className={styles.backgroundGlow} aria-hidden="true" />
 
       <header className={styles.hero} style={{ padding: "0 0 32px" }}>
-        <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: "16px" }}>
+        <div className={styles.headerWrapper} style={{ gap: "16px", width: "100%" }}>
           <div>
             <div className={styles.eyebrow} style={{ color: "#34d399" }}>Newlyweds Portal</div>
             <h1 style={{ fontFamily: "var(--bv-font-display)", fontSize: "2.8rem", margin: "16px 0 8px", color: "#fff" }}>
@@ -205,7 +205,7 @@ export default function NewEventPage() {
                 />
               </div>
 
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+              <div className={styles.formTwoCol}>
                 <div style={{ display: "grid", gap: "8px" }}>
                   <label style={labelStyle}>Available From (Start Date)</label>
                   <input

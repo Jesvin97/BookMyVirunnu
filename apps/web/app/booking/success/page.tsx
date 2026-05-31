@@ -143,7 +143,7 @@ function BookingSuccessContent() {
               </strong>
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "1.2fr 0.8fr", gap: "16px" }}>
+            <div className={styles.formTwoCol}>
               <div>
                 <span style={{ fontSize: "0.75rem", color: "rgba(243, 252, 247, 0.5)", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: "4px" }}>
                   Invited By

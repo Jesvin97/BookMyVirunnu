@@ -556,7 +556,7 @@ export default function GuestBookingPage() {
                     </div>
                   </div>
 
-                  <div style={{ display: "grid", gridTemplateColumns: "100px 1fr", gap: "12px" }}>
+                  <div className={styles.wizardButtons}>
                     <button
                       type="button"
                       onClick={() => handleStepTransition(1)}
@@ -640,7 +640,7 @@ export default function GuestBookingPage() {
 
                   </div>
 
-                  <div style={{ display: "grid", gridTemplateColumns: "100px 1fr", gap: "12px" }}>
+                  <div className={styles.wizardButtons}>
                     <button
                       type="button"
                       onClick={() => handleStepTransition(2)}
