@@ -51,7 +51,7 @@ export function errorHandler(err: unknown, req: Request, res: Response, next: Ne
       error: {
         code: "validation_error",
         message: "Request validation failed.",
-        details: Object.fromEntries(Object.entries(err.errors).map(([key, value]) => [key, value.message]))
+        details: Object.fromEntries(Object.entries(err.errors).map(([key, value]) => [key, (value as any).message]))
       }
     });
     return;
