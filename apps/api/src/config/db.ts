@@ -22,8 +22,10 @@ export async function connectDatabase(): Promise<void> {
     } catch (error) {
       console.log("\n⚠️ Local MongoDB connection refused. Spinning up an in-memory MongoDB instance for development...");
       try {
-        const { MongoMemoryServer } = await import("mongodb-memory-server");
-        mongoServer = await MongoMemoryServer.create();
+        const { MongoMemoryReplSet } = await import("mongodb-memory-server");
+        mongoServer = await MongoMemoryReplSet.create({
+          replSet: { dbName: "bookmyvirunnu" }
+        });
         const inMemoryUri = mongoServer.getUri();
         console.log(`🚀 In-memory MongoDB server started at: ${inMemoryUri}`);
         await mongoose.connect(inMemoryUri, {

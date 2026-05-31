@@ -101,10 +101,15 @@ export class EventService {
       throw new BookingConflictError("outside_event_window", "Event end date must be after the start date.");
     }
 
+    // Clean undefined fields to avoid overwriting existing properties
+    const cleanInput = Object.fromEntries(
+      Object.entries(input).filter(([_, v]) => v !== undefined)
+    );
+
     Object.assign(event, {
-      ...input,
-      startDate: input.startDate ?? event.startDate,
-      endDate: input.endDate ?? event.endDate
+      ...cleanInput,
+      startDate: cleanInput.startDate ?? event.startDate,
+      endDate: cleanInput.endDate ?? event.endDate
     });
 
     await event.save();

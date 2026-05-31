@@ -59,6 +59,14 @@ export class BookingService {
       let createdBooking: BookingDocument | null = null;
 
       await session.withTransaction(async () => {
+        if (input.idempotencyKey) {
+          const existing = await BookingModel.findOne({ idempotencyKey: input.idempotencyKey }).session(session);
+          if (existing) {
+            createdBooking = existing;
+            return;
+          }
+        }
+
         const event = await EventModel.findById(input.eventId).session(session);
         if (!event) throw new NotFoundError("Event not found.");
         if (event.hostUserId.toString() === input.guestUserId.toString()) {
