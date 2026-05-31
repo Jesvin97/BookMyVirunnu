@@ -89,7 +89,7 @@ function BookingSuccessContent() {
           <Link href="/" className={styles.secondaryButton} style={{ textDecoration: "none" }}>Return Home</Link>
         </div>
       ) : (
-        <div className={styles.panel} style={{ width: "min(520px, calc(100% - 32px))", padding: "40px", textAlign: "center" }}>
+        <div className={styles.panel} style={{ width: "min(520px, calc(100% - 32px))", padding: "clamp(20px, 6vw, 40px)", textAlign: "center" }}>
           {/* Celebratory Checkmark Icon */}
           <div style={{
             display: "inline-flex",
@@ -109,7 +109,7 @@ function BookingSuccessContent() {
           </div>
 
           <div className={styles.eyebrow} style={{ marginBottom: "16px" }}>Invitation Sent Successfully</div>
-          <h2 style={{ fontFamily: "var(--bv-font-display)", fontSize: "2.4rem", margin: "0 0 10px", color: "#fff", lineHeight: 1.1 }}>
+          <h2 style={{ fontFamily: "var(--bv-font-display)", fontSize: "clamp(1.8rem, 6vw, 2.4rem)", margin: "0 0 10px", color: "#fff", lineHeight: 1.1 }}>
             Feast Slot Reserved!
           </h2>
           <p style={{ color: "rgba(243, 252, 247, 0.65)", margin: "0 0 32px" }}>

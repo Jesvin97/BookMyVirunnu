@@ -225,10 +225,10 @@ export default function QuickCreatePage() {
       <main className={styles.shell} style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "48px 0" }}>
         <div className={styles.backgroundGlow} aria-hidden="true" />
         
-        <div className={`${styles.panel} animate-scale-pop`} style={{ width: "min(560px, calc(100% - 32px))", padding: "40px", textAlign: "center" }}>
+        <div className={`${styles.panel} animate-scale-pop`} style={{ width: "min(560px, calc(100% - 32px))", padding: "clamp(20px, 6vw, 40px)", textAlign: "center" }}>
           <div style={{ fontSize: "3.5rem", marginBottom: "16px" }}>🎉</div>
           
-          <h2 style={{ fontFamily: "var(--bv-font-display)", fontSize: "2.8rem", margin: "0 0 12px", color: "#fff", lineHeight: 1.1 }}>
+          <h2 style={{ fontFamily: "var(--bv-font-display)", fontSize: "clamp(1.8rem, 6vw, 2.8rem)", margin: "0 0 12px", color: "#fff", lineHeight: 1.1 }}>
             Feast Slots Live!
           </h2>
           <p style={{ color: "rgba(243, 252, 247, 0.75)", fontSize: "1.05rem", margin: "0 0 32px", lineHeight: 1.5 }}>
