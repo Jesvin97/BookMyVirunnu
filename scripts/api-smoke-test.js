@@ -53,7 +53,7 @@ async function runTests() {
       ...process.env,
       PORT: "4500",
       NODE_ENV: "development",
-      JWT_SECRET: "api-smoke-test-jwt-secret-must-be-32-chars-long",
+      JWT_SECRET: "api-smoke-test-jwt-secret-must-be-32-chars-long", // gitleaks:allow
       MONGODB_URI: "mongodb://127.0.0.1:27017/bookmyvirunnu" // will trigger auto-fallback to in-memory server
     }
   });

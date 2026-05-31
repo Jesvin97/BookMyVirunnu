@@ -9,6 +9,9 @@ permissions:
   contents: read
   security-events: write
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   # Job 1: Secrets Scanning & SCA (Software Composition Analysis)
   security-scan:
@@ -34,8 +37,6 @@ jobs:
 
       - name: Secrets Scanning (Gitleaks)
         uses: gitleaks/gitleaks-action@v2
-        with:
-          args: detect --no-banner --source .
 
       - name: Filesystem Security Scan (Trivy)
         uses: aquasecurity/trivy-action@v0.36.0
