@@ -7,7 +7,7 @@
   "types": "dist/server.d.ts",
   "scripts": {
     "build": "tsc -b tsconfig.json",
-    "check": "tsc -b tsconfig.json --noEmit",
+    "check": "tsc -p tsconfig.json --noEmit",
     "dev": "node dist/server.js",
     "start": "node dist/server.js"
   },
