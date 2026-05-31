@@ -5,6 +5,10 @@ import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { api } from "../../utils/api";
 import styles from "../../page.module.css";
+import { Progress } from "../../../components/ui/progress";
+import { Skeleton } from "../../../components/ui/skeleton";
+import { Textarea } from "../../../components/ui/textarea";
+import { toast } from "../../../components/ui/sonner";
 
 interface Event {
   _id: string;
@@ -196,6 +200,7 @@ export default function GuestBookingPage() {
       },
       (error) => {
         console.error("Geolocation error:", error);
+        toast.error("Unable to retrieve GPS coordinates. Please allow location access in your browser.");
         setError("Unable to retrieve GPS coordinates. Please allow location access in your browser.");
         setLocating(false);
       },
@@ -231,10 +236,12 @@ export default function GuestBookingPage() {
       );
 
       if (response && response.booking) {
+        toast.success("Feast invitation successfully sent to couple! ✉️");
         router.push(`/booking/success?bookingId=${response.booking._id}`);
       }
     } catch (err: any) {
       setError(err.message || "Booking failed. The slot may have been locked or filled.");
+      toast.error(err.message || "Booking failed. The slot may have been locked or filled.");
     } finally {
       setSubmitLoading(false);
     }
@@ -347,15 +354,10 @@ export default function GuestBookingPage() {
             )}
 
             {/* Progress tracker */}
-            <div style={{ width: "100%", maxWidth: "360px", background: "rgba(255,255,255,0.06)", height: "4px", borderRadius: "10px", margin: "28px auto 0", overflow: "hidden" }}>
-              <div style={{
-                background: "linear-gradient(90deg, #34d399 0%, #059669 100%)",
-                height: "100%",
-                width: step === 1 ? "33%" : step === 2 ? "66%" : "100%",
-                transition: "width 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
-                boxShadow: "0 0 8px rgba(52, 211, 153, 0.6)"
-              }} />
-            </div>
+            <Progress
+              value={step === 1 ? 33 : step === 2 ? 66 : 100}
+              style={{ width: "100%", maxWidth: "360px", margin: "28px auto 0" }}
+            />
           </header>
 
           <section className={styles.section} style={{ position: "relative" }}>
@@ -616,26 +618,18 @@ export default function GuestBookingPage() {
                           {locating ? "⏳ Pinpointing..." : "📍 Locate Me"}
                         </button>
                       </div>
-                      <textarea
-                        id="venueAddress"
-                        required
-                        placeholder="Provide your physical home address so the couple can navigate there (hidden until 24h prior)..."
-                        value={venueAddress}
-                        onChange={(e) => setVenueAddress(e.target.value)}
-                        style={{
-                          width: "100%",
-                          padding: "12px 16px",
-                          borderRadius: "12px",
-                          border: "1px solid rgba(52, 211, 153, 0.2)",
-                          background: "rgba(4, 9, 6, 0.4)",
-                          color: "#fff",
-                          outline: "none",
-                          fontSize: "0.95rem",
-                          minHeight: "100px",
-                          fontFamily: "inherit",
-                          resize: "vertical"
-                        }}
-                      />
+                      {locating ? (
+                        <Skeleton style={{ height: "100px", marginTop: "8px" }} />
+                      ) : (
+                        <Textarea
+                          id="venueAddress"
+                          required
+                          placeholder="Provide your physical home address so the couple can navigate there (hidden until 24h prior)..."
+                          value={venueAddress}
+                          onChange={(e) => setVenueAddress(e.target.value)}
+                          style={{ marginTop: "8px" }}
+                        />
+                      )}
                     </div>
 
                   </div>

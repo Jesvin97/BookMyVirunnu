@@ -5,6 +5,9 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { api } from "../../utils/api";
 import styles from "../../page.module.css";
+import { Progress } from "../../../components/ui/progress";
+import { CopyButton } from "../../../components/ui/copy-button";
+import { toast } from "../../../components/ui/sonner";
 
 interface Particle {
   id: number;
@@ -238,24 +241,12 @@ export default function QuickCreatePage() {
               </p>
               <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
                 <code style={{ flex: 1, background: "rgba(0, 0, 0, 0.4)", padding: "10px 14px", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.06)", fontSize: "0.85rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                  {successData.bookingUrl}
+                  {typeof window !== "undefined" ? `${window.location.origin}${successData.bookingUrl}` : successData.bookingUrl}
                 </code>
-                <button
-                  onClick={() => copyToClipboard(successData.bookingUrl, "booking")}
-                  style={{
-                    padding: "10px 16px",
-                    borderRadius: "8px",
-                    border: "0",
-                    background: "linear-gradient(135deg, #ffffff 0%, #e2fced 100%)",
-                    color: "#03200d",
-                    fontWeight: 600,
-                    fontSize: "0.85rem",
-                    cursor: "pointer",
-                    minWidth: "80px"
-                  }}
-                >
-                  {copiedBooking ? "Copied!" : "Copy"}
-                </button>
+                <CopyButton
+                  content={typeof window !== "undefined" ? `${window.location.origin}${successData.bookingUrl}` : successData.bookingUrl}
+                  successMessage="Relative Booking Link copied successfully! 🍛"
+                />
               </div>
             </div>
 
@@ -269,24 +260,17 @@ export default function QuickCreatePage() {
               </p>
               <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
                 <code style={{ flex: 1, background: "rgba(0, 0, 0, 0.4)", padding: "10px 14px", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.06)", fontSize: "0.85rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                  {successData.dashboardUrl}
+                  {typeof window !== "undefined" ? `${window.location.origin}${successData.dashboardUrl}` : successData.dashboardUrl}
                 </code>
-                <button
-                  onClick={() => copyToClipboard(successData.dashboardUrl, "dashboard")}
+                <CopyButton
+                  content={typeof window !== "undefined" ? `${window.location.origin}${successData.dashboardUrl}` : successData.dashboardUrl}
+                  successMessage="Dashboard Manage Link copied successfully! 🔑"
                   style={{
-                    padding: "10px 16px",
-                    borderRadius: "8px",
                     border: "1px solid rgba(239, 68, 68, 0.3)",
                     background: "rgba(239, 68, 68, 0.05)",
-                    color: "#f87171",
-                    fontWeight: 600,
-                    fontSize: "0.85rem",
-                    cursor: "pointer",
-                    minWidth: "80px"
+                    color: "#f87171"
                   }}
-                >
-                  {copiedDashboard ? "Copied!" : "Copy"}
-                </button>
+                />
               </div>
             </div>
 
@@ -342,15 +326,10 @@ export default function QuickCreatePage() {
         </p>
 
         {/* Wizard progress tracker */}
-        <div style={{ width: "100%", maxWidth: "360px", background: "rgba(255,255,255,0.06)", height: "4px", borderRadius: "10px", margin: "24px auto 0", overflow: "hidden", position: "relative" }}>
-          <div style={{
-            background: "linear-gradient(90deg, #34d399 0%, #059669 100%)",
-            height: "100%",
-            width: step === 1 ? "33%" : step === 2 ? "66%" : "100%",
-            transition: "width 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
-            boxShadow: "0 0 8px rgba(52, 211, 153, 0.6)"
-          }} />
-        </div>
+        <Progress
+          value={step === 1 ? 33 : step === 2 ? 66 : 100}
+          style={{ width: "100%", maxWidth: "360px", margin: "24px auto 0" }}
+        />
       </header>
 
       <section className={styles.section} style={{ maxWidth: "700px", margin: "0 auto", position: "relative" }}>
