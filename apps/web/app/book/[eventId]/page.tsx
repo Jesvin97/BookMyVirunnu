@@ -157,6 +157,12 @@ export default function GuestBookingPage() {
         setError("Please choose an available meal slot first.");
         return;
       }
+      const isStillAvailable = slots.some((s) => s._id === selectedSlot._id && s.status !== "locked" && (s.capacity - s.reservedCount) > 0);
+      if (!isStillAvailable) {
+        setError("This slot is no longer available. It was recently booked by another guest. Please choose a different slot.");
+        setSelectedSlot(null);
+        return;
+      }
       triggerParticles(e?.clientX || 0, e?.clientY || 0);
     }
     if (step === 2) {
@@ -290,6 +296,12 @@ export default function GuestBookingPage() {
       groups[dateKey].push(slot);
     });
     return groups;
+  };
+
+  const isDateFullyBooked = (dateStr: string) => {
+    const dateGroups = getSlotsByDate();
+    const slotsForDate = dateGroups[dateStr] || [];
+    return slotsForDate.length > 0 && slotsForDate.every((s) => s.status === "locked" || (s.capacity - s.reservedCount) <= 0);
   };
 
   if (loading) {
@@ -427,6 +439,7 @@ export default function GuestBookingPage() {
                       <div style={{ display: "flex", gap: "10px", overflowX: "auto", paddingBottom: "16px", marginBottom: "28px", WebkitOverflowScrolling: "touch" }}>
                         {Object.keys(getSlotsByDate()).map((dateStr) => {
                           const isSelected = selectedDate === dateStr;
+                          const isFull = isDateFullyBooked(dateStr);
                           return (
                             <button
                               key={dateStr}
@@ -436,16 +449,16 @@ export default function GuestBookingPage() {
                                 flexShrink: 0,
                                 padding: "10px 18px",
                                 borderRadius: "999px",
-                                background: isSelected ? "rgba(52, 211, 153, 0.12)" : "rgba(255, 255, 255, 0.03)",
-                                border: isSelected ? "2px solid #34d399" : "1px solid rgba(255, 255, 255, 0.08)",
-                                color: isSelected ? "#fff" : "rgba(243, 252, 247, 0.75)",
+                                background: isSelected ? "rgba(52, 211, 153, 0.12)" : isFull ? "rgba(239, 68, 68, 0.02)" : "rgba(255, 255, 255, 0.03)",
+                                border: isSelected ? "2px solid #34d399" : isFull ? "1px solid rgba(239, 68, 68, 0.15)" : "1px solid rgba(255, 255, 255, 0.08)",
+                                color: isSelected ? "#fff" : isFull ? "rgba(243, 252, 247, 0.35)" : "rgba(243, 252, 247, 0.75)",
                                 fontSize: "0.88rem",
                                 fontWeight: isSelected ? 700 : 500,
                                 cursor: "pointer",
                                 transition: "all 150ms ease"
                               }}
                             >
-                              {dateStr}
+                              {dateStr} {isFull && "🔒"}
                             </button>
                           );
                         })}
