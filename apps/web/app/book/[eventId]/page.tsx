@@ -51,6 +51,7 @@ export default function GuestBookingPage() {
   const [event, setEvent] = useState<Event | null>(null);
   const [slots, setSlots] = useState<Slot[]>([]);
   const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null);
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
   
   // Wizard States
   const [step, setStep] = useState<1 | 2 | 3>(1);
@@ -116,6 +117,15 @@ export default function GuestBookingPage() {
           return hour >= 11;
         });
         setSlots(lunchAndDinnerOnly);
+        if (lunchAndDinnerOnly.length > 0) {
+          const firstDateStr = new Date(lunchAndDinnerOnly[0].startAt).toLocaleDateString([], {
+            weekday: "short",
+            month: "short",
+            day: "numeric",
+            year: "numeric"
+          });
+          setSelectedDate(firstDateStr);
+        }
       }
     } catch (err) {
       console.error("Error fetching slots:", err);
@@ -150,8 +160,8 @@ export default function GuestBookingPage() {
       triggerParticles(e?.clientX || 0, e?.clientY || 0);
     }
     if (step === 2) {
-      if (!guestName.trim() || !guestEmail.trim() || !guestPhone.trim()) {
-        setError("Please fill out your Name, Email, and Phone number.");
+      if (!guestName.trim() || !guestPhone.trim()) {
+        setError("Please fill out your Name and Phone number.");
         return;
       }
     }
@@ -211,8 +221,8 @@ export default function GuestBookingPage() {
   const handleBooking = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedSlot) return;
-    if (!guestName.trim() || !guestEmail.trim() || !guestPhone.trim() || !venueAddress.trim()) {
-      setError("Please fill out your Name, Email, Phone, and Home Address.");
+    if (!guestName.trim() || !guestPhone.trim() || !venueAddress.trim()) {
+      setError("Please fill out your Name, Phone, and Home Address.");
       return;
     }
     setError("");
@@ -263,6 +273,23 @@ export default function GuestBookingPage() {
       name: "Feast Slot 🍽️", 
       time: date.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }) 
     };
+  };
+
+  const getSlotsByDate = () => {
+    const groups: Record<string, Slot[]> = {};
+    slots.forEach((slot) => {
+      const dateKey = new Date(slot.startAt).toLocaleDateString([], {
+        weekday: "short",
+        month: "short",
+        day: "numeric",
+        year: "numeric"
+      });
+      if (!groups[dateKey]) {
+        groups[dateKey] = [];
+      }
+      groups[dateKey].push(slot);
+    });
+    return groups;
   };
 
   if (loading) {
@@ -384,7 +411,7 @@ export default function GuestBookingPage() {
                     Select a Slot to Host the Couple 🍛
                   </h2>
                   <p style={{ color: "rgba(243, 252, 247, 0.6)", fontSize: "0.95rem", textAlign: "center", marginBottom: "32px" }}>
-                    Click on any open Lunch Sadhya or Dinner slot below to begin hosting.
+                    Choose an available date, then select a Lunch Sadhya or Dinner slot to host the couple.
                   </p>
 
                   {slots.length === 0 ? (
@@ -392,53 +419,84 @@ export default function GuestBookingPage() {
                       No active Lunch or Dinner slots are currently open for this couple.
                     </div>
                   ) : (
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "14px", marginBottom: "36px" }}>
-                      {slots.map((s) => {
-                        const startTime = new Date(s.startAt);
-                        const isSelected = selectedSlot?._id === s._id;
-                        const isLocked = s.status === "locked" || (s.capacity - s.reservedCount) <= 0;
-                        const meal = getMealLabel(s.startAt);
+                    <div>
+                      {/* Horizontal Date Slider Selector */}
+                      <span style={{ display: "block", fontSize: "0.85rem", color: "rgba(243, 252, 247, 0.5)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "12px" }}>
+                        🗓️ Select Date
+                      </span>
+                      <div style={{ display: "flex", gap: "10px", overflowX: "auto", paddingBottom: "16px", marginBottom: "28px", WebkitOverflowScrolling: "touch" }}>
+                        {Object.keys(getSlotsByDate()).map((dateStr) => {
+                          const isSelected = selectedDate === dateStr;
+                          return (
+                            <button
+                              key={dateStr}
+                              type="button"
+                              onClick={() => setSelectedDate(dateStr)}
+                              style={{
+                                flexShrink: 0,
+                                padding: "10px 18px",
+                                borderRadius: "999px",
+                                background: isSelected ? "rgba(52, 211, 153, 0.12)" : "rgba(255, 255, 255, 0.03)",
+                                border: isSelected ? "2px solid #34d399" : "1px solid rgba(255, 255, 255, 0.08)",
+                                color: isSelected ? "#fff" : "rgba(243, 252, 247, 0.75)",
+                                fontSize: "0.88rem",
+                                fontWeight: isSelected ? 700 : 500,
+                                cursor: "pointer",
+                                transition: "all 150ms ease"
+                              }}
+                            >
+                              {dateStr}
+                            </button>
+                          );
+                        })}
+                      </div>
 
-                        return (
-                          <button
-                            key={s._id}
-                            type="button"
-                            disabled={isLocked}
-                            onClick={() => {
-                              setSelectedSlot(s);
-                              // Auto slide to step 2 with small delay for slot-pop feel!
-                              setTimeout(() => {
-                                handleStepTransition(2);
-                              }, 350);
-                            }}
-                            style={{
-                              padding: "20px 16px",
-                              borderRadius: "16px",
-                              background: isSelected ? "rgba(52, 211, 153, 0.08)" : isLocked ? "rgba(255,255,255,0.01)" : "rgba(255,255,255,0.03)",
-                              border: isSelected ? "2px solid #34d399" : "1px solid rgba(255,255,255,0.08)",
-                              color: isSelected ? "#fff" : isLocked ? "rgba(243, 252, 247, 0.3)" : "rgba(243, 252, 247, 0.8)",
-                              cursor: isLocked ? "not-allowed" : "pointer",
-                              textAlign: "center",
-                              transition: "all 150ms ease",
-                              boxShadow: isSelected ? "0 0 15px rgba(52, 211, 153, 0.25)" : "none",
-                              transform: isSelected ? "scale(1.03)" : "scale(1)"
-                            }}
-                          >
-                            <strong style={{ display: "block", fontSize: "1.05rem", marginBottom: "4px", color: isSelected ? "#34d399" : "#fff" }}>
-                              {meal.name}
-                            </strong>
-                            <span style={{ display: "block", fontSize: "0.85rem", color: "rgba(243, 252, 247, 0.7)", marginBottom: "4px" }}>
-                              {meal.time}
-                            </span>
-                            <span style={{ display: "block", fontSize: "0.78rem", color: "rgba(243, 252, 247, 0.5)" }}>
-                              {startTime.toLocaleDateString([], { month: "short", day: "numeric" })}
-                            </span>
-                            <span style={{ display: "block", fontSize: "0.75rem", marginTop: "12px", fontWeight: 600 }}>
-                              {isLocked ? "🔒 Reserved / Blocked" : isSelected ? "Selected ✅" : "Open Slot"}
-                            </span>
-                          </button>
-                        );
-                      })}
+                      {/* Filtered Slots List */}
+                      {selectedDate && getSlotsByDate()[selectedDate] && (
+                        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "14px", marginBottom: "36px" }}>
+                          {getSlotsByDate()[selectedDate].map((s) => {
+                            const isSelected = selectedSlot?._id === s._id;
+                            const isLocked = s.status === "locked" || (s.capacity - s.reservedCount) <= 0;
+                            const meal = getMealLabel(s.startAt);
+
+                            return (
+                              <button
+                                key={s._id}
+                                type="button"
+                                disabled={isLocked}
+                                onClick={() => {
+                                  setSelectedSlot(s);
+                                  setTimeout(() => {
+                                    handleStepTransition(2);
+                                  }, 350);
+                                }}
+                                style={{
+                                  padding: "20px 16px",
+                                  borderRadius: "16px",
+                                  background: isSelected ? "rgba(52, 211, 153, 0.08)" : isLocked ? "rgba(255,255,255,0.01)" : "rgba(255,255,255,0.03)",
+                                  border: isSelected ? "2px solid #34d399" : "1px solid rgba(255, 255, 255, 0.08)",
+                                  color: isSelected ? "#fff" : isLocked ? "rgba(243, 252, 247, 0.3)" : "rgba(243, 252, 247, 0.8)",
+                                  cursor: isLocked ? "not-allowed" : "pointer",
+                                  textAlign: "center",
+                                  transition: "all 150ms ease",
+                                  boxShadow: isSelected ? "0 0 15px rgba(52, 211, 153, 0.25)" : "none",
+                                  transform: isSelected ? "scale(1.03)" : "scale(1)"
+                                }}
+                              >
+                                <strong style={{ display: "block", fontSize: "1.05rem", marginBottom: "4px", color: isSelected ? "#34d399" : "#fff" }}>
+                                  {meal.name}
+                                </strong>
+                                <span style={{ display: "block", fontSize: "0.85rem", color: "rgba(243, 252, 247, 0.7)", marginBottom: "4px" }}>
+                                  {meal.time}
+                                </span>
+                                <span style={{ display: "block", fontSize: "0.75rem", marginTop: "12px", fontWeight: 600 }}>
+                                  {isLocked ? "🔒 Reserved / Blocked" : isSelected ? "Selected ✅" : "Open Slot"}
+                                </span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )}
                     </div>
                   )}
 
@@ -535,13 +593,12 @@ export default function GuestBookingPage() {
 
                     <div style={{ display: "grid", gap: "6px" }}>
                       <label htmlFor="guestEmail" style={{ fontSize: "0.85rem", color: "rgba(243, 252, 247, 0.8)", fontWeight: 500 }}>
-                        Email Address
+                        Email Address (Optional)
                       </label>
                       <input
                         id="guestEmail"
                         type="email"
-                        required
-                        placeholder="e.g. host@example.com"
+                        placeholder="e.g. host@example.com (optional)"
                         value={guestEmail}
                         onChange={(e) => setGuestEmail(e.target.value)}
                         style={{
@@ -621,14 +678,19 @@ export default function GuestBookingPage() {
                       {locating ? (
                         <Skeleton style={{ height: "100px", marginTop: "8px" }} />
                       ) : (
-                        <Textarea
-                          id="venueAddress"
-                          required
-                          placeholder="Provide your physical home address so the couple can navigate there (hidden until 24h prior)..."
-                          value={venueAddress}
-                          onChange={(e) => setVenueAddress(e.target.value)}
-                          style={{ marginTop: "8px" }}
-                        />
+                        <div>
+                          <Textarea
+                            id="venueAddress"
+                            required
+                            placeholder="Provide your physical home address so the couple can navigate there (hidden until 24h prior)..."
+                            value={venueAddress}
+                            onChange={(e) => setVenueAddress(e.target.value)}
+                            style={{ marginTop: "8px" }}
+                          />
+                          <span style={{ display: "block", fontSize: "0.78rem", color: "rgba(243, 252, 247, 0.55)", marginTop: "6px", lineHeight: 1.4, textAlign: "left" }}>
+                            💡 <strong>Quick Tip for Mobile</strong>: You can open Google Maps, copy your home location link (or type a nearby landmark), and paste it here directly!
+                          </span>
+                        </div>
                       )}
                     </div>
 

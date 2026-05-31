@@ -40,20 +40,24 @@ export class BookingController {
     if (req.auth) {
       guestUserId = new Types.ObjectId(req.auth.id);
     } else {
-      if (!input.guestName || !input.guestEmail || !input.guestPhone || !input.venueAddress) {
+      if (!input.guestName || !input.guestPhone || !input.venueAddress) {
         res.status(400).json({
           success: false,
           error: {
             code: "validation_error",
-            message: "For One-Click RSVP, you must provide your Name, Email, Phone, and Venue Address."
+            message: "For One-Click RSVP, you must provide your Name, Phone, and Venue Address."
           }
         });
         return;
       }
 
-      const emailLower = input.guestEmail.toLowerCase().trim();
-      let shadowUser = await UserModel.findOne({ email: emailLower });
+      let shadowUser = await UserModel.findOne({ phone: input.guestPhone.trim() });
       if (!shadowUser) {
+        const cleanPhone = input.guestPhone.replace(/\D/g, "");
+        const emailLower = input.guestEmail
+          ? input.guestEmail.toLowerCase().trim()
+          : `${cleanPhone || Math.random().toString(36).substring(2, 10)}@bookmyvirunnu-shadow.com`;
+
         shadowUser = await UserModel.create({
           role: "guest",
           name: input.guestName.trim(),
@@ -151,6 +155,12 @@ export class BookingController {
     }
     const bookingId = objectIdSchema.parse(toParam(req.params.bookingId));
     const booking = await bookingService.cancelBooking(new Types.ObjectId(bookingId), new Types.ObjectId(req.auth.id));
+    sendSuccess(res, { booking });
+  });
+
+  publicCancel = asyncHandler(async (req: Request, res: Response) => {
+    const bookingId = objectIdSchema.parse(toParam(req.params.bookingId));
+    const booking = await bookingService.publicCancelBooking(new Types.ObjectId(bookingId));
     sendSuccess(res, { booking });
   });
 }

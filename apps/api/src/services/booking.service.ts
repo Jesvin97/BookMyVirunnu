@@ -271,6 +271,44 @@ export class BookingService {
     });
   }
 
+  async publicCancelBooking(bookingId: Types.ObjectId): Promise<BookingDocument> {
+    const session = await mongoose.startSession();
+    try {
+      session.startTransaction();
+      const booking = await BookingModel.findById(bookingId).session(session);
+      if (!booking) {
+        throw new BookingConflictError("event_not_bookable", "Booking not found.");
+      }
+      if (booking.status === "cancelled" || booking.status === "rejected") {
+        throw new BookingConflictError("event_not_bookable", "This booking is no longer active.");
+      }
+
+      const wasConfirmed = booking.status === "confirmed";
+      booking.status = "cancelled";
+      booking.isActive = false;
+      booking.cancelledAt = new Date();
+      await booking.save({ session });
+
+      const slot = await BookingSlotModel.findOne({ eventId: booking.eventId, startAt: booking.startAt }).session(session);
+      if (slot) {
+        slot.reservedCount = Math.max(slot.reservedCount - booking.partySize, 0);
+        if (wasConfirmed) {
+          slot.confirmedCount = Math.max(slot.confirmedCount - booking.partySize, 0);
+        }
+        slot.status = slot.reservedCount >= slot.capacity ? "locked" : "open";
+        await slot.save({ session });
+      }
+
+      await session.commitTransaction();
+      return booking;
+    } catch (error) {
+      await session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
+    }
+  }
+
   private async withBookingTransaction<T>(
     bookingId: Types.ObjectId,
     actorUserId: Types.ObjectId | undefined,

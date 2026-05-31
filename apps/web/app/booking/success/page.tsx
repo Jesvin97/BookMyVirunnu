@@ -34,6 +34,8 @@ function BookingSuccessContent() {
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [cancelled, setCancelled] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
 
   useEffect(() => {
     if (!bookingId) {
@@ -62,6 +64,21 @@ function BookingSuccessContent() {
     }
   };
 
+  const handlePublicCancel = async () => {
+    if (!bookingId) return;
+    if (!window.confirm("Are you sure you want to cancel this feast slot reservation?")) return;
+
+    try {
+      setCancelling(true);
+      await api.post(`/bookings/${bookingId}/public-cancel`);
+      setCancelled(true);
+    } catch (err: any) {
+      alert(err.message || "Failed to cancel reservation.");
+    } finally {
+      setCancelling(false);
+    }
+  };
+
   if (loading) {
     return (
       <main className={styles.shell} style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -87,6 +104,45 @@ function BookingSuccessContent() {
           <h2 style={{ color: "#f87171", marginBottom: "12px", fontFamily: "var(--bv-font-display)" }}>Error</h2>
           <p style={{ color: "rgba(243, 252, 247, 0.7)", marginBottom: "28px" }}>{error}</p>
           <Link href="/" className={styles.secondaryButton} style={{ textDecoration: "none" }}>Return Home</Link>
+        </div>
+      ) : cancelled ? (
+        <div className={styles.panel} style={{ width: "min(520px, calc(100% - 32px))", padding: "clamp(20px, 6vw, 40px)", textAlign: "center" }}>
+          <div style={{
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: "72px",
+            height: "72px",
+            borderRadius: "50%",
+            background: "rgba(239, 68, 68, 0.1)",
+            border: "2px solid rgba(239, 68, 68, 0.3)",
+            color: "#f87171",
+            fontSize: "2rem",
+            marginBottom: "28px",
+            boxShadow: "0 0 35px rgba(239, 68, 68, 0.15)"
+          }}>
+            🔓
+          </div>
+          <h2 style={{ fontFamily: "var(--bv-font-display)", fontSize: "clamp(1.8rem, 6vw, 2.4rem)", margin: "0 0 12px", color: "#fff", lineHeight: 1.1 }}>
+            Reservation Cancelled
+          </h2>
+          <p style={{ color: "rgba(243, 252, 247, 0.7)", marginBottom: "28px", lineHeight: 1.5 }}>
+            Your slot reservation has been cancelled successfully. The slot is now open and available for other relatives to book.
+          </p>
+          <Link
+            href={`/book/${booking?.eventId}`}
+            className={styles.primaryButton}
+            style={{ textDecoration: "none", width: "100%", textAlign: "center", display: "block", marginBottom: "12px", padding: "14px", borderRadius: "14px" }}
+          >
+            Choose a Different Slot
+          </Link>
+          <Link
+            href="/"
+            className={styles.secondaryButton}
+            style={{ textDecoration: "none", width: "100%", textAlign: "center", display: "block", padding: "14px", borderRadius: "14px" }}
+          >
+            Go to Home Page
+          </Link>
         </div>
       ) : (
         <div className={styles.panel} style={{ width: "min(520px, calc(100% - 32px))", padding: "clamp(20px, 6vw, 40px)", textAlign: "center" }}>
@@ -209,6 +265,42 @@ function BookingSuccessContent() {
             <Link href="/" className={styles.secondaryButton} style={{ textDecoration: "none", padding: "14px 20px", borderRadius: "14px" }}>
               Go to Home Page
             </Link>
+          </div>
+
+          {/* Need to Reschedule / Cancel helper card */}
+          <div style={{
+            marginTop: "28px",
+            padding: "20px",
+            background: "rgba(239, 68, 68, 0.02)",
+            border: "1px solid rgba(239, 68, 68, 0.15)",
+            borderRadius: "18px",
+            textAlign: "left"
+          }}>
+            <strong style={{ display: "block", color: "#f87171", fontSize: "0.95rem", marginBottom: "4px" }}>
+              📅 Need to Reschedule or Cancel?
+            </strong>
+            <p style={{ fontSize: "0.8rem", color: "rgba(243, 252, 247, 0.55)", margin: "0 0 16px", lineHeight: 1.4 }}>
+              If you have scheduling conflicts or made an error, you can cancel this slot instantly to free it up, then reserve a new date/time slot.
+            </p>
+            <button
+              type="button"
+              disabled={cancelling}
+              onClick={handlePublicCancel}
+              style={{
+                width: "100%",
+                background: "rgba(239, 68, 68, 0.12)",
+                border: "1px solid rgba(239, 68, 68, 0.22)",
+                color: "#f87171",
+                padding: "10px 14px",
+                borderRadius: "10px",
+                fontSize: "0.85rem",
+                fontWeight: 600,
+                cursor: cancelling ? "not-allowed" : "pointer",
+                transition: "all 150ms ease"
+              }}
+            >
+              {cancelling ? "Cancelling..." : "Cancel This Booking"}
+            </button>
           </div>
         </div>
       )}
