@@ -708,6 +708,71 @@ async function runQA() {
       logFail(20, "MongoDB Auto-Disconnect Recovery failed", e);
     }
 
+    // ------------------------------------------------------------------
+    // 9. Production Security Penetration & Vulnerability Tests
+    // ------------------------------------------------------------------
+    console.log("\n🔒 Commencing Security Penetration & Vulnerability Audits...");
+
+    // Test 21: NoSQL Query Injection Prevention
+    try {
+      const payload = {
+        email: { "$gt": "" },
+        password: "some-password"
+      };
+      const res = await request("http://localhost:4500/api/auth/login", { method: "POST" }, payload);
+      // Zod schema z.string().email() requires string, so this object payload must return 400 Bad Request
+      assert.strictEqual(res.statusCode, 400, "NoSQL injection operator payload must be blocked by validation");
+      logPass(21, "NoSQL Query Injection Prevention (Mongoose/Zod validation rejects operator query objects)");
+    } catch (e) {
+      logFail(21, "NoSQL Query Injection Prevention failed", e);
+    }
+
+    // Test 22: Brute-Force Rate Limiting Security
+    try {
+      let got429 = false;
+      // In auth.routes.ts, authLimiter limits to max 10 requests per 15 mins.
+      // We send 12 quick successive requests to trigger it.
+      for (let i = 0; i < 12; i++) {
+        const res = await request("http://localhost:4500/api/auth/login", {
+          method: "POST"
+        }, {
+          email: `brute-force-${i}@example.com`,
+          password: "password"
+        });
+        if (res.statusCode === 429) {
+          got429 = true;
+          break;
+        }
+      }
+      assert.ok(got429, "Excessive rapid auth attempts must return 429 Too Many Requests");
+      logPass(22, "Brute-Force Rate Limiting Security (Authentication routes block abuse with HTTP 429)");
+    } catch (e) {
+      logFail(22, "Brute-Force Rate Limiting Security failed", e);
+    }
+
+    // Test 23: HTTP Security Headers Validation (Helmet Auditing)
+    try {
+      const res = await request("http://localhost:4500/health");
+      const headers = res.headers;
+      assert.strictEqual(headers["x-content-type-options"], "nosniff", "Helmet nosniff header is missing");
+      assert.strictEqual(headers["x-frame-options"], "SAMEORIGIN", "Helmet X-Frame-Options SAMEORIGIN header is missing");
+      logPass(23, "HTTP Security Headers Validation (Helmet successfully injected X-Content-Type, X-Frame-Options)");
+    } catch (e) {
+      logFail(23, "HTTP Security Headers Validation failed", e);
+    }
+
+    // Test 24: CORS Origin Filtering Validation
+    try {
+      const res = await request("http://localhost:4500/health", {
+        headers: { "Origin": "http://malicious-hacker-domain.com" }
+      });
+      // Malicious origin header must be blocked and Access-Control-Allow-Origin omitted or filtered
+      assert.notStrictEqual(res.headers["access-control-allow-origin"], "http://malicious-hacker-domain.com", "Malicious origin allowed in CORS header");
+      logPass(24, "CORS Origin Filtering Validation (Unauthorized origins are blocked from fetching api content)");
+    } catch (e) {
+      logFail(24, "CORS Origin Filtering Validation failed", e);
+    }
+
   } catch (err) {
     console.error(`\n🚨 Critical Exception during QA Test execution: ${err.message}`);
     console.error(err.stack);
@@ -720,15 +785,15 @@ async function runQA() {
 
   console.log("\n==================================================================");
   console.log(`📊 QA Test Execution Results Summary:`);
-  console.log(`   🟢 PASSED: ${passCount} / 20`);
-  console.log(`   🔴 FAILED: ${failCount} / 20`);
+  console.log(`   🟢 PASSED: ${passCount} / 24`);
+  console.log(`   🔴 FAILED: ${failCount} / 24`);
   console.log("==================================================================");
 
   if (failCount === 0) {
-    console.log("🎉 Outstanding! All 20 Production-Level QA Tests Passed Successfully! 🎉");
+    console.log("🎉 Outstanding! All 24 Production-Level QA & Security Tests Passed Successfully! 🎉");
     process.exit(0);
   } else {
-    console.error("🚨 QA Test Failures Detected. Please review log errors.");
+    console.error("🚨 QA & Security Test Failures Detected. Please review log errors.");
     process.exit(1);
   }
 }
