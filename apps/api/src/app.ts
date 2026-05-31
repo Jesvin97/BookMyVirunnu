@@ -31,9 +31,10 @@ export function createApp() {
       return false;
     }
 
-    const whitelist = env.corsOrigin.split(",").map((o) => o.trim());
+    const whitelist = env.corsOrigin.split(",").map((o) => o.trim().replace(/\/$/, ""));
     return (origin, callback) => {
-      if (!origin || whitelist.includes(origin)) {
+      const sanitizedOrigin = origin ? origin.replace(/\/$/, "") : undefined;
+      if (!sanitizedOrigin || whitelist.includes(sanitizedOrigin)) {
         callback(null, true);
       } else {
         callback(new Error("Not allowed by CORS"));
