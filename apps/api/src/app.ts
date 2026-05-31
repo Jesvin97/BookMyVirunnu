@@ -69,6 +69,10 @@ export function createApp() {
   });
 
   app.use("/api", apiLimiter);
+  app.use("/auth", apiLimiter);
+  app.use("/events", apiLimiter);
+  app.use("/availability-rules", apiLimiter);
+  app.use("/bookings", apiLimiter);
 
   app.get("/health", (_req, res) => {
     res.json({
@@ -87,10 +91,16 @@ export function createApp() {
     res.status(204).end();
   });
 
+  // Support both /api/ paths and direct / paths to handle environment configurations with or without the "/api" suffix
   app.use("/api/auth", authRouter);
   app.use("/api/events", eventRouter);
   app.use("/api/availability-rules", availabilityRouter);
   app.use("/api/bookings", bookingRouter);
+
+  app.use("/auth", authRouter);
+  app.use("/events", eventRouter);
+  app.use("/availability-rules", availabilityRouter);
+  app.use("/bookings", bookingRouter);
 
   app.use(errorHandler);
   return app;
