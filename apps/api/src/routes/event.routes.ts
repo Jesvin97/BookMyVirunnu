@@ -11,6 +11,13 @@ const availabilityController = new AvailabilityRuleController();
 
 export const eventRouter = Router();
 
+const eventLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 200,
+  standardHeaders: "draft-7",
+  legacyHeaders: false
+});
+
 const publicPreviewLimiter = rateLimit({
   windowMs: 1 * 60 * 1000,
   max: 60,
@@ -18,7 +25,7 @@ const publicPreviewLimiter = rateLimit({
   legacyHeaders: false
 });
 
-eventRouter.use("/:eventId/availability", publicPreviewLimiter);
+eventRouter.use(eventLimiter);
 
 eventRouter.get("/public", controller.listPublic);
 eventRouter.get("/me", authenticate, controller.listMine);
@@ -27,7 +34,7 @@ eventRouter.patch("/:eventId", authenticate, requireRole("couple", "admin"), con
 eventRouter.post("/:eventId/publish", authenticate, requireRole("couple", "admin"), controller.publish);
 eventRouter.post("/:eventId/pause", authenticate, requireRole("couple", "admin"), controller.pause);
 eventRouter.post("/:eventId/cancel", authenticate, requireRole("couple", "admin"), controller.cancel);
-eventRouter.get("/:eventId/availability", bookingController.previewForEvent);
+eventRouter.get("/:eventId/availability", publicPreviewLimiter, bookingController.previewForEvent);
 eventRouter.get("/:eventId/bookings", authenticate, requireRole("couple", "admin"), bookingController.listEventBookings);
 eventRouter.get("/:eventId/availability-rules", authenticate, requireRole("couple", "admin"), availabilityController.list);
 eventRouter.post("/:eventId/availability-rules", authenticate, requireRole("couple", "admin"), availabilityController.create);

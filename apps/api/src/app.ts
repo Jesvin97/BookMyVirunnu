@@ -17,10 +17,34 @@ export function createApp() {
   app.disable("x-powered-by");
   app.set("trust proxy", env.nodeEnv === "production" ? 1 : false);
 
+  const getCorsOrigin = (): string | string[] | boolean | ((origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => void) => {
+    if (env.nodeEnv !== "production" && env.corsOrigin === "*") {
+      return [
+        "http://localhost:3000",
+        "http://localhost:3001",
+        "http://127.0.0.1:3000",
+        "http://127.0.0.1:3001"
+      ];
+    }
+
+    if (env.corsOrigin === "*") {
+      return false;
+    }
+
+    const whitelist = env.corsOrigin.split(",").map((o) => o.trim());
+    return (origin, callback) => {
+      if (!origin || whitelist.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    };
+  };
+
   app.use(helmet());
   app.use(
     cors({
-      origin: env.corsOrigin === "*" ? true : env.corsOrigin,
+      origin: getCorsOrigin(),
       credentials: true
     })
   );
