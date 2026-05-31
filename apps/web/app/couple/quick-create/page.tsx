@@ -245,8 +245,8 @@ export default function QuickCreatePage() {
               <p style={{ fontSize: "0.85rem", color: "rgba(243, 252, 247, 0.6)", margin: "0 0 12px", lineHeight: 1.4 }}>
                 Send this link directly to your family and relatives so they can book a slot and call you over for Sadhyas:
               </p>
-              <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-                <code style={{ flex: 1, background: "rgba(0, 0, 0, 0.4)", padding: "10px 14px", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.06)", fontSize: "0.85rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              <div style={{ display: "flex", gap: "8px", alignItems: "center", width: "100%", minWidth: 0 }}>
+                <code style={{ flex: 1, minWidth: 0, background: "rgba(0, 0, 0, 0.4)", padding: "10px 14px", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.06)", fontSize: "0.85rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                   {typeof window !== "undefined" ? `${window.location.origin}${successData.bookingUrl}` : successData.bookingUrl}
                 </code>
                 <CopyButton
@@ -264,8 +264,8 @@ export default function QuickCreatePage() {
               <p style={{ fontSize: "0.85rem", color: "rgba(243, 252, 247, 0.6)", margin: "0 0 12px", lineHeight: 1.4 }}>
                 Bookmark this link! Since there are no emails or passwords, you will need this specific link to manage your bookings and block rest days.
               </p>
-              <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-                <code style={{ flex: 1, background: "rgba(0, 0, 0, 0.4)", padding: "10px 14px", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.06)", fontSize: "0.85rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              <div style={{ display: "flex", gap: "8px", alignItems: "center", width: "100%", minWidth: 0 }}>
+                <code style={{ flex: 1, minWidth: 0, background: "rgba(0, 0, 0, 0.4)", padding: "10px 14px", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.06)", fontSize: "0.85rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                   {typeof window !== "undefined" ? `${window.location.origin}${successData.dashboardUrl}` : successData.dashboardUrl}
                 </code>
                 <CopyButton
