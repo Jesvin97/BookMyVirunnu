@@ -5,19 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { api } from "../utils/api";
 import styles from "../page.module.css";
-import {
-  SidebarProvider,
-  Sidebar,
-  SidebarHeader,
-  SidebarContent,
-  SidebarFooter,
-  SidebarGroup,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarTrigger
-} from "../../components/ui/sidebar";
+
 import { Skeleton } from "../../components/ui/skeleton";
 import {
   Table,
