@@ -29,6 +29,7 @@ export const quickRegisterSchema = z.object({
   description: z.string().max(4000).optional(),
   startDate: z.string(),
   endDate: z.string(),
+  enableBreakfast: z.boolean().default(true),
   enableLunch: z.boolean().default(true),
   enableDinner: z.boolean().default(true),
   phone: z.string().min(6).max(32).optional(),

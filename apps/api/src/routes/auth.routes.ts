@@ -13,14 +13,16 @@ const authLimiter = rateLimit({
   legacyHeaders: false
 });
 
-authRouter.use("/register", authLimiter);
-authRouter.use("/login", authLimiter);
-authRouter.use("/quick-register", authLimiter);
-authRouter.use("/access-id", authLimiter);
+const authActiveLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  standardHeaders: "draft-7",
+  legacyHeaders: false
+});
 
-authRouter.post("/register", controller.register);
-authRouter.post("/quick-register", controller.quickRegister);
-authRouter.post("/login", controller.login);
-authRouter.post("/access-id", controller.loginWithFeastId);
-authRouter.get("/me", authenticate, controller.me);
-authRouter.post("/logout", authenticate, controller.logout);
+authRouter.post("/register", authLimiter, controller.register);
+authRouter.post("/quick-register", authLimiter, controller.quickRegister);
+authRouter.post("/login", authLimiter, controller.login);
+authRouter.post("/access-id", authLimiter, controller.loginWithFeastId);
+authRouter.get("/me", authActiveLimiter, authenticate, controller.me);
+authRouter.post("/logout", authActiveLimiter, authenticate, controller.logout);

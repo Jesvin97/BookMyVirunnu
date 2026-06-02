@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { api } from "../../utils/api";
@@ -19,7 +19,6 @@ interface Particle {
 const DIETARY_OPTIONS = [
   { value: "Vegetarian 🥬", label: "Vegetarian 🥬" },
   { value: "No Beef 🚫🥩", label: "No Beef 🚫🥩" },
-  { value: "Halal 🥩", label: "Halal 🥩" },
   { value: "Eggless 🥚", label: "Eggless 🥚" },
   { value: "Nut Allergy 🥜", label: "Nut Allergy 🥜" },
   { value: "No Restrictions ✨", label: "No Restrictions ✨" }
@@ -50,17 +49,21 @@ export default function QuickCreatePage() {
   const [blockedDates, setBlockedDates] = useState<string[]>([]);
   
   const [phone, setPhone] = useState("");
-  const [enableLunch, setEnableLunch] = useState(true);
-  const [enableDinner, setEnableDinner] = useState(true);
+  const [enableBreakfast, setEnableBreakfast] = useState(false);
+  const [enableLunch, setEnableLunch] = useState(false);
+  const [enableDinner, setEnableDinner] = useState(false);
   const [selectedDiet, setSelectedDiet] = useState<string[]>([]);
 
   const [copiedBooking, setCopiedBooking] = useState(false);
   const [copiedDashboard, setCopiedDashboard] = useState(false);
   const [customDiet, setCustomDiet] = useState("");
 
+  const [backendConnected, setBackendConnected] = useState(false);
+  const [pinging, setPinging] = useState(false);
+
   // Celebratory particles splash
   const triggerParticles = (clientX: number, clientY: number) => {
-    const symbols = ["💖", "❤️", "✨", "🌸", "💍", "🎉"];
+    const symbols = ["✨", "🌸", "💍", "🎉", "🌾", "🍛"];
     const newParticles: Particle[] = [];
     for (let i = 0; i < 20; i++) {
       newParticles.push({
@@ -75,6 +78,31 @@ export default function QuickCreatePage() {
       setParticles((prev) => prev.slice(newParticles.length));
     }, 1500);
   };
+
+  useEffect(() => {
+    if (step === 2 && !backendConnected && !pinging) {
+      setPinging(true);
+      const hostUrl = process.env.NEXT_PUBLIC_API_URL 
+        ? process.env.NEXT_PUBLIC_API_URL.replace(/\/api$/, "") 
+        : "http://localhost:4000";
+
+      const checkConnection = async () => {
+        try {
+          const res = await fetch(`${hostUrl}/health`);
+          if (res.ok) {
+            setBackendConnected(true);
+            setPinging(false);
+            toast.success("Connection to backend established! 🌿");
+            return;
+          }
+        } catch (err) {
+          console.error("Backend ping failed, retrying...", err);
+        }
+        setTimeout(checkConnection, 3000);
+      };
+      checkConnection();
+    }
+  }, [step, backendConnected, pinging]);
 
   const handleStepTransition = (nextStep: 1 | 2 | 3, e?: React.MouseEvent) => {
     // Validate current step
@@ -137,8 +165,8 @@ export default function QuickCreatePage() {
     e.preventDefault();
     setError("");
 
-    if (!enableLunch && !enableDinner) {
-      setError("Please enable at least one feast meal block (Lunch or Dinner) for booking.");
+    if (!enableBreakfast && !enableLunch && !enableDinner) {
+      setError("Please enable at least one feast meal block (Breakfast, Lunch or Dinner) for booking.");
       return;
     }
 
@@ -162,6 +190,7 @@ export default function QuickCreatePage() {
         title: generatedTitle,
         startDate: new Date(startDate).toISOString(),
         endDate: new Date(endDate).toISOString(),
+        enableBreakfast,
         enableLunch,
         enableDinner,
         phone: phone || undefined,
@@ -202,6 +231,45 @@ export default function QuickCreatePage() {
     }
   };
 
+  // Progressive Sadhya progress calculation
+  let progressPercent = 0;
+  let progressText = "";
+
+  if (step === 1) {
+    if (husbandName.trim() && wifeName.trim()) {
+      progressPercent = 33;
+      progressText = "Banana chips came... 🍌";
+    } else if (husbandName.trim()) {
+      progressPercent = 15;
+      progressText = "Placing a banana leaf... 🍃";
+    } else {
+      progressPercent = 0;
+      progressText = "Preparing the feast hall... 🍽️";
+    }
+  } else if (step === 2) {
+    if (startDate && endDate) {
+      progressPercent = 66;
+      progressText = "Kootans came in... 🍲";
+    } else if (startDate) {
+      progressPercent = 45;
+      progressText = "Pickles placed... 🌶️";
+    } else {
+      progressPercent = 33;
+      progressText = "Banana chips came... 🍌";
+    }
+  } else if (step === 3) {
+    if (phone.trim().length >= 10) {
+      progressPercent = 100;
+      progressText = "Papad came, Rice came, Sambar came! 🍛";
+    } else if (phone.trim().length > 0) {
+      progressPercent = 90;
+      progressText = "Sambar came! 🍲";
+    } else {
+      progressPercent = 75;
+      progressText = "Papad came, Rice came! 🌾";
+    }
+  }
+
   const inputStyle: React.CSSProperties = {
     width: "100%",
     padding: "14px 18px",
@@ -225,7 +293,7 @@ export default function QuickCreatePage() {
       <main className={styles.shell} style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "48px 0" }}>
         <div className={styles.backgroundGlow} aria-hidden="true" />
         
-        <div className={`${styles.panel} animate-scale-pop`} style={{ width: "min(560px, calc(100% - 32px))", padding: "clamp(20px, 6vw, 40px)", textAlign: "center" }}>
+        <div className={`${styles.panel} animate-scale-pop`} style={{ width: "min(560px, calc(100% - 32px))", padding: "clamp(20px, 6vw, 40px)", textAlign: "center", minWidth: 0 }}>
           <div style={{ fontSize: "3.5rem", marginBottom: "16px" }}>🎉</div>
           
           <h2 style={{ fontFamily: "var(--bv-font-display)", fontSize: "clamp(1.8rem, 6vw, 2.8rem)", margin: "0 0 12px", color: "#fff", lineHeight: 1.1 }}>
@@ -235,18 +303,15 @@ export default function QuickCreatePage() {
             Congratulations, {husbandName} & {wifeName}! Your post-wedding feast slots are now generated. Please save the links below:
           </p>
 
-          <div style={{ display: "grid", gap: "24px", textAlign: "left", marginBottom: "32px" }}>
+          <div style={{ display: "grid", gap: "24px", textAlign: "left", marginBottom: "32px", minWidth: 0 }}>
             
             {/* Booking Link */}
-            <div style={{ background: "rgba(0, 0, 0, 0.3)", border: "1px solid rgba(52, 211, 153, 0.15)", borderRadius: "16px", padding: "18px 20px" }}>
-              <strong style={{ display: "block", color: "#34d399", fontSize: "1rem", marginBottom: "6px" }}>
-                Relative Booking Link 🔗
+            <div style={{ background: "rgba(0, 0, 0, 0.3)", border: "1px solid rgba(52, 211, 153, 0.15)", borderRadius: "16px", padding: "clamp(12px, 4vw, 20px)", minWidth: 0, flexShrink: 1, overflowWrap: "anywhere", wordBreak: "break-word" }}>
+              <strong style={{ display: "block", color: "#34d399", fontSize: "1rem", marginBottom: "12px" }}>
+                Send this to relative
               </strong>
-              <p style={{ fontSize: "0.85rem", color: "rgba(243, 252, 247, 0.6)", margin: "0 0 12px", lineHeight: 1.4 }}>
-                Send this link directly to your family and relatives so they can book a slot and call you over for Sadhyas:
-              </p>
               <div style={{ display: "flex", gap: "8px", alignItems: "center", width: "100%", minWidth: 0 }}>
-                <code style={{ flex: 1, minWidth: 0, background: "rgba(0, 0, 0, 0.4)", padding: "10px 14px", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.06)", fontSize: "0.85rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                <code style={{ flex: 1, minWidth: 0, flexShrink: 1, background: "rgba(0, 0, 0, 0.4)", padding: "10px 14px", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.06)", fontSize: "0.85rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", wordBreak: "break-all", overflowWrap: "anywhere" }}>
                   {typeof window !== "undefined" ? `${window.location.origin}${successData.bookingUrl}` : successData.bookingUrl}
                 </code>
                 <CopyButton
@@ -257,15 +322,12 @@ export default function QuickCreatePage() {
             </div>
 
             {/* Dashboard Link */}
-            <div style={{ background: "rgba(239, 68, 68, 0.03)", border: "1px solid rgba(239, 68, 68, 0.25)", borderRadius: "16px", padding: "18px 20px" }}>
-              <strong style={{ display: "block", color: "#f87171", fontSize: "1rem", marginBottom: "6px" }}>
-                Dashboard Manager Link (Private) 🔑
+            <div style={{ background: "rgba(239, 68, 68, 0.03)", border: "1px solid rgba(239, 68, 68, 0.25)", borderRadius: "16px", padding: "clamp(12px, 4vw, 20px)", minWidth: 0, flexShrink: 1, overflowWrap: "anywhere", wordBreak: "break-word" }}>
+              <strong style={{ display: "block", color: "#f87171", fontSize: "1rem", marginBottom: "12px" }}>
+                This is for You
               </strong>
-              <p style={{ fontSize: "0.85rem", color: "rgba(243, 252, 247, 0.6)", margin: "0 0 12px", lineHeight: 1.4 }}>
-                Bookmark this link! Since there are no emails or passwords, you will need this specific link to manage your bookings and block rest days.
-              </p>
               <div style={{ display: "flex", gap: "8px", alignItems: "center", width: "100%", minWidth: 0 }}>
-                <code style={{ flex: 1, minWidth: 0, background: "rgba(0, 0, 0, 0.4)", padding: "10px 14px", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.06)", fontSize: "0.85rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                <code style={{ flex: 1, minWidth: 0, flexShrink: 1, background: "rgba(0, 0, 0, 0.4)", padding: "10px 14px", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.06)", fontSize: "0.85rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", wordBreak: "break-all", overflowWrap: "anywhere" }}>
                   {typeof window !== "undefined" ? `${window.location.origin}${successData.dashboardUrl}` : successData.dashboardUrl}
                 </code>
                 <CopyButton
@@ -282,23 +344,11 @@ export default function QuickCreatePage() {
 
           </div>
 
-          <div style={{
-            padding: "14px 18px",
-            background: "rgba(251, 191, 36, 0.08)",
-            border: "1px solid rgba(251, 191, 36, 0.25)",
-            borderRadius: "14px",
-            color: "#fbbf24",
-            fontSize: "0.9rem",
-            lineHeight: 1.5,
-            marginBottom: "32px",
-            textAlign: "left"
-          }}>
-            <strong>⚠️ Important reminder:</strong> Please bookmark the dashboard link above right now! Anyone with that link can manage the wedding calendar.
-          </div>
-
           <Link href="/couple" className={styles.primaryButton} style={{ textDecoration: "none", display: "block", width: "100%", textAlign: "center", border: 0, padding: "16px" }}>
             Go to Dashboard & View Feasts
           </Link>
+
+          <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "16px", opacity: 0.35, fontSize: "0.8rem", color: "#34d399" }}>🌿</div>
         </div>
       </main>
     );
@@ -333,9 +383,14 @@ export default function QuickCreatePage() {
 
         {/* Wizard progress tracker */}
         <Progress
-          value={step === 1 ? 33 : step === 2 ? 66 : 100}
+          value={progressPercent}
           style={{ width: "100%", maxWidth: "360px", margin: "24px auto 0" }}
         />
+        {progressText && (
+          <div style={{ marginTop: "12px", fontSize: "0.9rem", color: "#34d399", fontWeight: 600, fontStyle: "italic" }} className="animate-pulse">
+            {progressText}
+          </div>
+        )}
       </header>
 
       <section className={styles.section} style={{ maxWidth: "700px", margin: "0 auto", position: "relative" }}>
@@ -358,7 +413,7 @@ export default function QuickCreatePage() {
           {step === 1 && (
             <div>
               <h2 style={{ fontFamily: "var(--bv-font-display)", fontSize: "2.2rem", color: "#34d399", margin: "0 0 8px", textAlign: "center" }}>
-                Who are the happy newlyweds? 💖
+                Who are the newlyweds?
               </h2>
               <p style={{ color: "rgba(243, 252, 247, 0.6)", fontSize: "0.95rem", textAlign: "center", marginBottom: "32px" }}>
                 Enter your names to generate your custom feast calendar schedule.
@@ -394,7 +449,7 @@ export default function QuickCreatePage() {
                     id="wifeName"
                     type="text"
                     required
-                    placeholder="e.g. Anjali"
+                    placeholder="sneha"
                     value={wifeName}
                     onChange={(e) => setWifeName(e.target.value)}
                     style={inputStyle}
@@ -415,7 +470,7 @@ export default function QuickCreatePage() {
                 className={styles.primaryButton}
                 style={{ width: "100%", border: 0, padding: "14px", fontSize: "1.05rem" }}
               >
-                Continue to Availability ➔
+                Continue
               </button>
             </div>
           )}
@@ -423,7 +478,7 @@ export default function QuickCreatePage() {
           {step === 2 && (
             <div>
               <h2 style={{ fontFamily: "var(--bv-font-display)", fontSize: "2.2rem", color: "#34d399", margin: "0 0 8px", textAlign: "center" }}>
-                When are you available for feasts? 📅
+                When are you available for feasts?
               </h2>
               <p style={{ color: "rgba(243, 252, 247, 0.6)", fontSize: "0.95rem", textAlign: "center", marginBottom: "32px" }}>
                 Define the overall date range you are open to be invited to host family homes.
@@ -546,11 +601,19 @@ export default function QuickCreatePage() {
                 </button>
                 <button
                   type="button"
+                  disabled={!backendConnected}
                   onClick={(e) => handleStepTransition(3, e)}
                   className={styles.primaryButton}
-                  style={{ width: "100%", border: 0, padding: "14px", fontSize: "1.05rem" }}
+                  style={{
+                    width: "100%",
+                    border: 0,
+                    padding: "14px",
+                    fontSize: "1.05rem",
+                    cursor: !backendConnected ? "not-allowed" : "pointer",
+                    opacity: !backendConnected ? 0.6 : 1
+                  }}
                 >
-                  Continue to Preferences ➔
+                  {backendConnected ? "Continue" : pinging ? "Connecting to backend..." : "Awaiting backend connection..."}
                 </button>
               </div>
             </div>
@@ -569,7 +632,27 @@ export default function QuickCreatePage() {
                 {/* Available Meals */}
                 <div>
                   <label style={{ ...labelStyle, display: "block", marginBottom: "12px" }}>Available Meals 🕒</label>
-                  <div className={styles.formTwoCol} style={{ gap: "14px" }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: "14px" }}>
+                    {/* Breakfast */}
+                    <button
+                      type="button"
+                      onClick={() => setEnableBreakfast(!enableBreakfast)}
+                      style={{
+                        padding: "16px",
+                        borderRadius: "14px",
+                        border: enableBreakfast ? "2px solid #34d399" : "1px solid rgba(255,255,255,0.08)",
+                        background: enableBreakfast ? "rgba(52, 211, 153, 0.08)" : "rgba(255,255,255,0.02)",
+                        color: enableBreakfast ? "#fff" : "rgba(243, 252, 247, 0.6)",
+                        cursor: "pointer",
+                        textAlign: "center",
+                        transition: "all 200ms ease",
+                        boxShadow: enableBreakfast ? "0 0 15px rgba(52, 211, 153, 0.25)" : "none",
+                        transform: enableBreakfast ? "scale(1.02)" : "scale(1)"
+                      }}
+                    >
+                      <strong style={{ display: "block", fontSize: "1rem" }}>Breakfast</strong>
+                    </button>
+
                     {/* Lunch */}
                     <button
                       type="button"
@@ -587,8 +670,7 @@ export default function QuickCreatePage() {
                         transform: enableLunch ? "scale(1.02)" : "scale(1)"
                       }}
                     >
-                      <strong style={{ display: "block", fontSize: "1rem", marginBottom: "4px" }}>Lunch (Sadhya) 🍛</strong>
-                      <span style={{ fontSize: "0.78rem", opacity: 0.8 }}>12:00 PM - 3:00 PM</span>
+                      <strong style={{ display: "block", fontSize: "1rem" }}>Lunch</strong>
                     </button>
 
                     {/* Dinner */}
@@ -608,8 +690,7 @@ export default function QuickCreatePage() {
                         transform: enableDinner ? "scale(1.02)" : "scale(1)"
                       }}
                     >
-                      <strong style={{ display: "block", fontSize: "1rem", marginBottom: "4px" }}>Dinner (Virunnu) 🍽️</strong>
-                      <span style={{ fontSize: "0.78rem", opacity: 0.8 }}>7:00 PM - 10:00 PM</span>
+                      <strong style={{ display: "block", fontSize: "1rem" }}>Dinner</strong>
                     </button>
                   </div>
                 </div>
@@ -699,7 +780,7 @@ export default function QuickCreatePage() {
                   className={styles.primaryButton}
                   style={{ width: "100%", border: 0, padding: "14px", fontSize: "1.05rem", cursor: loading ? "not-allowed" : "pointer" }}
                 >
-                  {loading ? "Creating Feast Calendar..." : "Generate Available Slots ✨"}
+                  {loading ? "Creating Feast Calendar..." : "Generate Link"}
                 </button>
               </div>
             </form>

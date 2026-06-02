@@ -117,7 +117,7 @@ export class AuthController {
       venue: {
         name: "Various Host Homes"
       },
-      maxGuestsTotal: (input.enableLunch ? 1 : 0) + (input.enableDinner ? 1 : 0),
+      maxGuestsTotal: (input.enableBreakfast ? 1 : 0) + (input.enableLunch ? 1 : 0) + (input.enableDinner ? 1 : 0),
       bookingMode: "instant",
       bookingRules: {
         slotDurationMinutes: 180,
@@ -133,6 +133,19 @@ export class AuthController {
     });
 
     const allDays = [0, 1, 2, 3, 4, 5, 6];
+
+    if (input.enableBreakfast) {
+      await ruleService.createRule(event._id.toString(), user._id.toString(), {
+        ruleType: "weekly",
+        daysOfWeek: allDays,
+        startTime: "08:00",
+        endTime: "11:00",
+        maxGuests: 1,
+        isBlocked: false,
+        priority: 1,
+        reason: "Breakfast Slot"
+      });
+    }
 
     if (input.enableLunch) {
       await ruleService.createRule(event._id.toString(), user._id.toString(), {

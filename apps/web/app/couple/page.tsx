@@ -89,6 +89,7 @@ export default function CoupleDashboard() {
   const [loading, setLoading] = useState(true);
   const [bookingsLoading, setBookingsLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [newRestDate, setNewRestDate] = useState("");
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -210,12 +211,7 @@ export default function CoupleDashboard() {
           `/events/${eventId}/availability?rangeStart=${start}&rangeEnd=${end}`
         );
         if (slotsRes && slotsRes.slots) {
-          // Hide Breakfast slots (<11am) here too for consistency
-          const filteredSlots = slotsRes.slots.filter(s => {
-            const hour = new Date(s.startAt).getHours();
-            return hour >= 11;
-          });
-          setSlots(filteredSlots);
+          setSlots(slotsRes.slots);
         }
       }
     } catch (err) {
@@ -304,7 +300,9 @@ export default function CoupleDashboard() {
   const getMealLabel = (startAtStr: string) => {
     const date = new Date(startAtStr);
     const hour = date.getHours();
-    return hour < 16 ? "Lunch (Sadhya) 🍛" : "Dinner (Virunnu) 🍽️";
+    if (hour < 12) return "Breakfast";
+    if (hour < 16) return "Lunch";
+    return "Dinner";
   };
 
   const activeEvent = events.find(e => e._id === selectedEventId);
@@ -341,90 +339,9 @@ export default function CoupleDashboard() {
   }
 
   return (
-    <SidebarProvider style={{ background: "#040906" }}>
-      {events.length > 0 && (
-        <Sidebar>
-          <SidebarHeader style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px" }}>
-            <h3 style={{ fontSize: "1.05rem", fontWeight: 700, color: "#34d399", margin: 0, letterSpacing: "0.02em" }}>
-              BookMyVirunnu
-            </h3>
-            <ThemeTogglerButton />
-          </SidebarHeader>
-          <SidebarContent>
-            <SidebarGroup>
-              <SidebarGroupLabel>Feast Calendars</SidebarGroupLabel>
-              <SidebarMenu>
-                {events.map((e) => {
-                  const isActive = selectedEventId === e._id;
-                  return (
-                    <SidebarMenuItem key={e._id}>
-                      <SidebarMenuButton
-                        isActive={isActive}
-                        onClick={() => setSelectedEventId(e._id)}
-                      >
-                        <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                          <strong style={{ fontSize: "0.95rem" }}>{e.title}</strong>
-                          <span style={{
-                            alignSelf: "flex-start",
-                            fontSize: "0.7rem",
-                            textTransform: "uppercase",
-                            padding: "2px 6px",
-                            borderRadius: "99px",
-                            background: e.status === "published" ? "rgba(16, 185, 129, 0.15)" : e.status === "draft" ? "rgba(251, 191, 36, 0.15)" : "rgba(239, 68, 68, 0.15)",
-                            color: e.status === "published" ? "#34d399" : e.status === "draft" ? "#fbbf24" : "#f87171",
-                            fontWeight: 600
-                          }}>
-                            {e.status}
-                          </span>
-                        </div>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  );
-                })}
-              </SidebarMenu>
-            </SidebarGroup>
-          </SidebarContent>
-          <SidebarFooter>
-            <button
-              onClick={handleLogout}
-              style={{
-                width: "100%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "8px",
-                padding: "10px 14px",
-                borderRadius: "10px",
-                border: "1px solid rgba(239, 68, 68, 0.2)",
-                background: "rgba(239, 68, 68, 0.05)",
-                color: "#f87171",
-                cursor: "pointer",
-                fontWeight: 600,
-                fontSize: "0.85rem",
-                transition: "all 0.2s ease"
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = "rgba(239, 68, 68, 0.12)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = "rgba(239, 68, 68, 0.05)";
-              }}
-            >
-              🚪 Sign Out
-            </button>
-          </SidebarFooter>
-        </Sidebar>
-      )}
-
+    <div style={{ background: "#040906", minHeight: "100vh", display: "flex", flexDirection: "column", width: "100%" }}>
       <main className={styles.shell} style={{ flex: 1, minHeight: "100vh", padding: "48px 24px", overflowY: "auto", position: "relative" }}>
         <div className={styles.backgroundGlow} aria-hidden="true" />
-
-        {events.length > 0 && (
-          <div style={{ marginBottom: "20px", display: "flex", alignItems: "center", gap: "12px" }}>
-            <SidebarTrigger />
-            <span style={{ fontSize: "0.85rem", color: "rgba(243, 252, 247, 0.4)" }}>Toggle Sidebar</span>
-          </div>
-        )}
 
         <header className={styles.hero} style={{ padding: "0 0 40px", display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: "24px" }}>
           <div>
@@ -438,15 +355,10 @@ export default function CoupleDashboard() {
           </div>
 
           <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
-            {events.length === 0 && <ThemeTogglerButton />}
-            <Link href="/couple/events/new" className={styles.primaryButton} style={{ textDecoration: "none" }}>
-              + Setup Feast Calendar
-            </Link>
-            {events.length === 0 && (
-              <button onClick={handleLogout} className={styles.secondaryButton} style={{ cursor: "pointer", border: "1px solid rgba(239, 68, 68, 0.2)", background: "rgba(239, 68, 68, 0.05)", color: "#f87171" }}>
-                Sign Out
-              </button>
-            )}
+            <ThemeTogglerButton />
+            <button onClick={handleLogout} className={styles.secondaryButton} style={{ cursor: "pointer", border: "1px solid rgba(239, 68, 68, 0.2)", background: "rgba(239, 68, 68, 0.05)", color: "#f87171" }}>
+              Sign Out
+            </button>
           </div>
         </header>
 
@@ -503,13 +415,13 @@ export default function CoupleDashboard() {
 
                   {/* Public Link Share Card */}
                   {activeEvent.status === "published" && (
-                    <div className={styles.notice} style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: "16px", padding: "16px 20px", marginBottom: "16px" }}>
-                      <div>
+                    <div className={styles.notice} style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: "16px", padding: "12px 16px", marginBottom: "16px", minWidth: 0, flexShrink: 1, overflowWrap: "anywhere", wordBreak: "break-word" }}>
+                      <div style={{ minWidth: 0, flexShrink: 1 }}>
                         <strong style={{ display: "block", color: "#fff", marginBottom: "4px" }}>Share Your Invite Portal Link 🔗</strong>
                         <span style={{ fontSize: "0.85rem", color: "rgba(243, 252, 247, 0.7)" }}>Send this link to families and friends so they can call you for meals:</span>
                       </div>
-                      <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-                        <code style={{ background: "rgba(0,0,0,0.3)", padding: "6px 12px", borderRadius: "8px", border: "1px solid rgba(52, 211, 153, 0.15)", fontSize: "0.85rem" }}>
+                      <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap", minWidth: 0, flexShrink: 1 }}>
+                        <code style={{ background: "rgba(0,0,0,0.3)", padding: "4px 8px", borderRadius: "8px", border: "1px solid rgba(52, 211, 153, 0.15)", fontSize: "0.75rem", minWidth: 0, flexShrink: 1, overflowWrap: "anywhere", wordBreak: "break-all", whiteSpace: "normal" }}>
                           /book/{activeEvent._id}
                         </code>
                         <CopyButton
@@ -529,13 +441,13 @@ export default function CoupleDashboard() {
                   )}
 
                   {/* Private Dashboard Link Card */}
-                  <div className={styles.panelAccent} style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: "16px", padding: "16px 20px", marginBottom: "32px", background: "rgba(239, 68, 68, 0.03)", border: "1px solid rgba(239, 68, 68, 0.2)" }}>
-                    <div>
+                  <div className={styles.panelAccent} style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: "16px", padding: "12px 16px", marginBottom: "32px", background: "rgba(239, 68, 68, 0.03)", border: "1px solid rgba(239, 68, 68, 0.2)", minWidth: 0, maxWidth: "100%", flexShrink: 1, boxSizing: "border-box", overflowWrap: "anywhere", wordBreak: "break-word" }}>
+                    <div style={{ minWidth: 0, flexShrink: 1 }}>
                       <strong style={{ display: "block", color: "#f87171", marginBottom: "4px" }}>Feast ID & Private Dashboard Manager 🔑</strong>
                       <span style={{ fontSize: "0.85rem", color: "rgba(243, 252, 247, 0.7)" }}>Bookmark this link to access your dashboard passwordlessly on other devices:</span>
                     </div>
-                    <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-                      <code style={{ background: "rgba(0,0,0,0.3)", padding: "6px 12px", borderRadius: "8px", border: "1px solid rgba(239, 68, 68, 0.25)", fontSize: "0.85rem", color: "#f87171" }}>
+                    <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap", minWidth: 0, flexShrink: 1 }}>
+                      <code style={{ background: "rgba(0,0,0,0.3)", padding: "4px 8px", borderRadius: "8px", border: "1px solid rgba(239, 68, 68, 0.25)", fontSize: "0.75rem", color: "#f87171", minWidth: 0, flexShrink: 1, overflowWrap: "anywhere", wordBreak: "break-all", whiteSpace: "normal" }}>
                         {activeEvent._id}
                       </code>
                       <CopyButton
@@ -628,102 +540,188 @@ export default function CoupleDashboard() {
                     </Table>
                   )}
 
-                  {/* Manual Slot Blocking Calendar */}
-                  <h3 style={{ fontSize: "1.2rem", color: "#34d399", margin: "24px 0 16px", fontFamily: "var(--bv-font-display)" }}>
-                    Couple's Calendar & Date Blocking Manager 📅
+                  {/* Compact Feast Calendar & Date Blocking Manager */}
+                  <h3 style={{ fontSize: "1.2rem", color: "#34d399", margin: "28px 0 16px", fontFamily: "var(--bv-font-display)" }}>
+                    Feast Calendar Configuration & Rest Days
                   </h3>
-                  <p style={{ color: "rgba(243, 252, 247, 0.6)", fontSize: "0.85rem", marginBottom: "16px" }}>
-                    Click "Block Slot" on any open Lunch or Dinner block to prevent families from reserving it. Ideal for rest or private trips!
-                  </p>
 
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: "12px" }}>
-                    {slots.map((s) => {
-                      const startTime = new Date(s.startAt);
-                      const meal = getMealLabel(s.startAt);
-                      const isBooked = bookings.some(b => new Date(b.startAt).getTime() === startTime.getTime());
-                      const isBlockedByRule = s.status === "blocked" || rules.some(
-                        r => r.ruleType === "specific_date" && 
-                             r.date === startTime.toLocaleDateString("en-CA") && 
-                             r.isBlocked
-                      );
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "20px", marginBottom: "32px" }}>
+                    
+                    {/* Selected Calendar Range & Configured Meals Status */}
+                    <div className={styles.panelAccent} style={{ padding: "20px", borderRadius: "16px", background: "rgba(52, 211, 153, 0.03)", border: "1px solid rgba(52, 211, 153, 0.15)", display: "flex", flexDirection: "column", gap: "16px", minWidth: 0, maxWidth: "100%", flexShrink: 1, boxSizing: "border-box", overflowWrap: "anywhere", wordBreak: "break-word" }}>
+                      <h4 style={{ margin: 0, color: "#fff", fontSize: "1.05rem", fontWeight: 600 }}>Feast Setup Summary 🌿</h4>
+                      
+                      <div style={{ fontSize: "0.9rem", color: "rgba(243, 252, 247, 0.85)" }}>
+                        <strong style={{ display: "block", color: "#34d399", fontSize: "0.8rem", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "4px" }}>Selected Calendar Range</strong>
+                        <span>
+                          {new Date(activeEvent.startDate).toLocaleDateString(undefined, { dateStyle: "long" })} to {new Date(activeEvent.endDate).toLocaleDateString(undefined, { dateStyle: "long" })}
+                        </span>
+                      </div>
 
-                      return (
-                        <div
-                          key={s._id}
+                      <div style={{ fontSize: "0.9rem", color: "rgba(243, 252, 247, 0.85)" }}>
+                        <strong style={{ display: "block", color: "#34d399", fontSize: "0.8rem", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "8px" }}>Configured Meals</strong>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+                          {[
+                            { name: "Breakfast", active: rules.some(r => r.ruleType === "weekly" && r.startTime === "08:00") },
+                            { name: "Lunch", active: rules.some(r => r.ruleType === "weekly" && r.startTime === "12:00") },
+                            { name: "Dinner", active: rules.some(r => r.ruleType === "weekly" && r.startTime === "19:00") }
+                          ].map(meal => (
+                            <span key={meal.name} style={{
+                              fontSize: "0.78rem",
+                              padding: "4px 10px",
+                              borderRadius: "99px",
+                              background: meal.active ? "rgba(52, 211, 153, 0.15)" : "rgba(255, 255, 255, 0.05)",
+                              border: meal.active ? "1px solid rgba(52, 211, 153, 0.3)" : "1px solid rgba(255, 255, 255, 0.08)",
+                              color: meal.active ? "#34d399" : "rgba(243, 252, 247, 0.4)",
+                              fontWeight: 600
+                            }}>
+                              {meal.name}: {meal.active ? "Active" : "Disabled"}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div style={{ fontSize: "0.9rem", color: "rgba(243, 252, 247, 0.85)" }}>
+                        <strong style={{ display: "block", color: "#34d399", fontSize: "0.8rem", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "8px" }}>Slot Availability Status</strong>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+                          <span style={{ fontSize: "0.78rem", padding: "4px 10px", borderRadius: "99px", background: "rgba(52, 211, 153, 0.15)", border: "1px solid rgba(52, 211, 153, 0.3)", color: "#fff", fontWeight: 600 }}>
+                            Open: {slots.filter(s => s.status !== "locked" && s.reservedCount === 0).length}
+                          </span>
+                          <span style={{ fontSize: "0.78rem", padding: "4px 10px", borderRadius: "99px", background: "rgba(239, 68, 68, 0.1)", border: "1px solid rgba(239, 68, 68, 0.2)", color: "#f87171", fontWeight: 600 }}>
+                            Reserved Feasts: {slots.filter(s => s.status === "locked" || s.reservedCount > 0).length}
+                          </span>
+                          <span style={{ fontSize: "0.78rem", padding: "4px 10px", borderRadius: "99px", background: "rgba(239, 68, 68, 0.05)", border: "1px solid rgba(239, 68, 68, 0.15)", color: "#f87171", fontWeight: 600 }}>
+                            Blocked Rest Dates: {rules.filter(r => r.ruleType === "specific_date" && r.isBlocked).length}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Block New Rest Date Form */}
+                    <div className={styles.panelAccent} style={{ padding: "20px", borderRadius: "16px", background: "rgba(239, 68, 68, 0.01)", border: "1px solid rgba(239, 68, 68, 0.15)", display: "flex", flexDirection: "column", gap: "14px", minWidth: 0, maxWidth: "100%", flexShrink: 1, boxSizing: "border-box", overflowWrap: "anywhere", wordBreak: "break-word" }}>
+                      <h4 style={{ margin: 0, color: "#fff", fontSize: "1.05rem", fontWeight: 600 }}>Block a Rest Date 🚫</h4>
+                      <p style={{ margin: 0, fontSize: "0.8rem", color: "rgba(243, 252, 247, 0.55)", lineHeight: 1.4 }}>
+                        Add dates (e.g., honeymoon, personal plans) to completely hide all meals on that day from relatives.
+                      </p>
+                      
+                      <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                        <input
+                          type="date"
+                          value={newRestDate}
+                          onChange={(e) => setNewRestDate(e.target.value)}
                           style={{
-                            padding: "16px",
-                            borderRadius: "14px",
-                            background: isBooked ? "rgba(16, 185, 129, 0.05)" : isBlockedByRule ? "rgba(239, 68, 68, 0.03)" : "rgba(255,255,255,0.02)",
-                            border: isBooked ? "1px solid rgba(16, 185, 129, 0.25)" : isBlockedByRule ? "1px solid rgba(239, 68, 68, 0.25)" : "1px solid rgba(255,255,255,0.06)",
-                            display: "flex",
-                            flexDirection: "column",
-                            justifyContent: "space-between",
-                            gap: "12px"
+                            flex: 1,
+                            minWidth: "120px",
+                            padding: "8px 12px",
+                            borderRadius: "8px",
+                            border: "1px solid rgba(239, 68, 68, 0.25)",
+                            background: "rgba(0, 0, 0, 0.3)",
+                            color: "#fff",
+                            outline: "none",
+                            fontSize: "0.85rem"
+                          }}
+                        />
+                        <button
+                          type="button"
+                          disabled={actionLoading === "block-rest" || !newRestDate}
+                          onClick={async () => {
+                            if (!selectedEventId || !newRestDate) return;
+                            setActionLoading("block-rest");
+                            try {
+                              await api.post(`/events/${selectedEventId}/availability-rules`, {
+                                ruleType: "specific_date",
+                                date: newRestDate,
+                                startTime: "00:00",
+                                endTime: "23:59",
+                                isBlocked: true,
+                                priority: 10,
+                                reason: "Blocked Rest Day"
+                              });
+                              toast.success("Rest date successfully blocked! 🚫");
+                              setNewRestDate("");
+                              await refreshDashboardData(selectedEventId);
+                            } catch (err: any) {
+                              console.error("Failed to block rest date:", err);
+                              toast.error(err.message || "Failed to block rest date.");
+                            } finally {
+                              setActionLoading(null);
+                            }
+                          }}
+                          style={{
+                            padding: "8px 14px",
+                            borderRadius: "8px",
+                            border: "1px solid rgba(239, 68, 68, 0.3)",
+                            background: "rgba(239, 68, 68, 0.08)",
+                            color: "#f87171",
+                            fontSize: "0.85rem",
+                            fontWeight: 600,
+                            cursor: (!newRestDate || actionLoading === "block-rest") ? "not-allowed" : "pointer",
+                            opacity: (!newRestDate || actionLoading === "block-rest") ? 0.6 : 1
                           }}
                         >
-                          <div>
-                            <strong style={{ display: "block", color: isBooked ? "#34d399" : isBlockedByRule ? "#f87171" : "#fff", fontSize: "0.95rem" }}>
-                              {meal}
-                            </strong>
-                            <span style={{ display: "block", fontSize: "0.8rem", color: "rgba(243, 252, 247, 0.7)" }}>
-                              {startTime.toLocaleDateString([], { month: "short", day: "numeric" })}
-                            </span>
-                            <span style={{ display: "block", fontSize: "0.75rem", color: "rgba(243, 252, 247, 0.45)" }}>
-                              {startTime.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
-                            </span>
-                          </div>
+                          {actionLoading === "block-rest" ? "Blocking..." : "🚫 Block Date"}
+                        </button>
+                      </div>
+                    </div>
 
-                          <div>
-                            {isBooked ? (
-                              <span style={{ fontSize: "0.8rem", color: "#34d399", fontWeight: 600 }}>
-                                Reserved 🍛
-                              </span>
-                            ) : isBlockedByRule ? (
-                              <button
-                                disabled={actionLoading === s._id}
-                                onClick={() => handleUnblockSlot(s)}
-                                style={{
-                                  width: "100%",
-                                  padding: "6px 12px",
-                                  borderRadius: "8px",
-                                  border: "1px solid rgba(52, 211, 153, 0.3)",
-                                  background: "rgba(52, 211, 153, 0.05)",
-                                  color: "#34d399",
-                                  fontSize: "0.8rem",
-                                  cursor: "pointer"
-                                }}
-                              >
-                                {actionLoading === s._id ? "Opening..." : "🔓 Unblock Slot"}
-                              </button>
-                            ) : (
-                              <button
-                                disabled={actionLoading === s._id}
-                                onClick={() => handleBlockSlot(s)}
-                                style={{
-                                  width: "100%",
-                                  padding: "6px 12px",
-                                  borderRadius: "8px",
-                                  border: "1px solid rgba(239, 68, 68, 0.3)",
-                                  background: "rgba(239, 68, 68, 0.05)",
-                                  color: "#f87171",
-                                  fontSize: "0.8rem",
-                                  cursor: "pointer"
-                                }}
-                              >
-                                {actionLoading === s._id ? "Blocking..." : "🚫 Block Slot"}
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                      );
-                    })}
                   </div>
+
+                  {/* Blocked Rest Dates List */}
+                  <h4 style={{ color: "#fff", fontSize: "1.1rem", marginBottom: "12px", fontWeight: 600 }}>Active Blocked Rest Dates</h4>
+                  {rules.filter(r => r.ruleType === "specific_date" && r.isBlocked).length === 0 ? (
+                    <div style={{ color: "rgba(243, 252, 247, 0.4)", fontSize: "0.85rem", fontStyle: "italic", border: "1px dashed rgba(255,255,255,0.06)", borderRadius: "12px", padding: "16px", textAlign: "center", marginBottom: "24px" }}>
+                      No blocked rest dates. You are open for all dates in the calendar range!
+                    </div>
+                  ) : (
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: "10px", marginBottom: "32px" }}>
+                      {rules.filter(r => r.ruleType === "specific_date" && r.isBlocked).map(rule => {
+                        const ruleDate = rule.date ? new Date(rule.date) : null;
+                        const dateLabel = ruleDate ? ruleDate.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" }) : rule.date;
+                        return (
+                          <div key={rule._id} style={{ display: "flex", alignItems: "center", gap: "10px", padding: "6px 12px", borderRadius: "10px", background: "rgba(239, 68, 68, 0.05)", border: "1px solid rgba(239, 68, 68, 0.25)" }}>
+                            <span style={{ fontSize: "0.85rem", color: "#f87171", fontWeight: 600 }}>🚫 {dateLabel}</span>
+                            <button
+                              type="button"
+                              disabled={actionLoading === rule._id}
+                              onClick={async () => {
+                                setActionLoading(rule._id);
+                                try {
+                                  await api.delete(`/availability-rules/${rule._id}`);
+                                  toast.success("Rest date unblocked! 🔓");
+                                  if (selectedEventId) {
+                                    await refreshDashboardData(selectedEventId);
+                                  }
+                                } catch (err: any) {
+                                  console.error("Failed to unblock rest date:", err);
+                                  toast.error(err.message || "Failed to unblock rest date.");
+                                } finally {
+                                  setActionLoading(null);
+                                }
+                              }}
+                              style={{
+                                border: 0,
+                                background: "none",
+                                color: "#f87171",
+                                cursor: "pointer",
+                                fontSize: "1rem",
+                                padding: "0 4px",
+                                fontWeight: "bold"
+                              }}
+                            >
+                              {actionLoading === rule._id ? "..." : "×"}
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+
                 </div>
               )}
             </div>
           )}
         </section>
       </main>
-    </SidebarProvider>
+    </div>
   );
 }
