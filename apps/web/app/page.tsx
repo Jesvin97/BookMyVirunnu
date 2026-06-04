@@ -3,23 +3,23 @@ import styles from "./page.module.css";
 
 const pillars = [
   {
-    title: "Ceremonial booking flow",
-    copy: "A calmer way to choose a virunnu slot. Availability, capacity, and privacy stay visible without turning the experience into a dashboard."
+    title: "The Ceremonial Flow",
+    copy: "A serene way for guests to select their virunnu slot. Capacity and privacy are elegantly managed without feeling like a corporate tool."
   },
   {
-    title: "Host-led availability",
-    copy: "Couples define windows, buffers, and blackout periods. Guests only see what the host intends to share."
+    title: "Curated Availability",
+    copy: "You set the pace. Define hosting windows, rest buffers, and blackout dates. Guests only see the moments you choose to share."
   },
   {
-    title: "Invite-first privacy",
-    copy: "Private home-hosting needs restraint. Invite links, confirmations, and address reveal rules stay explicit and controlled."
+    title: "Uncompromised Privacy",
+    copy: "Intimate gatherings demand discretion. Our secure invite links and timed address reveals ensure you always remain in control."
   }
 ];
 
 const steps = [
-  "Host creates an event and sets availability rules.",
-  "Guests open the invite and choose a valid slot.",
-  "The system checks conflicts and confirms the booking."
+  "You curate the event and establish your hosting availability.",
+  "Invited guests seamlessly select a slot that works for them.",
+  "We handle the scheduling gracefully and instantly confirm the gathering."
 ];
 
 export default function HomePage() {
@@ -28,33 +28,32 @@ export default function HomePage() {
       <div className={styles.backgroundGlow} aria-hidden="true" />
       <section className={styles.hero}>
         <div className={styles.eyebrow}>BookMyVirunnu</div>
-        <h1>Ceremonial hospitality for the modern virunnu.</h1>
+        <h1>Elevate the Tradition of Virunnu.</h1>
         <p className={styles.lead}>
-          A premium booking experience for Kerala home-hosted gatherings. Designed to keep virunnu warm,
-          private, and easy to coordinate without turning hospitality into a generic SaaS workflow.
+          A sophisticated, invite-only booking experience for Kerala's home-hosted gatherings. We preserve the warmth and privacy of traditional hospitality, reimagined for the modern host.
         </p>
 
-        <div className={styles.actions} style={{ display: "flex", gap: "16px", flexWrap: "wrap", justifyContent: "center", marginTop: "24px" }}>
-          <Link className={styles.primaryButton} href="/couple/quick-create" style={{ background: "linear-gradient(135deg, #34d399 0%, #059669 100%)", color: "#03200d", border: 0, textDecoration: "none", fontWeight: 600 }}>
-            Newlyweds: Setup Feast Calendar ✨
+        <div className={styles.actions}>
+          <Link className={styles.primaryButton} href="/couple/quick-create">
+            Newlyweds: Curate Your Calendar
           </Link>
-          <Link className={styles.secondaryButton} href="/login" style={{ textDecoration: "none" }}>
-            Access Feast Dashboard 🔑
+          <Link className={styles.secondaryButton} href="/login">
+            Guest Login / Dashboard
           </Link>
         </div>
 
         <div className={styles.statsRow}>
           <div className={styles.statCard}>
-            <span>Host control</span>
-            <strong>Availability, buffers, and blackouts</strong>
+            <span>Host Exclusivity</span>
+            <strong>Complete control over dates, buffers, and blackout periods.</strong>
           </div>
           <div className={styles.statCard}>
-            <span>Guest clarity</span>
-            <strong>Conflicts explained with alternate slots</strong>
+            <span>Seamless Clarity</span>
+            <strong>Smart scheduling with polite alternative slot suggestions.</strong>
           </div>
           <div className={styles.statCard}>
-            <span>Privacy first</span>
-            <strong>Invite-only access and controlled address reveal</strong>
+            <span>Absolute Privacy</span>
+            <strong>Invite-only access with delayed, secure address reveals.</strong>
           </div>
         </div>
       </section>
@@ -62,7 +61,7 @@ export default function HomePage() {
       <section className={styles.section} id="experience">
         <div className={styles.sectionHeader}>
           <div className={styles.sectionKicker}>Experience</div>
-          <h2>Built for a quieter, more intentional booking journey.</h2>
+          <h2>Crafted for an intentional, graceful booking journey.</h2>
         </div>
 
         <div className={styles.pillarGrid}>
@@ -79,7 +78,7 @@ export default function HomePage() {
         <div className={styles.splitLayout}>
           <article className={styles.panel}>
             <div className={styles.sectionKicker}>How it works</div>
-            <h2>One flow for hosts, one flow for guests.</h2>
+            <h2>Effortless for hosts. Intuitive for guests.</h2>
             <ol className={styles.stepList}>
               {steps.map((step, index) => (
                 <li key={step}>
@@ -91,11 +90,10 @@ export default function HomePage() {
           </article>
 
           <article className={styles.panelAccent} id="trust">
-            <div className={styles.sectionKicker}>Trust model</div>
-            <h2>Privacy and control are part of the product, not an afterthought.</h2>
+            <div className={styles.sectionKicker}>The Trust Model</div>
+            <h2>Built on discretion and peace of mind.</h2>
             <p>
-              Invite links are unlisted by default. Host addresses stay hidden until the booking rules allow
-              disclosure. Conflict handling is neutral and explainable.
+              Your privacy is our priority. Invite links are inherently unlisted, and your address is securely hidden until the booking is fully confirmed. We handle any scheduling conflicts with neutral grace, ensuring every guest feels welcome.
             </p>
             <div className={styles.notice}>
               Current deployment note: this frontend must be served from the <code>apps/web</code> project root in Vercel.

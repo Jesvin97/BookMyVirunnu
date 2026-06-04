@@ -1,7 +1,11 @@
 :root {
   --bv-font-body: "Inter", system-ui, sans-serif;
-  --bv-font-display: "Cormorant Garamond", Georgia, serif;
-  color-scheme: dark;
+  --bv-font-display: "Montserrat", "Cormorant Garamond", Georgia, serif;
+  --color-primary: #a4b980;
+  --color-primary-dark: #8b9e6c;
+  --color-bg: #faf9f6;
+  --color-text: #2c3329;
+  color-scheme: light;
 }
 
 * {
@@ -16,8 +20,8 @@ body {
   margin: 0;
   min-height: 100vh;
   font-family: var(--bv-font-body);
-  background: #040906; /* Elite extremely dark forest green-black */
-  color: #f3fcf7; /* Sophisticated soft mint-white */
+  background: var(--color-bg);
+  color: var(--color-text);
 }
 
 a {

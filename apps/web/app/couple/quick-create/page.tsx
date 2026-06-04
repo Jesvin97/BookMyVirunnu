@@ -111,7 +111,6 @@ export default function QuickCreatePage() {
         setError("Please enter both Husband's and Wife's names.");
         return;
       }
-      triggerParticles(e?.clientX || 0, e?.clientY || 0);
     }
     if (step === 2 && nextStep > 2) {
       if (!startDate || !endDate) {
@@ -293,9 +292,9 @@ export default function QuickCreatePage() {
     width: "100%",
     padding: "14px 18px",
     borderRadius: "14px",
-    border: "1px solid rgba(52, 211, 153, 0.25)",
-    background: "rgba(4, 9, 6, 0.5)",
-    color: "#fff",
+    border: "1px solid #d1d5db",
+    background: "#fff",
+    color: "#000",
     outline: "none",
     fontSize: "1rem",
     transition: "border-color 200ms ease, box-shadow 200ms ease"
@@ -303,7 +302,7 @@ export default function QuickCreatePage() {
 
   const labelStyle: React.CSSProperties = {
     fontSize: "0.9rem",
-    color: "rgba(243, 252, 247, 0.85)",
+    color: "#000",
     fontWeight: 500
   };
 
@@ -392,11 +391,11 @@ export default function QuickCreatePage() {
       ))}
 
       <header className={styles.hero} style={{ padding: "0 0 28px", maxWidth: "700px", margin: "0 auto", textAlign: "center" }}>
-        <div className={styles.eyebrow} style={{ color: "#34d399", margin: "0 auto 8px" }}>Newlyweds Portal</div>
-        <h1 style={{ fontFamily: "var(--bv-font-display)", fontSize: "2.8rem", margin: "8px 0 6px", color: "#fff" }}>
+        <div className={styles.eyebrow} style={{ color: "var(--color-primary-dark)", margin: "0 auto 8px" }}>Newlyweds Portal</div>
+        <h1 style={{ fontFamily: "var(--bv-font-display)", fontSize: "2.8rem", margin: "8px 0 6px", color: "#000" }}>
           Wedding Feast Planner
         </h1>
-        <p style={{ color: "rgba(243, 252, 247, 0.65)", margin: 0 }}>
+        <p style={{ color: "#000", margin: 0 }}>
           Set up your available post-wedding Sadhya slots in 3 quick steps!
         </p>
 
@@ -412,7 +411,7 @@ export default function QuickCreatePage() {
         )}
       </header>
 
-      <section className={styles.section} style={{ maxWidth: "700px", margin: "0 auto", position: "relative" }}>
+      <section className={styles.section} style={{ maxWidth: "700px", margin: "0 auto", position: "relative", paddingTop: "16px" }}>
         {error && (
           <div style={{
             padding: "12px 16px",
@@ -430,15 +429,15 @@ export default function QuickCreatePage() {
 
         <div className={`${styles.panel} ${animatingOut ? "animate-fade-out" : "animate-fade-in"}`} style={{ padding: "40px" }}>
           {step === 1 && (
-            <div>
-              <h2 style={{ fontFamily: "var(--bv-font-display)", fontSize: "2.2rem", color: "#34d399", margin: "0 0 8px", textAlign: "center" }}>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+              <h2 style={{ fontFamily: "var(--bv-font-display)", fontSize: "clamp(1.6rem, 5vw, 2.2rem)", color: "#000", margin: "0 0 8px", textAlign: "center", whiteSpace: "nowrap" }}>
                 Who are the newlyweds?
               </h2>
-              <p style={{ color: "rgba(243, 252, 247, 0.6)", fontSize: "0.95rem", textAlign: "center", marginBottom: "32px" }}>
+              <p style={{ color: "#000", fontSize: "0.95rem", textAlign: "center", marginBottom: "32px", maxWidth: "80%" }}>
                 Enter your names to generate your custom feast calendar schedule.
               </p>
 
-              <div style={{ display: "grid", gap: "24px", marginBottom: "36px" }}>
+              <div style={{ display: "grid", gap: "24px", marginBottom: "36px", width: "100%" }}>
                 <div style={{ display: "grid", gap: "8px" }}>
                   <label htmlFor="husbandName" style={labelStyle}>Husband's Name 🤵</label>
                   <input
@@ -496,10 +495,10 @@ export default function QuickCreatePage() {
 
           {step === 2 && (
             <div>
-              <h2 style={{ fontFamily: "var(--bv-font-display)", fontSize: "2.2rem", color: "#34d399", margin: "0 0 8px", textAlign: "center" }}>
+              <h2 style={{ fontFamily: "var(--bv-font-display)", fontSize: "clamp(1.2rem, 4vw, 2.2rem)", color: "#000", margin: "0 0 8px", textAlign: "center", whiteSpace: "nowrap" }}>
                 When are you available for feasts?
               </h2>
-              <p style={{ color: "rgba(243, 252, 247, 0.6)", fontSize: "0.95rem", textAlign: "center", marginBottom: "32px" }}>
+              <p style={{ color: "#000", fontSize: "0.95rem", textAlign: "center", marginBottom: "32px" }}>
                 Define the overall date range you are open to be invited to host family homes.
               </p>
 
