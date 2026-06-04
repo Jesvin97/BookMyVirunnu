@@ -472,7 +472,6 @@ export default function CoupleDashboard() {
                       </TableHeader>
                       <TableBody>
                         {bookings.map((b) => {
-                          const isMasked = b.venue?.address?.includes("Masked");
                           const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(b.venue?.address || "")}`;
                           const mealLabel = getMealLabel(b.startAt);
 
@@ -497,7 +496,7 @@ export default function CoupleDashboard() {
                                 </div>
                               </TableCell>
                               <TableCell style={{ maxWidth: "220px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                                <span style={{ fontSize: "0.85rem", color: isMasked ? "rgba(243, 252, 247, 0.45)" : "#fff" }}>
+                                <span style={{ fontSize: "0.85rem", color: "#fff" }}>
                                   {b.venue?.address || "Address undisclosed"}
                                 </span>
                               </TableCell>
@@ -511,13 +510,13 @@ export default function CoupleDashboard() {
                                 )}
                               </TableCell>
                               <TableCell>
-                                {!isMasked && b.venue?.address ? (
+                                {b.venue?.address ? (
                                   <a href={mapsUrl} target="_blank" rel="noopener noreferrer" className={styles.secondaryButton} style={{ textDecoration: "none", fontSize: "0.75rem", padding: "6px 12px", minHeight: "30px", background: "rgba(52, 211, 153, 0.05)", border: "1px solid rgba(52, 211, 153, 0.2)", color: "#34d399" }}>
                                     🗺️ Maps
                                   </a>
                                 ) : (
                                   <span style={{ fontSize: "0.75rem", color: "rgba(243, 252, 247, 0.45)", fontStyle: "italic" }}>
-                                    Revealed 24h prior 🔒
+                                    No Address
                                   </span>
                                 )}
                               </TableCell>

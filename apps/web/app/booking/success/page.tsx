@@ -96,7 +96,7 @@ function BookingSuccessContent() {
   };
 
   return (
-    <main className={styles.shell} style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "48px 0" }}>
+    <main className={styles.shell} style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "24px 0" }}>
       <div className={styles.backgroundGlow} aria-hidden="true" />
 
       {error ? (
@@ -145,7 +145,7 @@ function BookingSuccessContent() {
           </Link>
         </div>
       ) : (
-        <div className={styles.panel} style={{ width: "min(520px, calc(100% - 32px))", padding: "clamp(20px, 6vw, 40px)", textAlign: "center" }}>
+        <div className={styles.panel} style={{ width: "min(520px, calc(100% - 24px))", padding: "24px", textAlign: "center" }}>
           {/* Celebratory Checkmark Icon */}
           <div style={{
             display: "inline-flex",
@@ -258,7 +258,7 @@ function BookingSuccessContent() {
                   transition: "all 150ms ease"
                 }}
               >
-                💬 Send WhatsApp Confirmation
+                Send WhatsApp Confirmation
               </a>
             )}
 

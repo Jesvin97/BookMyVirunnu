@@ -14,21 +14,6 @@ const eventService = new EventService();
 function maskBookingAddress(booking: any, authUserId?: string): any {
   if (!booking) return booking;
   const bookingObj = booking.toObject ? booking.toObject() : { ...booking };
-  if (!bookingObj.venue || !bookingObj.venue.address) return bookingObj;
-
-  const start = new Date(bookingObj.startAt);
-  const now = new Date();
-  const diffMs = start.getTime() - now.getTime();
-  const diffHours = diffMs / (1000 * 60 * 60);
-
-  // If requester is the guest owner, do NOT mask
-  const isGuest = authUserId && bookingObj.guestUserId?.toString() === authUserId.toString();
-  if (isGuest) return bookingObj;
-
-  // Mask address if more than 24 hours in the future
-  if (diffHours > 24) {
-    bookingObj.venue.address = "Masked (Revealed 24h prior)";
-  }
   return bookingObj;
 }
 

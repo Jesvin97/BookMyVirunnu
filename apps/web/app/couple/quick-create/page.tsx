@@ -35,7 +35,7 @@ export default function QuickCreatePage() {
   } | null>(null);
 
   // Wizard Flow State
-  const [step, setStep] = useState<1 | 2 | 3>(1);
+  const [step, setStep] = useState<number>(1);
   const [animatingOut, setAnimatingOut] = useState(false);
   const [particles, setParticles] = useState<Particle[]>([]);
 
@@ -104,22 +104,28 @@ export default function QuickCreatePage() {
     }
   }, [step, backendConnected, pinging]);
 
-  const handleStepTransition = (nextStep: 1 | 2 | 3, e?: React.MouseEvent) => {
+  const handleStepTransition = (nextStep: number, e?: React.MouseEvent) => {
     // Validate current step
-    if (step === 1) {
+    if (step === 1 && nextStep > 1) {
       if (!husbandName.trim() || !wifeName.trim()) {
         setError("Please enter both Husband's and Wife's names.");
         return;
       }
       triggerParticles(e?.clientX || 0, e?.clientY || 0);
     }
-    if (step === 2) {
+    if (step === 2 && nextStep > 2) {
       if (!startDate || !endDate) {
         setError("Please select both start and end dates.");
         return;
       }
       if (new Date(endDate) <= new Date(startDate)) {
         setError("End date must be after the start date.");
+        return;
+      }
+    }
+    if (step === 4 && nextStep > 4) {
+      if (!enableBreakfast && !enableLunch && !enableDinner) {
+        setError("Please enable at least one feast meal block (Breakfast, Lunch or Dinner).");
         return;
       }
     }
@@ -167,6 +173,11 @@ export default function QuickCreatePage() {
 
     if (!enableBreakfast && !enableLunch && !enableDinner) {
       setError("Please enable at least one feast meal block (Breakfast, Lunch or Dinner) for booking.");
+      return;
+    }
+    
+    if (!phone.trim()) {
+      setError("Contact number is required.");
       return;
     }
 
@@ -237,36 +248,44 @@ export default function QuickCreatePage() {
 
   if (step === 1) {
     if (husbandName.trim() && wifeName.trim()) {
-      progressPercent = 33;
-      progressText = "Banana chips came... 🍌";
+      progressPercent = 16;
+      progressText = "Banana chips came...";
     } else if (husbandName.trim()) {
-      progressPercent = 15;
-      progressText = "Placing a banana leaf... 🍃";
+      progressPercent = 8;
+      progressText = "Placing a banana leaf...";
     } else {
       progressPercent = 0;
-      progressText = "Preparing the feast hall... 🍽️";
+      progressText = "Preparing the feast hall...";
     }
   } else if (step === 2) {
     if (startDate && endDate) {
-      progressPercent = 66;
-      progressText = "Kootans came in... 🍲";
-    } else if (startDate) {
-      progressPercent = 45;
-      progressText = "Pickles placed... 🌶️";
-    } else {
       progressPercent = 33;
-      progressText = "Banana chips came... 🍌";
+      progressText = "Pickles placed...";
+    } else {
+      progressPercent = 16;
+      progressText = "Banana chips came...";
     }
   } else if (step === 3) {
+    progressPercent = 50;
+    progressText = "Papad came...";
+  } else if (step === 4) {
+    if (enableBreakfast || enableLunch || enableDinner) {
+      progressPercent = 66;
+      progressText = "Kootans came in...";
+    } else {
+      progressPercent = 50;
+      progressText = "Papad came...";
+    }
+  } else if (step === 5) {
+    progressPercent = 83;
+    progressText = "Rice came...";
+  } else if (step === 6) {
     if (phone.trim().length >= 10) {
       progressPercent = 100;
-      progressText = "Papad came, Rice came, Sambar came! 🍛";
-    } else if (phone.trim().length > 0) {
-      progressPercent = 90;
-      progressText = "Sambar came! 🍲";
+      progressText = "Sambar came!";
     } else {
-      progressPercent = 75;
-      progressText = "Papad came, Rice came! 🌾";
+      progressPercent = 90;
+      progressText = "Rice came...";
     }
   }
 
@@ -511,15 +530,49 @@ export default function QuickCreatePage() {
                     />
                   </div>
                 </div>
+              </div>
 
-                <hr style={{ border: 0, borderTop: "1px solid rgba(52, 211, 153, 0.12)", margin: "8px 0" }} />
+              <div className={styles.wizardButtons} style={{ display: "flex", gap: "12px", flexDirection: "row" }}>
+                <button
+                  type="button"
+                  onClick={() => handleStepTransition(1)}
+                  className={styles.secondaryButton}
+                  style={{ flex: 1, padding: "14px" }}
+                >
+                  ⬅ Back
+                </button>
+                <button
+                  type="button"
+                  disabled={!backendConnected}
+                  onClick={(e) => handleStepTransition(3, e)}
+                  className={styles.primaryButton}
+                  style={{
+                    flex: 1,
+                    border: 0,
+                    padding: "14px",
+                    fontSize: "1.05rem",
+                    cursor: !backendConnected ? "not-allowed" : "pointer",
+                    opacity: !backendConnected ? 0.6 : 1
+                  }}
+                >
+                  {backendConnected ? "Continue" : pinging ? "Connecting..." : "Awaiting..."}
+                </button>
+              </div>
+            </div>
+          )}
 
+          {step === 3 && (
+            <div>
+              <h2 style={{ fontFamily: "var(--bv-font-display)", fontSize: "2.2rem", color: "#34d399", margin: "0 0 8px", textAlign: "center" }}>
+                Do you have any private rest dates? 🚫
+              </h2>
+              <p style={{ color: "rgba(243, 252, 247, 0.6)", fontSize: "0.95rem", textAlign: "center", marginBottom: "32px" }}>
+                Add specific days (e.g. your honeymoon or rest days) you want to pre-block and completely hide from relatives.
+              </p>
+
+              <div style={{ display: "grid", gap: "24px", marginBottom: "36px" }}>
                 {/* Rest Date Blocker */}
                 <div style={{ display: "grid", gap: "8px" }}>
-                  <label style={labelStyle}>Do you have any private rest dates? 🚫</label>
-                  <p style={{ color: "rgba(243, 252, 247, 0.5)", fontSize: "0.82rem", margin: "0 0 6px" }}>
-                    Add specific days (e.g. your honeymoon or rest days) you want to pre-block and completely hide from relatives.
-                  </p>
                   <div style={{ display: "flex", gap: "10px" }}>
                     <input
                       type="date"
@@ -590,48 +643,40 @@ export default function QuickCreatePage() {
                 </div>
               </div>
 
-              <div className={styles.wizardButtons}>
+              <div className={styles.wizardButtons} style={{ display: "flex", gap: "12px", flexDirection: "row" }}>
                 <button
                   type="button"
-                  onClick={() => handleStepTransition(1)}
+                  onClick={() => handleStepTransition(2)}
                   className={styles.secondaryButton}
-                  style={{ width: "100%", padding: "14px" }}
+                  style={{ flex: 1, padding: "14px" }}
                 >
                   ⬅ Back
                 </button>
                 <button
                   type="button"
-                  disabled={!backendConnected}
-                  onClick={(e) => handleStepTransition(3, e)}
+                  onClick={(e) => handleStepTransition(4, e)}
                   className={styles.primaryButton}
-                  style={{
-                    width: "100%",
-                    border: 0,
-                    padding: "14px",
-                    fontSize: "1.05rem",
-                    cursor: !backendConnected ? "not-allowed" : "pointer",
-                    opacity: !backendConnected ? 0.6 : 1
-                  }}
+                  style={{ flex: 1, border: 0, padding: "14px", fontSize: "1.05rem" }}
                 >
-                  {backendConnected ? "Continue" : pinging ? "Connecting to backend..." : "Awaiting backend connection..."}
+                  Continue
                 </button>
               </div>
             </div>
           )}
 
-          {step === 3 && (
-            <form onSubmit={handleSubmit}>
+          {step === 4 && (
+            <div>
               <h2 style={{ fontFamily: "var(--bv-font-display)", fontSize: "2.2rem", color: "#34d399", margin: "0 0 8px", textAlign: "center" }}>
-                Select Feast Settings 🍛
+                Select Feast Settings
               </h2>
               <p style={{ color: "rgba(243, 252, 247, 0.6)", fontSize: "0.95rem", textAlign: "center", marginBottom: "32px" }}>
-                Choose meal times, dietary preferences, and set contact details.
+                Choose meal times you are available for.
               </p>
 
               <div style={{ display: "grid", gap: "28px", marginBottom: "36px" }}>
                 {/* Available Meals */}
                 <div>
-                  <label style={{ ...labelStyle, display: "block", marginBottom: "12px" }}>Available Meals 🕒</label>
+                  <label style={{ ...labelStyle, display: "block", marginBottom: "12px" }}>Available Meals</label>
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: "14px" }}>
                     {/* Breakfast */}
                     <button
@@ -694,15 +739,41 @@ export default function QuickCreatePage() {
                     </button>
                   </div>
                 </div>
+              </div>
 
-                <hr style={{ border: 0, borderTop: "1px solid rgba(52, 211, 153, 0.12)", margin: 0 }} />
+              <div className={styles.wizardButtons} style={{ display: "flex", gap: "12px", flexDirection: "row" }}>
+                <button
+                  type="button"
+                  onClick={() => handleStepTransition(3)}
+                  className={styles.secondaryButton}
+                  style={{ flex: 1, padding: "14px" }}
+                >
+                  ⬅ Back
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => handleStepTransition(5, e)}
+                  className={styles.primaryButton}
+                  style={{ flex: 1, border: 0, padding: "14px", fontSize: "1.05rem" }}
+                >
+                  Continue
+                </button>
+              </div>
+            </div>
+          )}
 
+          {step === 5 && (
+            <div>
+              <h2 style={{ fontFamily: "var(--bv-font-display)", fontSize: "2.2rem", color: "#34d399", margin: "0 0 8px", textAlign: "center" }}>
+                Newlyweds Dietary Preferences
+              </h2>
+              <p style={{ color: "rgba(243, 252, 247, 0.6)", fontSize: "0.95rem", textAlign: "center", marginBottom: "32px" }}>
+                Select any food preferences/restrictions. Relatives will see this notice prominently when booking a slot!
+              </p>
+
+              <div style={{ display: "grid", gap: "28px", marginBottom: "36px" }}>
                 {/* Dietary Restrictions */}
                 <div>
-                  <label style={{ ...labelStyle, display: "block", marginBottom: "8px" }}>Newlyweds Dietary Preferences 🥗</label>
-                  <p style={{ color: "rgba(243, 252, 247, 0.5)", fontSize: "0.82rem", margin: "0 0 14px" }}>
-                    Select any food preferences/restrictions. Relatives will see this notice prominently when booking a slot!
-                  </p>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
                     {DIETARY_OPTIONS.map((opt) => {
                       const isSelected = selectedDiet.includes(opt.value);
@@ -746,15 +817,46 @@ export default function QuickCreatePage() {
                     />
                   </div>
                 </div>
+              </div>
 
-                <hr style={{ border: 0, borderTop: "1px solid rgba(52, 211, 153, 0.12)", margin: 0 }} />
+              <div className={styles.wizardButtons} style={{ display: "flex", gap: "12px", flexDirection: "row" }}>
+                <button
+                  type="button"
+                  onClick={() => handleStepTransition(4)}
+                  className={styles.secondaryButton}
+                  style={{ flex: 1, padding: "14px" }}
+                >
+                  ⬅ Back
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => handleStepTransition(6, e)}
+                  className={styles.primaryButton}
+                  style={{ flex: 1, border: 0, padding: "14px", fontSize: "1.05rem" }}
+                >
+                  Continue
+                </button>
+              </div>
+            </div>
+          )}
 
+          {step === 6 && (
+            <form onSubmit={handleSubmit}>
+              <h2 style={{ fontFamily: "var(--bv-font-display)", fontSize: "2.2rem", color: "#34d399", margin: "0 0 8px", textAlign: "center" }}>
+                Contact Number
+              </h2>
+              <p style={{ color: "rgba(243, 252, 247, 0.6)", fontSize: "0.95rem", textAlign: "center", marginBottom: "32px" }}>
+                Provide a number for your relatives to contact you regarding the feast.
+              </p>
+
+              <div style={{ display: "grid", gap: "28px", marginBottom: "36px" }}>
                 {/* Phone */}
                 <div style={{ display: "grid", gap: "8px" }}>
-                  <label htmlFor="phone" style={labelStyle}>Contact Number (Optional, for host relatives)</label>
+                  <label htmlFor="phone" style={labelStyle}>Contact Number</label>
                   <input
                     id="phone"
                     type="text"
+                    required
                     placeholder="e.g. +91 98765 43210"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
@@ -765,12 +867,12 @@ export default function QuickCreatePage() {
                 </div>
               </div>
 
-              <div className={styles.wizardButtons}>
+              <div className={styles.wizardButtons} style={{ display: "flex", gap: "12px", flexDirection: "row" }}>
                 <button
                   type="button"
-                  onClick={() => handleStepTransition(2)}
+                  onClick={() => handleStepTransition(5)}
                   className={styles.secondaryButton}
-                  style={{ width: "100%", padding: "14px" }}
+                  style={{ flex: 1, padding: "14px" }}
                 >
                   ⬅ Back
                 </button>
@@ -778,7 +880,7 @@ export default function QuickCreatePage() {
                   type="submit"
                   disabled={loading}
                   className={styles.primaryButton}
-                  style={{ width: "100%", border: 0, padding: "14px", fontSize: "1.05rem", cursor: loading ? "not-allowed" : "pointer" }}
+                  style={{ flex: 1, border: 0, padding: "14px", fontSize: "1.05rem", cursor: loading ? "not-allowed" : "pointer" }}
                 >
                   {loading ? "Creating Feast Calendar..." : "Generate Link"}
                 </button>

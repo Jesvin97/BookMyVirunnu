@@ -118,9 +118,7 @@ export default function GuestBookingPage() {
     if (event) {
       const savedName = typeof window !== "undefined" ? localStorage.getItem("bv_last_host_name") : null;
       if (!savedName && (guestName === "Jesvin & Family" || !guestName)) {
-        const coupleName = event.title.replace("'s Feast Schedule 🍛", "").replace("'s Feast Schedule", "");
-        const hostLastName = coupleName.split(" & ")[0];
-        setGuestName(`${hostLastName}'s Host Family`);
+        setGuestName("");
       }
     }
   }, [event, guestName]);
@@ -328,7 +326,11 @@ export default function GuestBookingPage() {
     }
   };
 
-  const getMealLabel = (startAtStr: string) => {
+  const getMealLabel = (startAtStr: string, index?: number) => {
+    if (typeof index === "number") {
+      const mealNames = ["Breakfast", "Lunch", "Dinner"];
+      return { name: mealNames[index] || `Slot ${index + 1}` };
+    }
     const date = new Date(startAtStr);
     const hour = date.getHours();
 
@@ -387,7 +389,7 @@ export default function GuestBookingPage() {
   }
 
   return (
-    <main className={styles.shell} style={{ minHeight: "100vh", padding: "48px 0" }}>
+    <main className={styles.shell} style={{ minHeight: "100vh", padding: "24px 0" }}>
       <div className={styles.backgroundGlow} aria-hidden="true" />
 
       {/* Floating particles container */}
@@ -472,7 +474,7 @@ export default function GuestBookingPage() {
               </div>
             )}
 
-            <div className={`${styles.panel} ${animatingOut ? "animate-fade-out" : "animate-fade-in"}`} style={{ padding: "40px" }}>
+            <div className={`${styles.panel} ${animatingOut ? "animate-fade-out" : "animate-fade-in"}`} style={{ padding: "24px" }}>
               
               {step === 1 && (
                 <div>
@@ -524,10 +526,10 @@ export default function GuestBookingPage() {
                       {/* Filtered Slots List */}
                       {selectedDate && getSlotsByDate()[selectedDate] && (
                         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "14px", marginBottom: "36px" }}>
-                          {getSlotsByDate()[selectedDate].map((s) => {
+                          {getSlotsByDate()[selectedDate].map((s, index) => {
                             const isSelected = selectedSlot?._id === s._id;
                             const isLocked = s.status === "locked" || (s.capacity - s.reservedCount) <= 0;
-                            const meal = getMealLabel(s.startAt);
+                            const meal = getMealLabel(s.startAt, index);
 
                             return (
                               <button
@@ -671,12 +673,12 @@ export default function GuestBookingPage() {
                     </div>
                   </div>
 
-                  <div className={styles.wizardButtons}>
+                  <div className={styles.wizardButtons} style={{ display: "flex", gap: "12px", flexDirection: "row" }}>
                     <button
                       type="button"
                       onClick={() => handleStepTransition(1)}
                       className={styles.secondaryButton}
-                      style={{ width: "100%", padding: "14px" }}
+                      style={{ flex: 1, padding: "14px" }}
                     >
                       ⬅ Back
                     </button>
@@ -684,7 +686,7 @@ export default function GuestBookingPage() {
                       type="button"
                       onClick={(e) => handleStepTransition(3, e)}
                       className={styles.primaryButton}
-                      style={{ width: "100%", border: 0, padding: "14px", fontSize: "1.05rem" }}
+                      style={{ flex: 1, border: 0, padding: "14px", fontSize: "1.05rem" }}
                     >
                       Continue to Location ➔
                     </button>
@@ -738,26 +740,23 @@ export default function GuestBookingPage() {
                           <Textarea
                             id="venueAddress"
                             required
-                            placeholder="Provide your physical home address so the couple can navigate there (hidden until 24h prior)..."
+                            placeholder="Provide your physical home address so the couple can navigate there..."
                             value={venueAddress}
                             onChange={(e) => setVenueAddress(e.target.value)}
                             style={{ marginTop: "8px" }}
                           />
-                          <span style={{ display: "block", fontSize: "0.78rem", color: "rgba(243, 252, 247, 0.55)", marginTop: "6px", lineHeight: 1.4, textAlign: "left" }}>
-                            💡 <strong>Quick Tip for Mobile</strong>: You can open Google Maps, copy your home location link (or type a nearby landmark), and paste it here directly!
-                          </span>
                         </div>
                       )}
                     </div>
 
                   </div>
 
-                  <div className={styles.wizardButtons}>
+                  <div className={styles.wizardButtons} style={{ display: "flex", gap: "12px", flexDirection: "row" }}>
                     <button
                       type="button"
                       onClick={() => handleStepTransition(2)}
                       className={styles.secondaryButton}
-                      style={{ width: "100%", padding: "14px" }}
+                      style={{ flex: 1, padding: "14px" }}
                     >
                       ⬅ Back
                     </button>
@@ -765,9 +764,9 @@ export default function GuestBookingPage() {
                       type="submit"
                       disabled={submitLoading || locating}
                       className={styles.primaryButton}
-                      style={{ width: "100%", border: 0, padding: "14px", fontSize: "1.05rem", cursor: (submitLoading || locating) ? "not-allowed" : "pointer" }}
+                      style={{ flex: 1, border: 0, padding: "14px", fontSize: "1.05rem", cursor: (submitLoading || locating) ? "not-allowed" : "pointer" }}
                     >
-                      {submitLoading ? "Reserving Slot..." : "Send Invitation to Couple ✉️"}
+                      {submitLoading ? "Reserving Slot..." : "Send Invitation ✉️"}
                     </button>
                   </div>
                 </form>
