@@ -17,7 +17,7 @@ const cormorant = Cormorant_Garamond({
 });
 
 export const metadata = {
-  title: "BookMyVirunnu",
+  title: "BookOurVirunnu",
   description: "Ceremonial hospitality booking for Kerala virunnu experiences."
 };
 

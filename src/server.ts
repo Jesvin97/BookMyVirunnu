@@ -7,7 +7,7 @@ async function bootstrap(): Promise<void> {
   const app = createApp();
 
   app.listen(env.port, () => {
-    console.log(`BookMyVirunnu API listening on port ${env.port}`);
+    console.log(`BookOurVirunnu API listening on port ${env.port}`);
   });
 }
 

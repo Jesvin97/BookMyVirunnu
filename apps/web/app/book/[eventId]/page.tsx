@@ -327,13 +327,11 @@ export default function GuestBookingPage() {
   };
 
   const getMealLabel = (startAtStr: string) => {
-    const formatter = new Intl.DateTimeFormat("en-US", {
-      timeZone: "Asia/Kolkata",
-      hour: "numeric",
-      hour12: false
-    });
-    const hourStr = formatter.format(new Date(startAtStr));
-    const hour = parseInt(hourStr, 10);
+    // Asia/Kolkata is UTC + 5:30
+    const date = new Date(startAtStr);
+    const istMillis = date.getTime() + (5.5 * 60 * 60 * 1000);
+    const istDate = new Date(istMillis);
+    const hour = istDate.getUTCHours();
 
     if (hour < 12) {
       return { name: "Breakfast" };
@@ -346,7 +344,13 @@ export default function GuestBookingPage() {
 
   const getSlotsByDate = () => {
     const groups: Record<string, Slot[]> = {};
+    const now = new Date();
+    
     slots.forEach((slot) => {
+      const slotEnd = new Date(slot.endAt);
+      // Ignore slots that have already ended
+      if (slotEnd < now) return;
+
       const dateKey = new Date(slot.startAt).toLocaleDateString([], {
         weekday: "short",
         month: "short",
