@@ -66,11 +66,11 @@ export default function LoginPage() {
       
       <div className={styles.panel} style={{ width: "min(440px, calc(100% - 32px))", padding: "40px" }}>
         <div style={{ textAlign: "center", marginBottom: "32px" }}>
-          <div className={styles.eyebrow} style={{ marginBottom: "16px" }}>Login</div>
-          <h2 style={{ fontFamily: "var(--bv-font-display)", fontSize: "2.4rem", margin: "0 0 10px", color: "#fff" }}>
+          <div className={styles.eyebrow} style={{ marginBottom: "16px", color: "#8b9e6c" }}>Login</div>
+          <h2 style={{ fontFamily: "var(--bv-font-display)", fontSize: "2.4rem", margin: "0 0 10px", color: "#8b9e6c" }}>
             Welcome back
           </h2>
-          <p style={{ color: "rgba(243, 252, 247, 0.65)", margin: 0 }}>
+          <p style={{ color: "#8b9e6c", margin: 0 }}>
             Enter your credentials to manage your virunnu slots
           </p>
         </div>
@@ -140,7 +140,7 @@ export default function LoginPage() {
           {activeTab === "password" ? (
             <>
               <div style={{ display: "grid", gap: "8px" }}>
-                <label htmlFor="email" style={{ fontSize: "0.85rem", color: "rgba(243, 252, 247, 0.8)", fontWeight: 500 }}>
+                <label htmlFor="email" style={{ fontSize: "0.85rem", color: "#8b9e6c", fontWeight: 500 }}>
                   Email address
                 </label>
                 <input
@@ -167,7 +167,7 @@ export default function LoginPage() {
               </div>
 
               <div style={{ display: "grid", gap: "8px" }}>
-                <label htmlFor="password" style={{ fontSize: "0.85rem", color: "rgba(243, 252, 247, 0.8)", fontWeight: 500 }}>
+                <label htmlFor="password" style={{ fontSize: "0.85rem", color: "#8b9e6c", fontWeight: 500 }}>
                   Password
                 </label>
                 <input
@@ -195,7 +195,7 @@ export default function LoginPage() {
             </>
           ) : (
             <div style={{ display: "grid", gap: "8px" }}>
-              <label htmlFor="eventId" style={{ fontSize: "0.85rem", color: "rgba(243, 252, 247, 0.8)", fontWeight: 500 }}>
+              <label htmlFor="eventId" style={{ fontSize: "0.85rem", color: "#8b9e6c", fontWeight: 500 }}>
                 Wedding Feast ID 🔑
               </label>
               <input
@@ -219,7 +219,7 @@ export default function LoginPage() {
                 onFocus={(e) => e.target.style.borderColor = "#34d399"}
                 onBlur={(e) => e.target.style.borderColor = "rgba(52, 211, 153, 0.2)"}
               />
-              <span style={{ fontSize: "0.8rem", color: "rgba(243, 252, 247, 0.5)", marginTop: "4px" }}>
+              <span style={{ fontSize: "0.8rem", color: "#8b9e6c", marginTop: "4px" }}>
                 Enter the unique 24-character Feast ID generated when you created your calendar.
               </span>
             </div>
@@ -229,13 +229,13 @@ export default function LoginPage() {
             type="submit"
             disabled={loading}
             className={styles.primaryButton}
-            style={{ width: "100%", border: "0", cursor: loading ? "not-allowed" : "pointer", marginTop: "10px" }}
+            style={{ width: "100%", border: "0", cursor: loading ? "not-allowed" : "pointer", marginTop: "10px", color: "#fff" }}
           >
-            {loading ? "Verifying..." : activeTab === "password" ? "Sign in to account" : "Access Feast Dashboard ✨"}
+            {loading ? "Verifying..." : activeTab === "password" ? "Sign in to account" : "Access Feast Dashboard"}
           </button>
         </form>
 
-        <div style={{ textAlign: "center", marginTop: "28px", fontSize: "0.9rem", color: "rgba(243, 252, 247, 0.6)" }}>
+        <div style={{ textAlign: "center", marginTop: "28px", fontSize: "0.9rem", color: "#8b9e6c" }}>
           Don't have an account?{" "}
           <Link href="/register" style={{ color: "#34d399", fontWeight: 600, textDecoration: "none" }}>
             Register here

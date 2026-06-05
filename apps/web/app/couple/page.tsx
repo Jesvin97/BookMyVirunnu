@@ -286,8 +286,14 @@ export default function CoupleDashboard() {
   };
 
   const getMealLabel = (startAtStr: string) => {
-    const date = new Date(startAtStr);
-    const hour = date.getHours();
+    const formatter = new Intl.DateTimeFormat("en-US", {
+      timeZone: "Asia/Kolkata",
+      hour: "numeric",
+      hour12: false
+    });
+    const hourStr = formatter.format(new Date(startAtStr));
+    const hour = parseInt(hourStr, 10);
+    
     if (hour < 12) return "Breakfast";
     if (hour < 16) return "Lunch";
     return "Dinner";
@@ -327,17 +333,17 @@ export default function CoupleDashboard() {
   }
 
   return (
-    <div style={{ background: "#040906", minHeight: "100vh", display: "flex", flexDirection: "column", width: "100%" }}>
+    <div style={{ background: "#fff", minHeight: "100vh", display: "flex", flexDirection: "column", width: "100%" }}>
       <main className={styles.shell} style={{ flex: 1, minHeight: "100vh", padding: "48px 24px", overflowY: "auto", position: "relative" }}>
         <div className={styles.backgroundGlow} aria-hidden="true" />
 
         <header className={styles.hero} style={{ padding: "0 0 40px", display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: "24px" }}>
           <div>
-            <div className={styles.eyebrow} style={{ color: "#34d399" }}>Newlywed Feasts Portal</div>
-            <h1 style={{ fontFamily: "var(--bv-font-display)", fontSize: "3rem", margin: "16px 0 8px", color: "#fff" }}>
+            <div className={styles.eyebrow} style={{ color: "var(--color-primary)" }}>Newlywed Feasts Portal</div>
+            <h1 style={{ fontFamily: "var(--bv-font-display)", fontSize: "3rem", margin: "16px 0 8px", color: "#000" }}>
               Namaskaram, {user?.name || "Couple"} 👋
             </h1>
-            <p style={{ color: "rgba(243, 252, 247, 0.65)", margin: 0 }}>
+            <p style={{ color: "#000", margin: 0 }}>
               Manage invitations from family and block dates to rest.
             </p>
           </div>
@@ -353,8 +359,8 @@ export default function CoupleDashboard() {
         <section className={styles.section}>
           {events.length === 0 ? (
             <div className={styles.panel} style={{ textAlign: "center", padding: "64px 32px" }}>
-              <h3 style={{ fontSize: "1.5rem", margin: "0 0 12px", color: "#34d399" }}>No Feast Calendar Created Yet</h3>
-              <p style={{ color: "rgba(243, 252, 247, 0.7)", maxWidth: "400px", margin: "0 auto 28px" }}>
+              <h3 style={{ fontSize: "1.5rem", margin: "0 0 12px", color: "var(--color-primary)" }}>No Feast Calendar Created Yet</h3>
+              <p style={{ color: "#000", maxWidth: "400px", margin: "0 auto 28px" }}>
                 Setup your available date range so families and friends can begin calling you to their homes for traditional wedding meals!
               </p>
               <Link href="/couple/events/new" className={styles.primaryButton} style={{ textDecoration: "none" }}>
@@ -367,10 +373,10 @@ export default function CoupleDashboard() {
                 <div className={styles.panel} style={{ padding: "32px" }}>
                   <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", gap: "16px", marginBottom: "20px" }}>
                     <div>
-                      <h2 style={{ fontSize: "2rem", margin: "0 0 8px", color: "#fff", fontFamily: "var(--bv-font-display)" }}>
+                      <h2 style={{ fontSize: "2rem", margin: "0 0 8px", color: "#000", fontFamily: "var(--bv-font-display)" }}>
                         {activeEvent.title}
                       </h2>
-                      <p style={{ color: "rgba(243, 252, 247, 0.5)", fontSize: "0.9rem", margin: 0 }}>
+                      <p style={{ color: "#000", fontSize: "0.9rem", margin: 0 }}>
                         Active Calendar Range: {new Date(activeEvent.startDate).toLocaleDateString()} - {new Date(activeEvent.endDate).toLocaleDateString()}
                       </p>
                     </div>
@@ -405,11 +411,11 @@ export default function CoupleDashboard() {
                   {activeEvent.status === "published" && (
                     <div className={styles.notice} style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: "16px", padding: "12px 16px", marginBottom: "16px", minWidth: 0, flexShrink: 1, overflowWrap: "anywhere", wordBreak: "break-word" }}>
                       <div style={{ minWidth: 0, flexShrink: 1 }}>
-                        <strong style={{ display: "block", color: "#fff", marginBottom: "4px" }}>Share Your Invite Portal Link 🔗</strong>
-                        <span style={{ fontSize: "0.85rem", color: "rgba(243, 252, 247, 0.7)" }}>Send this link to families and friends so they can call you for meals:</span>
+                        <strong style={{ display: "block", color: "#000", marginBottom: "4px" }}>Share Your Invite Portal Link 🔗</strong>
+                        <span style={{ fontSize: "0.85rem", color: "#000" }}>Send this link to families and friends so they can call you for meals:</span>
                       </div>
                       <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap", minWidth: 0, flexShrink: 1 }}>
-                        <code style={{ background: "rgba(0,0,0,0.3)", padding: "4px 8px", borderRadius: "8px", border: "1px solid rgba(52, 211, 153, 0.15)", fontSize: "0.75rem", minWidth: 0, flexShrink: 1, overflowWrap: "anywhere", wordBreak: "break-all", whiteSpace: "normal" }}>
+                        <code style={{ background: "#fff", padding: "4px 8px", borderRadius: "8px", border: "1px solid #d1d5db", fontSize: "0.75rem", color: "#000", minWidth: 0, flexShrink: 1, overflowWrap: "anywhere", wordBreak: "break-all", whiteSpace: "normal" }}>
                           /book/{activeEvent._id}
                         </code>
                         <CopyButton
@@ -429,25 +435,25 @@ export default function CoupleDashboard() {
                   )}
 
                   {/* Private Dashboard Link Card */}
-                  <div className={styles.panelAccent} style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: "16px", padding: "12px 16px", marginBottom: "32px", background: "rgba(239, 68, 68, 0.03)", border: "1px solid rgba(239, 68, 68, 0.2)", minWidth: 0, maxWidth: "100%", flexShrink: 1, boxSizing: "border-box", overflowWrap: "anywhere", wordBreak: "break-word" }}>
+                  <div className={styles.panelAccent} style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: "16px", padding: "12px 16px", marginBottom: "32px", background: "#fef2f2", border: "1px solid #fecaca", minWidth: 0, maxWidth: "100%", flexShrink: 1, boxSizing: "border-box", overflowWrap: "anywhere", wordBreak: "break-word" }}>
                     <div style={{ minWidth: 0, flexShrink: 1 }}>
-                      <strong style={{ display: "block", color: "#f87171", marginBottom: "4px" }}>Feast ID & Private Dashboard Manager 🔑</strong>
-                      <span style={{ fontSize: "0.85rem", color: "rgba(243, 252, 247, 0.7)" }}>Bookmark this link to access your dashboard passwordlessly on other devices:</span>
+                      <strong style={{ display: "block", color: "#ef4444", marginBottom: "4px" }}>Feast ID & Private Dashboard Manager 🔑</strong>
+                      <span style={{ fontSize: "0.85rem", color: "#000" }}>Bookmark this link to access your dashboard passwordlessly on other devices:</span>
                     </div>
                     <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap", minWidth: 0, flexShrink: 1 }}>
-                      <code style={{ background: "rgba(0,0,0,0.3)", padding: "4px 8px", borderRadius: "8px", border: "1px solid rgba(239, 68, 68, 0.25)", fontSize: "0.75rem", color: "#f87171", minWidth: 0, flexShrink: 1, overflowWrap: "anywhere", wordBreak: "break-all", whiteSpace: "normal" }}>
+                      <code style={{ background: "#fff", padding: "4px 8px", borderRadius: "8px", border: "1px solid #fca5a5", fontSize: "0.75rem", color: "#ef4444", minWidth: 0, flexShrink: 1, overflowWrap: "anywhere", wordBreak: "break-all", whiteSpace: "normal" }}>
                         {activeEvent._id}
                       </code>
                       <CopyButton
                         content={typeof window !== "undefined" ? `${window.location.origin}/couple?id=${activeEvent._id}` : `${activeEvent._id}`}
                         successMessage="Private Manage Link copied successfully! 🔑"
-                        style={{ padding: "0 14px", minHeight: "32px", fontSize: "0.8rem", border: "1px solid rgba(239, 68, 68, 0.3)", background: "rgba(239, 68, 68, 0.05)", color: "#f87171" }}
+                        style={{ padding: "0 14px", minHeight: "32px", fontSize: "0.8rem", border: "1px solid #fca5a5", background: "#fff", color: "#ef4444" }}
                       />
                     </div>
                   </div>
 
                   {/* Bookings & Visits Schedule */}
-                  <h3 style={{ fontSize: "1.2rem", color: "#34d399", margin: "0 0 16px", fontFamily: "var(--bv-font-display)" }}>
+                  <h3 style={{ fontSize: "1.2rem", color: "#000", margin: "0 0 16px", fontFamily: "var(--bv-font-display)" }}>
                     Scheduled Home Visits 🍛
                   </h3>
                   {bookingsLoading ? (
@@ -456,7 +462,7 @@ export default function CoupleDashboard() {
                       <Skeleton style={{ height: "40px" }} />
                     </div>
                   ) : bookings.length === 0 ? (
-                    <div style={{ color: "rgba(243, 252, 247, 0.5)", fontStyle: "italic", border: "1px dashed rgba(255,255,255,0.06)", borderRadius: "12px", padding: "20px", textAlign: "center", marginBottom: "32px" }}>
+                    <div style={{ color: "#000", fontStyle: "italic", border: "1px dashed #d1d5db", borderRadius: "12px", padding: "20px", textAlign: "center", marginBottom: "32px" }}>
                       No families have invited you for a meal yet. Share your link!
                     </div>
                   ) : (
@@ -479,9 +485,9 @@ export default function CoupleDashboard() {
                             <TableRow key={b._id}>
                               <TableCell style={{ fontWeight: 600 }}>
                                 <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                                  <span style={{ color: "#fff" }}>{b.venue?.name || "Host Family"}</span>
+                                  <span style={{ color: "#000" }}>{b.venue?.name || "Host Family"}</span>
                                   {b.venue?.phone && (
-                                    <span style={{ fontSize: "0.8rem", color: "rgba(243, 252, 247, 0.5)" }}>
+                                    <span style={{ fontSize: "0.8rem", color: "#000" }}>
                                       📞 {b.venue.phone}
                                     </span>
                                   )}
@@ -489,33 +495,33 @@ export default function CoupleDashboard() {
                               </TableCell>
                               <TableCell>
                                 <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                                  <span style={{ color: "#34d399", fontWeight: 600 }}>{mealLabel}</span>
-                                  <span style={{ fontSize: "0.8rem", color: "rgba(243, 252, 247, 0.6)" }}>
+                                  <span style={{ color: "var(--color-primary)", fontWeight: 600 }}>{mealLabel}</span>
+                                  <span style={{ fontSize: "0.8rem", color: "#000" }}>
                                     {new Date(b.startAt).toLocaleDateString([], { weekday: "short", month: "short", day: "numeric" })}
                                   </span>
                                 </div>
                               </TableCell>
                               <TableCell style={{ maxWidth: "220px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                                <span style={{ fontSize: "0.85rem", color: "#fff" }}>
+                                <span style={{ fontSize: "0.85rem", color: "#000" }}>
                                   {b.venue?.address || "Address undisclosed"}
                                 </span>
                               </TableCell>
                               <TableCell>
                                 {b.specialRequests ? (
-                                  <span style={{ fontSize: "0.85rem", fontStyle: "italic", color: "rgba(243, 252, 247, 0.75)" }}>
+                                  <span style={{ fontSize: "0.85rem", fontStyle: "italic", color: "#000" }}>
                                     "{b.specialRequests}"
                                   </span>
                                 ) : (
-                                  <span style={{ color: "rgba(243, 252, 247, 0.35)", fontSize: "0.8rem" }}>None</span>
+                                  <span style={{ color: "rgba(0,0,0,0.5)", fontSize: "0.8rem" }}>None</span>
                                 )}
                               </TableCell>
                               <TableCell>
                                 {b.venue?.address ? (
-                                  <a href={mapsUrl} target="_blank" rel="noopener noreferrer" className={styles.secondaryButton} style={{ textDecoration: "none", fontSize: "0.75rem", padding: "6px 12px", minHeight: "30px", background: "rgba(52, 211, 153, 0.05)", border: "1px solid rgba(52, 211, 153, 0.2)", color: "#34d399" }}>
+                                  <a href={mapsUrl} target="_blank" rel="noopener noreferrer" className={styles.secondaryButton} style={{ textDecoration: "none", fontSize: "0.75rem", padding: "6px 12px", minHeight: "30px", background: "rgba(52, 211, 153, 0.05)", border: "1px solid rgba(52, 211, 153, 0.2)", color: "var(--color-primary)" }}>
                                     🗺️ Maps
                                   </a>
                                 ) : (
-                                  <span style={{ fontSize: "0.75rem", color: "rgba(243, 252, 247, 0.45)", fontStyle: "italic" }}>
+                                  <span style={{ fontSize: "0.75rem", color: "rgba(0,0,0,0.5)", fontStyle: "italic" }}>
                                     No Address
                                   </span>
                                 )}
@@ -528,25 +534,25 @@ export default function CoupleDashboard() {
                   )}
 
                   {/* Compact Feast Calendar & Date Blocking Manager */}
-                  <h3 style={{ fontSize: "1.2rem", color: "#34d399", margin: "28px 0 16px", fontFamily: "var(--bv-font-display)" }}>
+                  <h3 style={{ fontSize: "1.2rem", color: "#000", margin: "28px 0 16px", fontFamily: "var(--bv-font-display)" }}>
                     Feast Calendar Configuration & Rest Days
                   </h3>
 
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "20px", marginBottom: "32px" }}>
                     
                     {/* Selected Calendar Range & Configured Meals Status */}
-                    <div className={styles.panelAccent} style={{ padding: "20px", borderRadius: "16px", background: "rgba(52, 211, 153, 0.03)", border: "1px solid rgba(52, 211, 153, 0.15)", display: "flex", flexDirection: "column", gap: "16px", minWidth: 0, maxWidth: "100%", flexShrink: 1, boxSizing: "border-box", overflowWrap: "anywhere", wordBreak: "break-word" }}>
-                      <h4 style={{ margin: 0, color: "#fff", fontSize: "1.05rem", fontWeight: 600 }}>Feast Setup Summary 🌿</h4>
+                    <div className={styles.panelAccent} style={{ padding: "20px", borderRadius: "16px", background: "#f9fafb", border: "1px solid #d1d5db", display: "flex", flexDirection: "column", gap: "16px", minWidth: 0, maxWidth: "100%", flexShrink: 1, boxSizing: "border-box", overflowWrap: "anywhere", wordBreak: "break-word" }}>
+                      <h4 style={{ margin: 0, color: "#000", fontSize: "1.05rem", fontWeight: 600 }}>Feast Setup Summary 🌿</h4>
                       
-                      <div style={{ fontSize: "0.9rem", color: "rgba(243, 252, 247, 0.85)" }}>
-                        <strong style={{ display: "block", color: "#34d399", fontSize: "0.8rem", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "4px" }}>Selected Calendar Range</strong>
+                      <div style={{ fontSize: "0.9rem", color: "#000" }}>
+                        <strong style={{ display: "block", color: "var(--color-primary)", fontSize: "0.8rem", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "4px" }}>Selected Calendar Range</strong>
                         <span>
                           {new Date(activeEvent.startDate).toLocaleDateString(undefined, { dateStyle: "long" })} to {new Date(activeEvent.endDate).toLocaleDateString(undefined, { dateStyle: "long" })}
                         </span>
                       </div>
 
-                      <div style={{ fontSize: "0.9rem", color: "rgba(243, 252, 247, 0.85)" }}>
-                        <strong style={{ display: "block", color: "#34d399", fontSize: "0.8rem", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "8px" }}>Configured Meals</strong>
+                      <div style={{ fontSize: "0.9rem", color: "#000" }}>
+                        <strong style={{ display: "block", color: "var(--color-primary)", fontSize: "0.8rem", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "8px" }}>Configured Meals</strong>
                         <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
                           {[
                             { name: "Breakfast", active: rules.some(r => r.ruleType === "weekly" && r.startTime === "08:00") },
@@ -557,9 +563,9 @@ export default function CoupleDashboard() {
                               fontSize: "0.78rem",
                               padding: "4px 10px",
                               borderRadius: "99px",
-                              background: meal.active ? "rgba(52, 211, 153, 0.15)" : "rgba(255, 255, 255, 0.05)",
-                              border: meal.active ? "1px solid rgba(52, 211, 153, 0.3)" : "1px solid rgba(255, 255, 255, 0.08)",
-                              color: meal.active ? "#34d399" : "rgba(243, 252, 247, 0.4)",
+                              background: meal.active ? "var(--color-primary-light)" : "#f3f4f6",
+                              border: meal.active ? "1px solid var(--color-primary)" : "1px solid #d1d5db",
+                              color: meal.active ? "var(--color-primary-dark)" : "#000",
                               fontWeight: 600
                             }}>
                               {meal.name}: {meal.active ? "Active" : "Disabled"}
@@ -568,16 +574,16 @@ export default function CoupleDashboard() {
                         </div>
                       </div>
 
-                      <div style={{ fontSize: "0.9rem", color: "rgba(243, 252, 247, 0.85)" }}>
-                        <strong style={{ display: "block", color: "#34d399", fontSize: "0.8rem", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "8px" }}>Slot Availability Status</strong>
+                      <div style={{ fontSize: "0.9rem", color: "#000" }}>
+                        <strong style={{ display: "block", color: "var(--color-primary)", fontSize: "0.8rem", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "8px" }}>Slot Availability Status</strong>
                         <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
-                          <span style={{ fontSize: "0.78rem", padding: "4px 10px", borderRadius: "99px", background: "rgba(52, 211, 153, 0.15)", border: "1px solid rgba(52, 211, 153, 0.3)", color: "#fff", fontWeight: 600 }}>
+                          <span style={{ fontSize: "0.78rem", padding: "4px 10px", borderRadius: "99px", background: "var(--color-primary-light)", border: "1px solid var(--color-primary)", color: "var(--color-primary-dark)", fontWeight: 600 }}>
                             Open: {slots.filter(s => s.status !== "locked" && s.reservedCount === 0).length}
                           </span>
-                          <span style={{ fontSize: "0.78rem", padding: "4px 10px", borderRadius: "99px", background: "rgba(239, 68, 68, 0.1)", border: "1px solid rgba(239, 68, 68, 0.2)", color: "#f87171", fontWeight: 600 }}>
+                          <span style={{ fontSize: "0.78rem", padding: "4px 10px", borderRadius: "99px", background: "#fef2f2", border: "1px solid #fecaca", color: "#b91c1c", fontWeight: 600 }}>
                             Reserved Feasts: {slots.filter(s => s.status === "locked" || s.reservedCount > 0).length}
                           </span>
-                          <span style={{ fontSize: "0.78rem", padding: "4px 10px", borderRadius: "99px", background: "rgba(239, 68, 68, 0.05)", border: "1px solid rgba(239, 68, 68, 0.15)", color: "#f87171", fontWeight: 600 }}>
+                          <span style={{ fontSize: "0.78rem", padding: "4px 10px", borderRadius: "99px", background: "#fef2f2", border: "1px solid #fca5a5", color: "#b91c1c", fontWeight: 600 }}>
                             Blocked Rest Dates: {rules.filter(r => r.ruleType === "specific_date" && r.isBlocked).length}
                           </span>
                         </div>
@@ -585,9 +591,9 @@ export default function CoupleDashboard() {
                     </div>
 
                     {/* Block New Rest Date Form */}
-                    <div className={styles.panelAccent} style={{ padding: "20px", borderRadius: "16px", background: "rgba(239, 68, 68, 0.01)", border: "1px solid rgba(239, 68, 68, 0.15)", display: "flex", flexDirection: "column", gap: "14px", minWidth: 0, maxWidth: "100%", flexShrink: 1, boxSizing: "border-box", overflowWrap: "anywhere", wordBreak: "break-word" }}>
-                      <h4 style={{ margin: 0, color: "#fff", fontSize: "1.05rem", fontWeight: 600 }}>Block a Rest Date 🚫</h4>
-                      <p style={{ margin: 0, fontSize: "0.8rem", color: "rgba(243, 252, 247, 0.55)", lineHeight: 1.4 }}>
+                    <div className={styles.panelAccent} style={{ padding: "20px", borderRadius: "16px", background: "#fef2f2", border: "1px solid #fecaca", display: "flex", flexDirection: "column", gap: "14px", minWidth: 0, maxWidth: "100%", flexShrink: 1, boxSizing: "border-box", overflowWrap: "anywhere", wordBreak: "break-word" }}>
+                      <h4 style={{ margin: 0, color: "#000", fontSize: "1.05rem", fontWeight: 600 }}>Block a Rest Date 🚫</h4>
+                      <p style={{ margin: 0, fontSize: "0.8rem", color: "#000", lineHeight: 1.4 }}>
                         Add dates (e.g., honeymoon, personal plans) to completely hide all meals on that day from relatives.
                       </p>
                       
@@ -601,9 +607,9 @@ export default function CoupleDashboard() {
                             minWidth: "120px",
                             padding: "8px 12px",
                             borderRadius: "8px",
-                            border: "1px solid rgba(239, 68, 68, 0.25)",
-                            background: "rgba(0, 0, 0, 0.3)",
-                            color: "#fff",
+                            border: "1px solid #fca5a5",
+                            background: "#fff",
+                            color: "#000",
                             outline: "none",
                             fontSize: "0.85rem"
                           }}
@@ -654,9 +660,9 @@ export default function CoupleDashboard() {
                   </div>
 
                   {/* Blocked Rest Dates List */}
-                  <h4 style={{ color: "#fff", fontSize: "1.1rem", marginBottom: "12px", fontWeight: 600 }}>Active Blocked Rest Dates</h4>
+                  <h4 style={{ color: "#000", fontSize: "1.1rem", marginBottom: "12px", fontWeight: 600 }}>Active Blocked Rest Dates</h4>
                   {rules.filter(r => r.ruleType === "specific_date" && r.isBlocked).length === 0 ? (
-                    <div style={{ color: "rgba(243, 252, 247, 0.4)", fontSize: "0.85rem", fontStyle: "italic", border: "1px dashed rgba(255,255,255,0.06)", borderRadius: "12px", padding: "16px", textAlign: "center", marginBottom: "24px" }}>
+                    <div style={{ color: "#000", fontSize: "0.85rem", fontStyle: "italic", border: "1px dashed #d1d5db", borderRadius: "12px", padding: "16px", textAlign: "center", marginBottom: "24px" }}>
                       No blocked rest dates. You are open for all dates in the calendar range!
                     </div>
                   ) : (
@@ -665,8 +671,8 @@ export default function CoupleDashboard() {
                         const ruleDate = rule.date ? new Date(rule.date) : null;
                         const dateLabel = ruleDate ? ruleDate.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" }) : rule.date;
                         return (
-                          <div key={rule._id} style={{ display: "flex", alignItems: "center", gap: "10px", padding: "6px 12px", borderRadius: "10px", background: "rgba(239, 68, 68, 0.05)", border: "1px solid rgba(239, 68, 68, 0.25)" }}>
-                            <span style={{ fontSize: "0.85rem", color: "#f87171", fontWeight: 600 }}>🚫 {dateLabel}</span>
+                          <div key={rule._id} style={{ display: "flex", alignItems: "center", gap: "10px", padding: "6px 12px", borderRadius: "10px", background: "#fef2f2", border: "1px solid #fecaca" }}>
+                            <span style={{ fontSize: "0.85rem", color: "#b91c1c", fontWeight: 600 }}>🚫 {dateLabel}</span>
                             <button
                               type="button"
                               disabled={actionLoading === rule._id}

@@ -165,3 +165,27 @@ export interface DomainUser {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface BookingGuestDetails {
+  _id: string;
+  name: string;
+  email: string;
+  phone?: string;
+}
+
+export interface DashboardBooking extends Omit<DomainBooking, "guestUserId"> {
+  guest: BookingGuestDetails;
+}
+
+export interface DashboardEvent extends DomainEvent {
+  bookings: DashboardBooking[];
+}
+
+export interface CoupleDashboardSummary {
+  couple: DomainUser;
+  events: DashboardEvent[];
+}
+
+export interface AdminDashboardData {
+  couples: CoupleDashboardSummary[];
+}

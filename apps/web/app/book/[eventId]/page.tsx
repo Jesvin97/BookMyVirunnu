@@ -326,13 +326,14 @@ export default function GuestBookingPage() {
     }
   };
 
-  const getMealLabel = (startAtStr: string, index?: number) => {
-    if (typeof index === "number") {
-      const mealNames = ["Breakfast", "Lunch", "Dinner"];
-      return { name: mealNames[index] || `Slot ${index + 1}` };
-    }
-    const date = new Date(startAtStr);
-    const hour = date.getHours();
+  const getMealLabel = (startAtStr: string) => {
+    const formatter = new Intl.DateTimeFormat("en-US", {
+      timeZone: "Asia/Kolkata",
+      hour: "numeric",
+      hour12: false
+    });
+    const hourStr = formatter.format(new Date(startAtStr));
+    const hour = parseInt(hourStr, 10);
 
     if (hour < 12) {
       return { name: "Breakfast" };
@@ -410,8 +411,8 @@ export default function GuestBookingPage() {
         <div style={{ maxWidth: "760px", margin: "0 auto" }}>
           
           <header className={styles.hero} style={{ padding: "0 0 28px", textAlign: "center" }}>
-            <div className={styles.eyebrow} style={{ color: "#34d399", margin: "0 auto 8px" }}>Invitation Portal</div>
-            <h1 style={{ fontFamily: "var(--bv-font-display)", fontSize: "2.8rem", margin: "8px 0 6px", color: "#fff", lineHeight: 1.1 }}>
+            <div className={styles.eyebrow} style={{ color: "var(--color-primary)", margin: "0 auto 8px" }}>Invitation Portal</div>
+            <h1 style={{ fontFamily: "var(--bv-font-display)", fontSize: "2.8rem", margin: "8px 0 6px", color: "#000", lineHeight: 1.1 }}>
               Invite {event.title.replace("'s Feast Schedule 🍛", "").replace("'s Feast Schedule", "")}
             </h1>
 
@@ -424,13 +425,13 @@ export default function GuestBookingPage() {
                 gap: "8px",
                 padding: "12px 24px",
                 borderRadius: "14px",
-                border: "1px solid rgba(52, 211, 153, 0.25)",
-                background: "rgba(52, 211, 153, 0.04)",
+                border: "1px solid #d1d5db",
+                background: "#f9fafb",
                 maxWidth: "600px",
                 margin: "0 auto",
-                boxShadow: "0 4px 20px rgba(0,0,0,0.15)"
+                boxShadow: "0 4px 20px rgba(0,0,0,0.05)"
               }}>
-                <span style={{ fontSize: "0.82rem", color: "#34d399", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                <span style={{ fontSize: "0.82rem", color: "#000", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>
                   🥗 Note from Newlyweds: Dietary Preferences
                 </span>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", justifyContent: "center" }}>
@@ -439,9 +440,9 @@ export default function GuestBookingPage() {
                       fontSize: "0.8rem",
                       padding: "4px 10px",
                       borderRadius: "8px",
-                      background: "rgba(52, 211, 153, 0.12)",
-                      border: "1px solid rgba(52, 211, 153, 0.2)",
-                      color: "#fff",
+                      background: "#fff",
+                      border: "1px solid #d1d5db",
+                      color: "#000",
                       fontWeight: 600
                     }}>
                       {diet}
@@ -478,24 +479,24 @@ export default function GuestBookingPage() {
               
               {step === 1 && (
                 <div>
-                  <h2 style={{ fontFamily: "var(--bv-font-display)", fontSize: "2.2rem", color: "#34d399", margin: "0 0 8px", textAlign: "center" }}>
+                  <h2 style={{ fontFamily: "var(--bv-font-display)", fontSize: "2.2rem", color: "#000", margin: "0 0 8px", textAlign: "center" }}>
                     Select a Slot to Host the Couple
                   </h2>
-                  <p style={{ color: "rgba(243, 252, 247, 0.6)", fontSize: "0.95rem", textAlign: "center", marginBottom: "32px" }}>
+                  <p style={{ color: "#000", fontSize: "0.95rem", textAlign: "center", marginBottom: "32px" }}>
                     Choose an available date, then select a slot to host the newlyweds.
                   </p>
 
                   {slots.length === 0 ? (
-                    <div style={{ color: "rgba(243, 252, 247, 0.5)", fontStyle: "italic", border: "1px dashed rgba(255,255,255,0.06)", borderRadius: "12px", padding: "28px", textAlign: "center" }}>
+                    <div style={{ color: "#000", fontStyle: "italic", border: "1px dashed #d1d5db", borderRadius: "12px", padding: "28px", textAlign: "center" }}>
                       No active slots are currently open for this couple.
                     </div>
                   ) : (
                     <div>
                       {/* Horizontal Date Slider Selector */}
-                      <span style={{ display: "block", fontSize: "0.85rem", color: "rgba(243, 252, 247, 0.5)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "12px" }}>
+                      <span style={{ display: "block", fontSize: "0.85rem", color: "#000", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "12px", textAlign: "center" }}>
                         🗓️ Select Date
                       </span>
-                      <div style={{ display: "flex", flexWrap: "wrap", gap: "10px", marginBottom: "28px" }}>
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: "10px", marginBottom: "28px", justifyContent: "center" }}>
                         {Object.keys(getSlotsByDate()).map((dateStr) => {
                           const isSelected = selectedDate === dateStr;
                           const isFull = isDateFullyBooked(dateStr);
@@ -508,9 +509,9 @@ export default function GuestBookingPage() {
                                 flexShrink: 0,
                                 padding: "10px 18px",
                                 borderRadius: "999px",
-                                background: isSelected ? "rgba(52, 211, 153, 0.12)" : isFull ? "rgba(239, 68, 68, 0.02)" : "rgba(255, 255, 255, 0.03)",
-                                border: isSelected ? "2px solid #34d399" : isFull ? "1px solid rgba(239, 68, 68, 0.15)" : "1px solid rgba(255, 255, 255, 0.08)",
-                                color: isSelected ? "#fff" : isFull ? "rgba(243, 252, 247, 0.35)" : "rgba(243, 252, 247, 0.75)",
+                                background: isSelected ? "rgba(52, 211, 153, 0.08)" : isFull ? "rgba(239, 68, 68, 0.02)" : "#f9fafb",
+                                border: isSelected ? "2px solid #34d399" : isFull ? "1px solid #fecaca" : "1px solid #d1d5db",
+                                color: isSelected ? "#065f46" : isFull ? "#f87171" : "#000",
                                 fontSize: "0.88rem",
                                 fontWeight: isSelected ? 700 : 500,
                                 cursor: "pointer",
@@ -529,7 +530,7 @@ export default function GuestBookingPage() {
                           {getSlotsByDate()[selectedDate].map((s, index) => {
                             const isSelected = selectedSlot?._id === s._id;
                             const isLocked = s.status === "locked" || (s.capacity - s.reservedCount) <= 0;
-                            const meal = getMealLabel(s.startAt, index);
+                            const meal = getMealLabel(s.startAt);
 
                             return (
                               <button
@@ -545,9 +546,9 @@ export default function GuestBookingPage() {
                                 style={{
                                   padding: "20px 16px",
                                   borderRadius: "16px",
-                                  background: isLocked ? "rgba(239, 68, 68, 0.05)" : isSelected ? "rgba(52, 211, 153, 0.08)" : "rgba(255,255,255,0.03)",
-                                  border: isLocked ? "1px solid rgba(239, 68, 68, 0.25)" : isSelected ? "2px solid #34d399" : "1px solid rgba(255, 255, 255, 0.08)",
-                                  color: isLocked ? "rgba(239, 68, 68, 0.4)" : isSelected ? "#fff" : "rgba(243, 252, 247, 0.8)",
+                                  background: isLocked ? "rgba(239, 68, 68, 0.05)" : isSelected ? "rgba(52, 211, 153, 0.08)" : "#f9fafb",
+                                  border: isLocked ? "1px solid #fecaca" : isSelected ? "2px solid #34d399" : "1px solid #d1d5db",
+                                  color: isLocked ? "#ef4444" : isSelected ? "#065f46" : "#000",
                                   cursor: isLocked ? "not-allowed" : "pointer",
                                   textAlign: "center",
                                   transition: "all 150ms ease",
@@ -561,10 +562,10 @@ export default function GuestBookingPage() {
                                   wordBreak: "break-word"
                                 }}
                               >
-                                <strong style={{ display: "block", fontSize: "1.05rem", marginBottom: "4px", color: isLocked ? "rgba(239, 68, 68, 0.6)" : isSelected ? "#34d399" : "#fff" }}>
+                                <strong style={{ display: "block", fontSize: "1.05rem", marginBottom: "4px", color: isLocked ? "#ef4444" : isSelected ? "#065f46" : "#000" }}>
                                   {meal.name}
                                 </strong>
-                                <span style={{ display: "block", fontSize: "0.75rem", marginTop: "12px", fontWeight: 600 }}>
+                                <span style={{ display: "block", fontSize: "0.75rem", marginTop: "12px", fontWeight: 600, color: isLocked ? "#ef4444" : isSelected ? "#065f46" : "#000" }}>
                                   {isLocked ? "🔒 Reserved / Blocked" : isSelected ? "Selected ✅" : "Open Slot"}
                                 </span>
                               </button>
@@ -589,10 +590,10 @@ export default function GuestBookingPage() {
 
               {step === 2 && (
                 <div>
-                  <h2 style={{ fontFamily: "var(--bv-font-display)", fontSize: "2.2rem", color: "#34d399", margin: "0 0 8px", textAlign: "center" }}>
+                  <h2 style={{ fontFamily: "var(--bv-font-display)", fontSize: "2.2rem", color: "#000", margin: "0 0 8px", textAlign: "center" }}>
                     Who is hosting the feast?
                   </h2>
-                  <p style={{ color: "rgba(243, 252, 247, 0.6)", fontSize: "0.95rem", textAlign: "center", marginBottom: "32px" }}>
+                  <p style={{ color: "#000", fontSize: "0.95rem", textAlign: "center", marginBottom: "32px" }}>
                     Please enter your host details so the newlyweds can connect with you.
                   </p>
 
@@ -600,18 +601,18 @@ export default function GuestBookingPage() {
                     <div style={{
                       padding: "14px 18px",
                       borderRadius: "14px",
-                      background: "rgba(52, 211, 153, 0.05)",
-                      border: "1px solid rgba(52, 211, 153, 0.2)",
-                      color: "#fff",
+                      background: "#f9fafb",
+                      border: "1px solid #d1d5db",
+                      color: "#000",
                       marginBottom: "28px"
                     }}>
-                      <span style={{ fontSize: "0.8rem", color: "rgba(52, 211, 153, 0.75)", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: "4px" }}>
+                      <span style={{ fontSize: "0.8rem", color: "#000", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: "4px" }}>
                         Selected Slot
                       </span>
-                      <strong style={{ display: "block", color: "#34d399", fontSize: "1.05rem", marginBottom: "4px" }}>
+                      <strong style={{ display: "block", color: "var(--color-primary)", fontSize: "1.05rem", marginBottom: "4px" }}>
                         {getMealLabel(selectedSlot.startAt).name}
                       </strong>
-                      <span style={{ fontSize: "0.85rem", color: "rgba(243, 252, 247, 0.6)" }}>
+                      <span style={{ fontSize: "0.85rem", color: "#000" }}>
                         Date: {new Date(selectedSlot.startAt).toLocaleDateString([], { dateStyle: "medium" })}
                       </span>
                     </div>
@@ -619,7 +620,7 @@ export default function GuestBookingPage() {
 
                   <div style={{ display: "grid", gap: "20px", marginBottom: "36px" }}>
                     <div style={{ display: "grid", gap: "6px" }}>
-                      <label htmlFor="guestName" style={{ fontSize: "0.85rem", color: "rgba(243, 252, 247, 0.8)", fontWeight: 500 }}>
+                      <label htmlFor="guestName" style={{ fontSize: "0.85rem", color: "#000", fontWeight: 500 }}>
                         Family / Host Name
                       </label>
                       <input
@@ -633,9 +634,9 @@ export default function GuestBookingPage() {
                           width: "100%",
                           padding: "12px 16px",
                           borderRadius: "12px",
-                          border: "1px solid rgba(52, 211, 153, 0.2)",
-                          background: "rgba(4, 9, 6, 0.4)",
-                          color: "#fff",
+                          border: "1px solid #d1d5db",
+                          background: "#fff",
+                          color: "#000",
                           outline: "none",
                           fontSize: "0.95rem"
                         }}
@@ -643,7 +644,7 @@ export default function GuestBookingPage() {
                     </div>
 
                     <div style={{ display: "grid", gap: "6px" }}>
-                      <label htmlFor="guestPhone" style={{ fontSize: "0.85rem", color: "rgba(243, 252, 247, 0.8)", fontWeight: 500 }}>
+                      <label htmlFor="guestPhone" style={{ fontSize: "0.85rem", color: "#000", fontWeight: 500 }}>
                         Phone Number
                       </label>
                       <input
@@ -663,9 +664,9 @@ export default function GuestBookingPage() {
                           width: "100%",
                           padding: "12px 16px",
                           borderRadius: "12px",
-                          border: "1px solid rgba(52, 211, 153, 0.2)",
-                          background: "rgba(4, 9, 6, 0.4)",
-                          color: "#fff",
+                          border: "1px solid #d1d5db",
+                          background: "#fff",
+                          color: "#000",
                           outline: "none",
                           fontSize: "0.95rem"
                         }}
@@ -696,10 +697,10 @@ export default function GuestBookingPage() {
 
               {step === 3 && (
                 <form onSubmit={handleBooking}>
-                  <h2 style={{ fontFamily: "var(--bv-font-display)", fontSize: "2.2rem", color: "#34d399", margin: "0 0 8px", textAlign: "center" }}>
+                  <h2 style={{ fontFamily: "var(--bv-font-display)", fontSize: "2.2rem", color: "#000", margin: "0 0 8px", textAlign: "center" }}>
                     Feast Venue Location 📍
                   </h2>
-                  <p style={{ color: "rgba(243, 252, 247, 0.6)", fontSize: "0.95rem", textAlign: "center", marginBottom: "32px" }}>
+                  <p style={{ color: "#000", fontSize: "0.95rem", textAlign: "center", marginBottom: "32px" }}>
                     Pinpoint your home address so the newlyweds can navigate easily.
                   </p>
 
@@ -707,7 +708,7 @@ export default function GuestBookingPage() {
                     
                     <div style={{ display: "grid", gap: "8px" }}>
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                        <label htmlFor="venueAddress" style={{ fontSize: "0.85rem", color: "rgba(243, 252, 247, 0.8)", fontWeight: 500 }}>
+                        <label htmlFor="venueAddress" style={{ fontSize: "0.85rem", color: "#000", fontWeight: 500 }}>
                           Feast Venue
                         </label>
                         <button
@@ -718,9 +719,9 @@ export default function GuestBookingPage() {
                           style={{
                             padding: "6px 12px",
                             borderRadius: "8px",
-                            border: "1px solid rgba(52, 211, 153, 0.3)",
-                            background: "rgba(52, 211, 153, 0.08)",
-                            color: "#34d399",
+                            border: "1px solid var(--color-primary)",
+                            background: "#fff",
+                            color: "var(--color-primary)",
                             fontSize: "0.78rem",
                             fontWeight: 600,
                             cursor: locating ? "not-allowed" : "pointer",

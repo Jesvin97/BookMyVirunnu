@@ -7,6 +7,7 @@ import { authRouter } from "./routes/auth.routes";
 import { eventRouter } from "./routes/event.routes";
 import { availabilityRouter } from "./routes/availability.routes";
 import { bookingRouter } from "./routes/booking.routes";
+import { adminRouter } from "./routes/admin.routes";
 import { errorHandler } from "./middleware/error-handler";
 import rateLimit from "express-rate-limit";
 
@@ -73,6 +74,7 @@ export function createApp() {
   app.use("/events", apiLimiter);
   app.use("/availability-rules", apiLimiter);
   app.use("/bookings", apiLimiter);
+  app.use("/admin", apiLimiter);
 
   app.get("/health", (_req, res) => {
     res.json({
@@ -96,11 +98,13 @@ export function createApp() {
   app.use("/api/events", eventRouter);
   app.use("/api/availability-rules", availabilityRouter);
   app.use("/api/bookings", bookingRouter);
+  app.use("/api/admin", adminRouter);
 
   app.use("/auth", authRouter);
   app.use("/events", eventRouter);
   app.use("/availability-rules", availabilityRouter);
   app.use("/bookings", bookingRouter);
+  app.use("/admin", adminRouter);
 
   app.use(errorHandler);
   return app;

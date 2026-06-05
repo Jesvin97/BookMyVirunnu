@@ -36,10 +36,11 @@ export function CopyButton({
         alignItems: "center",
         justifyContent: "center",
         padding: "8px 14px",
-        borderRadius: "10px",
-        border: copied ? "1px solid rgba(52, 211, 153, 0.4)" : "1px solid rgba(255, 255, 255, 0.08)",
-        background: copied ? "rgba(52, 211, 153, 0.06)" : "rgba(255, 255, 255, 0.03)",
-        color: copied ? "#34d399" : "rgba(243, 252, 247, 0.8)",
+        borderRadius: "8px",
+        border: "1px solid",
+        borderColor: copied ? "var(--color-primary-dark)" : "var(--color-primary)",
+        background: copied ? "var(--color-primary-dark)" : "var(--color-primary)",
+        color: "#fff",
         fontSize: "0.85rem",
         fontWeight: 600,
         cursor: "pointer",
@@ -50,14 +51,16 @@ export function CopyButton({
       }}
       onMouseEnter={(e) => {
         if (!copied) {
-          e.currentTarget.style.background = "rgba(255, 255, 255, 0.06)";
-          e.currentTarget.style.color = "#fff";
+          e.currentTarget.style.background = "var(--color-primary-dark)";
+          e.currentTarget.style.borderColor = "var(--color-primary-dark)";
+          e.currentTarget.style.transform = "translateY(-2px)";
         }
       }}
       onMouseLeave={(e) => {
         if (!copied) {
-          e.currentTarget.style.background = "rgba(255, 255, 255, 0.03)";
-          e.currentTarget.style.color = "rgba(243, 252, 247, 0.8)";
+          e.currentTarget.style.background = "var(--color-primary)";
+          e.currentTarget.style.borderColor = "var(--color-primary)";
+          e.currentTarget.style.transform = "translateY(0)";
         }
       }}
       {...props}

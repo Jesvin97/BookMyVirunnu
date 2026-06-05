@@ -46,6 +46,7 @@ export default function QuickCreatePage() {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [restDateInput, setRestDateInput] = useState("");
+  const [restDateEnd, setRestDateEnd] = useState("");
   const [blockedDates, setBlockedDates] = useState<string[]>([]);
   
   const [phone, setPhone] = useState("");
@@ -153,13 +154,47 @@ export default function QuickCreatePage() {
 
   const addRestDate = () => {
     if (!restDateInput) return;
-    if (blockedDates.includes(restDateInput)) {
-      setError("This date is already blocked.");
+    setError("");
+
+    let datesToAdd = [restDateInput];
+    
+    if (restDateEnd) {
+      const start = new Date(restDateInput);
+      const end = new Date(restDateEnd);
+      
+      if (end < start) {
+        setError("End date must be on or after the start date.");
+        return;
+      }
+      
+      datesToAdd = [];
+      const current = new Date(start);
+      while (current <= end) {
+        datesToAdd.push(current.toISOString().split("T")[0]);
+        current.setDate(current.getDate() + 1);
+      }
+    }
+
+    const newBlocks = [...blockedDates];
+    let addedAny = false;
+    
+    datesToAdd.forEach(d => {
+      if (!newBlocks.includes(d)) {
+        newBlocks.push(d);
+        addedAny = true;
+      }
+    });
+
+    if (!addedAny) {
+      setError(datesToAdd.length === 1 ? "This date is already blocked." : "All dates in this range are already blocked.");
       return;
     }
-    setError("");
-    setBlockedDates([...blockedDates, restDateInput]);
+
+    newBlocks.sort();
+    
+    setBlockedDates(newBlocks);
     setRestDateInput("");
+    setRestDateEnd("");
   };
 
   const removeRestDate = (dateToRemove: string) => {
@@ -311,25 +346,23 @@ export default function QuickCreatePage() {
       <main className={styles.shell} style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "48px 0" }}>
         <div className={styles.backgroundGlow} aria-hidden="true" />
         
-        <div className={`${styles.panel} animate-scale-pop`} style={{ width: "min(560px, calc(100% - 32px))", padding: "clamp(20px, 6vw, 40px)", textAlign: "center", minWidth: 0 }}>
-          <div style={{ fontSize: "3.5rem", marginBottom: "16px" }}>🎉</div>
-          
-          <h2 style={{ fontFamily: "var(--bv-font-display)", fontSize: "clamp(1.8rem, 6vw, 2.8rem)", margin: "0 0 12px", color: "#fff", lineHeight: 1.1 }}>
+        <div className={`${styles.panel} animate-scale-pop`} style={{ width: "min(560px, calc(100% - 32px))", padding: "clamp(20px, 6vw, 40px)", textAlign: "center", minWidth: 0, display: "flex", flexDirection: "column", alignItems: "center" }}>
+          <h2 style={{ fontFamily: "var(--bv-font-display)", fontSize: "clamp(1.8rem, 6vw, 2.8rem)", margin: "0 0 12px", color: "var(--color-primary)", lineHeight: 1.1, textAlign: "center" }}>
             Feast Slots Live!
           </h2>
-          <p style={{ color: "rgba(243, 252, 247, 0.75)", fontSize: "1.05rem", margin: "0 0 32px", lineHeight: 1.5 }}>
+          <p style={{ color: "var(--color-primary)", fontSize: "1.05rem", margin: "0 0 32px", lineHeight: 1.5, textAlign: "center" }}>
             Congratulations, {husbandName} & {wifeName}! Your post-wedding feast slots are now generated. Please save the links below:
           </p>
 
-          <div style={{ display: "grid", gap: "24px", textAlign: "left", marginBottom: "32px", minWidth: 0 }}>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "24px", textAlign: "center", marginBottom: "32px", width: "100%" }}>
             
             {/* Booking Link */}
-            <div style={{ background: "rgba(0, 0, 0, 0.3)", border: "1px solid rgba(52, 211, 153, 0.15)", borderRadius: "16px", padding: "clamp(12px, 4vw, 20px)", minWidth: 0, flexShrink: 1, overflowWrap: "anywhere", wordBreak: "break-word" }}>
-              <strong style={{ display: "block", color: "#34d399", fontSize: "1rem", marginBottom: "12px" }}>
+            <div style={{ background: "#f9fafb", border: "1px solid #d1d5db", borderRadius: "16px", padding: "clamp(12px, 4vw, 20px)", width: "100%", overflowWrap: "anywhere", wordBreak: "break-word" }}>
+              <strong style={{ display: "block", color: "var(--color-primary)", fontSize: "1rem", marginBottom: "12px", textAlign: "center" }}>
                 Send this to relative
               </strong>
-              <div style={{ display: "flex", gap: "8px", alignItems: "center", width: "100%", minWidth: 0 }}>
-                <code style={{ flex: 1, minWidth: 0, flexShrink: 1, background: "rgba(0, 0, 0, 0.4)", padding: "10px 14px", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.06)", fontSize: "0.85rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", wordBreak: "break-all", overflowWrap: "anywhere" }}>
+              <div style={{ display: "flex", gap: "8px", alignItems: "center", width: "100%", justifyContent: "center" }}>
+                <code style={{ flexGrow: 1, flexShrink: 1, flexBasis: "0%", minWidth: 0, background: "#fff", padding: "10px 14px", borderRadius: "8px", border: "1px solid #e5e7eb", color: "#000", fontSize: "0.85rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                   {typeof window !== "undefined" ? `${window.location.origin}${successData.bookingUrl}` : successData.bookingUrl}
                 </code>
                 <CopyButton
@@ -340,22 +373,17 @@ export default function QuickCreatePage() {
             </div>
 
             {/* Dashboard Link */}
-            <div style={{ background: "rgba(239, 68, 68, 0.03)", border: "1px solid rgba(239, 68, 68, 0.25)", borderRadius: "16px", padding: "clamp(12px, 4vw, 20px)", minWidth: 0, flexShrink: 1, overflowWrap: "anywhere", wordBreak: "break-word" }}>
-              <strong style={{ display: "block", color: "#f87171", fontSize: "1rem", marginBottom: "12px" }}>
+            <div style={{ background: "#f9fafb", border: "1px solid #d1d5db", borderRadius: "16px", padding: "clamp(12px, 4vw, 20px)", width: "100%", overflowWrap: "anywhere", wordBreak: "break-word" }}>
+              <strong style={{ display: "block", color: "var(--color-primary)", fontSize: "1rem", marginBottom: "12px", textAlign: "center" }}>
                 This is for You
               </strong>
-              <div style={{ display: "flex", gap: "8px", alignItems: "center", width: "100%", minWidth: 0 }}>
-                <code style={{ flex: 1, minWidth: 0, flexShrink: 1, background: "rgba(0, 0, 0, 0.4)", padding: "10px 14px", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.06)", fontSize: "0.85rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", wordBreak: "break-all", overflowWrap: "anywhere" }}>
+              <div style={{ display: "flex", gap: "8px", alignItems: "center", width: "100%", justifyContent: "center" }}>
+                <code style={{ flexGrow: 1, flexShrink: 1, flexBasis: "0%", minWidth: 0, background: "#fff", padding: "10px 14px", borderRadius: "8px", border: "1px solid #e5e7eb", color: "#000", fontSize: "0.85rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                   {typeof window !== "undefined" ? `${window.location.origin}${successData.dashboardUrl}` : successData.dashboardUrl}
                 </code>
                 <CopyButton
                   content={typeof window !== "undefined" ? `${window.location.origin}${successData.dashboardUrl}` : successData.dashboardUrl}
                   successMessage="Dashboard Manage Link copied successfully! 🔑"
-                  style={{
-                    border: "1px solid rgba(239, 68, 68, 0.3)",
-                    background: "rgba(239, 68, 68, 0.05)",
-                    color: "#f87171"
-                  }}
                 />
               </div>
             </div>
@@ -395,9 +423,7 @@ export default function QuickCreatePage() {
         <h1 style={{ fontFamily: "var(--bv-font-display)", fontSize: "2.8rem", margin: "8px 0 6px", color: "#000" }}>
           Wedding Feast Planner
         </h1>
-        <p style={{ color: "#000", margin: 0 }}>
-          Set up your available post-wedding Sadhya slots in 3 quick steps!
-        </p>
+
 
         {/* Wizard progress tracker */}
         <Progress
@@ -561,41 +587,38 @@ export default function QuickCreatePage() {
           )}
 
           {step === 3 && (
-            <div>
-              <h2 style={{ fontFamily: "var(--bv-font-display)", fontSize: "2.2rem", color: "#34d399", margin: "0 0 8px", textAlign: "center" }}>
-                Do you have any private rest dates? 🚫
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+              <h2 style={{ fontFamily: "var(--bv-font-display)", fontSize: "clamp(1.2rem, 4vw, 2.2rem)", color: "#000", margin: "0 0 8px", textAlign: "center", whiteSpace: "nowrap" }}>
+                Do you have any private rest dates?
               </h2>
-              <p style={{ color: "rgba(243, 252, 247, 0.6)", fontSize: "0.95rem", textAlign: "center", marginBottom: "32px" }}>
+              <p style={{ color: "#000", fontSize: "0.95rem", textAlign: "center", marginBottom: "32px", maxWidth: "80%" }}>
                 Add specific days (e.g. your honeymoon or rest days) you want to pre-block and completely hide from relatives.
               </p>
 
-              <div style={{ display: "grid", gap: "24px", marginBottom: "36px" }}>
+              <div style={{ display: "grid", gap: "24px", marginBottom: "36px", width: "100%" }}>
                 {/* Rest Date Blocker */}
                 <div style={{ display: "grid", gap: "8px" }}>
-                  <div style={{ display: "flex", gap: "10px" }}>
+                  <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
                     <input
                       type="date"
                       value={restDateInput}
                       onChange={(e) => setRestDateInput(e.target.value)}
-                      style={{ ...inputStyle, flex: 1 }}
-                      onFocus={(e) => e.target.style.borderColor = "#34d399"}
-                      onBlur={(e) => e.target.style.borderColor = "rgba(52, 211, 153, 0.25)"}
+                      style={{ ...inputStyle, flex: 1, minWidth: "130px" }}
+                    />
+                    <span style={{ color: "#000", fontWeight: 500 }}>to</span>
+                    <input
+                      type="date"
+                      value={restDateEnd}
+                      onChange={(e) => setRestDateEnd(e.target.value)}
+                      style={{ ...inputStyle, flex: 1, minWidth: "130px" }}
                     />
                     <button
                       type="button"
                       onClick={addRestDate}
-                      style={{
-                        padding: "0 18px",
-                        borderRadius: "14px",
-                        border: "1px solid rgba(52, 211, 153, 0.3)",
-                        background: "rgba(52, 211, 153, 0.08)",
-                        color: "#34d399",
-                        fontWeight: 600,
-                        fontSize: "0.9rem",
-                        cursor: "pointer"
-                      }}
+                      className={styles.primaryButton}
+                      style={{ padding: "14px 18px", border: 0, height: "100%" }}
                     >
-                      + Block Date
+                      + Block
                     </button>
                   </div>
 
@@ -664,19 +687,19 @@ export default function QuickCreatePage() {
           )}
 
           {step === 4 && (
-            <div>
-              <h2 style={{ fontFamily: "var(--bv-font-display)", fontSize: "2.2rem", color: "#34d399", margin: "0 0 8px", textAlign: "center" }}>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+              <h2 style={{ fontFamily: "var(--bv-font-display)", fontSize: "clamp(1.2rem, 4vw, 2.2rem)", color: "#000", margin: "0 0 8px", textAlign: "center", whiteSpace: "nowrap" }}>
                 Select Feast Settings
               </h2>
-              <p style={{ color: "rgba(243, 252, 247, 0.6)", fontSize: "0.95rem", textAlign: "center", marginBottom: "32px" }}>
+              <p style={{ color: "#000", fontSize: "0.95rem", textAlign: "center", marginBottom: "32px", maxWidth: "80%" }}>
                 Choose meal times you are available for.
               </p>
 
-              <div style={{ display: "grid", gap: "28px", marginBottom: "36px" }}>
+              <div style={{ display: "grid", gap: "28px", marginBottom: "36px", width: "100%" }}>
                 {/* Available Meals */}
-                <div>
-                  <label style={{ ...labelStyle, display: "block", marginBottom: "12px" }}>Available Meals</label>
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: "14px" }}>
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                  <label style={{ ...labelStyle, display: "block", marginBottom: "12px", textAlign: "center" }}>Available Meals</label>
+                  <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "14px", width: "100%" }}>
                     {/* Breakfast */}
                     <button
                       type="button"
@@ -684,14 +707,15 @@ export default function QuickCreatePage() {
                       style={{
                         padding: "16px",
                         borderRadius: "14px",
-                        border: enableBreakfast ? "2px solid #34d399" : "1px solid rgba(255,255,255,0.08)",
-                        background: enableBreakfast ? "rgba(52, 211, 153, 0.08)" : "rgba(255,255,255,0.02)",
-                        color: enableBreakfast ? "#fff" : "rgba(243, 252, 247, 0.6)",
+                        border: enableBreakfast ? "2px solid #34d399" : "1px solid #d1d5db",
+                        background: enableBreakfast ? "rgba(52, 211, 153, 0.08)" : "#f9fafb",
+                        color: enableBreakfast ? "#065f46" : "#000",
                         cursor: "pointer",
                         textAlign: "center",
                         transition: "all 200ms ease",
                         boxShadow: enableBreakfast ? "0 0 15px rgba(52, 211, 153, 0.25)" : "none",
-                        transform: enableBreakfast ? "scale(1.02)" : "scale(1)"
+                        transform: enableBreakfast ? "scale(1.02)" : "scale(1)",
+                        flex: "1 1 100px"
                       }}
                     >
                       <strong style={{ display: "block", fontSize: "1rem" }}>Breakfast</strong>
@@ -704,14 +728,15 @@ export default function QuickCreatePage() {
                       style={{
                         padding: "16px",
                         borderRadius: "14px",
-                        border: enableLunch ? "2px solid #34d399" : "1px solid rgba(255,255,255,0.08)",
-                        background: enableLunch ? "rgba(52, 211, 153, 0.08)" : "rgba(255,255,255,0.02)",
-                        color: enableLunch ? "#fff" : "rgba(243, 252, 247, 0.6)",
+                        border: enableLunch ? "2px solid #34d399" : "1px solid #d1d5db",
+                        background: enableLunch ? "rgba(52, 211, 153, 0.08)" : "#f9fafb",
+                        color: enableLunch ? "#065f46" : "#000",
                         cursor: "pointer",
                         textAlign: "center",
                         transition: "all 200ms ease",
                         boxShadow: enableLunch ? "0 0 15px rgba(52, 211, 153, 0.25)" : "none",
-                        transform: enableLunch ? "scale(1.02)" : "scale(1)"
+                        transform: enableLunch ? "scale(1.02)" : "scale(1)",
+                        flex: "1 1 100px"
                       }}
                     >
                       <strong style={{ display: "block", fontSize: "1rem" }}>Lunch</strong>
@@ -724,14 +749,15 @@ export default function QuickCreatePage() {
                       style={{
                         padding: "16px",
                         borderRadius: "14px",
-                        border: enableDinner ? "2px solid #34d399" : "1px solid rgba(255,255,255,0.08)",
-                        background: enableDinner ? "rgba(52, 211, 153, 0.08)" : "rgba(255,255,255,0.02)",
-                        color: enableDinner ? "#fff" : "rgba(243, 252, 247, 0.6)",
+                        border: enableDinner ? "2px solid #34d399" : "1px solid #d1d5db",
+                        background: enableDinner ? "rgba(52, 211, 153, 0.08)" : "#f9fafb",
+                        color: enableDinner ? "#065f46" : "#000",
                         cursor: "pointer",
                         textAlign: "center",
                         transition: "all 200ms ease",
                         boxShadow: enableDinner ? "0 0 15px rgba(52, 211, 153, 0.25)" : "none",
-                        transform: enableDinner ? "scale(1.02)" : "scale(1)"
+                        transform: enableDinner ? "scale(1.02)" : "scale(1)",
+                        flex: "1 1 100px"
                       }}
                     >
                       <strong style={{ display: "block", fontSize: "1rem" }}>Dinner</strong>
@@ -762,18 +788,18 @@ export default function QuickCreatePage() {
           )}
 
           {step === 5 && (
-            <div>
-              <h2 style={{ fontFamily: "var(--bv-font-display)", fontSize: "2.2rem", color: "#34d399", margin: "0 0 8px", textAlign: "center" }}>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+              <h2 style={{ fontFamily: "var(--bv-font-display)", fontSize: "clamp(1.2rem, 4vw, 2.2rem)", color: "#000", margin: "0 0 8px", textAlign: "center", whiteSpace: "nowrap" }}>
                 Newlyweds Dietary Preferences
               </h2>
-              <p style={{ color: "rgba(243, 252, 247, 0.6)", fontSize: "0.95rem", textAlign: "center", marginBottom: "32px" }}>
+              <p style={{ color: "#000", fontSize: "0.95rem", textAlign: "center", marginBottom: "32px", maxWidth: "80%" }}>
                 Select any food preferences/restrictions. Relatives will see this notice prominently when booking a slot!
               </p>
 
-              <div style={{ display: "grid", gap: "28px", marginBottom: "36px" }}>
+              <div style={{ display: "grid", gap: "28px", marginBottom: "36px", width: "100%" }}>
                 {/* Dietary Restrictions */}
-                <div>
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                  <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "10px" }}>
                     {DIETARY_OPTIONS.map((opt) => {
                       const isSelected = selectedDiet.includes(opt.value);
                       return (
@@ -784,9 +810,9 @@ export default function QuickCreatePage() {
                           style={{
                             padding: "10px 16px",
                             borderRadius: "12px",
-                            border: isSelected ? "2px solid #34d399" : "1px solid rgba(255,255,255,0.08)",
-                            background: isSelected ? "rgba(52, 211, 153, 0.08)" : "rgba(255,255,255,0.02)",
-                            color: isSelected ? "#fff" : "rgba(243, 252, 247, 0.7)",
+                            border: isSelected ? "2px solid #34d399" : "1px solid #d1d5db",
+                            background: isSelected ? "rgba(52, 211, 153, 0.08)" : "#f9fafb",
+                            color: isSelected ? "#065f46" : "#000",
                             fontSize: "0.85rem",
                             fontWeight: 600,
                             cursor: "pointer",
@@ -800,8 +826,8 @@ export default function QuickCreatePage() {
                       );
                     })}
                   </div>
-                  <div style={{ display: "grid", gap: "8px", marginTop: "16px" }}>
-                    <label htmlFor="customDiet" style={{ fontSize: "0.85rem", color: "rgba(243, 252, 247, 0.75)", fontWeight: 500 }}>
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px", marginTop: "16px", width: "100%" }}>
+                    <label htmlFor="customDiet" style={{ fontSize: "0.85rem", color: "#000", fontWeight: 500 }}>
                       Other Dietary Restrictions / Allergies (Optional)
                     </label>
                     <input
@@ -811,8 +837,6 @@ export default function QuickCreatePage() {
                       value={customDiet}
                       onChange={(e) => setCustomDiet(e.target.value)}
                       style={inputStyle}
-                      onFocus={(e) => e.target.style.borderColor = "#34d399"}
-                      onBlur={(e) => e.target.style.borderColor = "rgba(52, 211, 153, 0.25)"}
                     />
                   </div>
                 </div>
@@ -840,15 +864,15 @@ export default function QuickCreatePage() {
           )}
 
           {step === 6 && (
-            <form onSubmit={handleSubmit}>
-              <h2 style={{ fontFamily: "var(--bv-font-display)", fontSize: "2.2rem", color: "#34d399", margin: "0 0 8px", textAlign: "center" }}>
+            <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+              <h2 style={{ fontFamily: "var(--bv-font-display)", fontSize: "clamp(1.6rem, 5vw, 2.2rem)", color: "#000", margin: "0 0 8px", textAlign: "center", whiteSpace: "nowrap" }}>
                 Contact Number
               </h2>
-              <p style={{ color: "rgba(243, 252, 247, 0.6)", fontSize: "0.95rem", textAlign: "center", marginBottom: "32px" }}>
+              <p style={{ color: "#000", fontSize: "0.95rem", textAlign: "center", marginBottom: "32px", maxWidth: "80%" }}>
                 Provide a number for your relatives to contact you regarding the feast.
               </p>
 
-              <div style={{ display: "grid", gap: "28px", marginBottom: "36px" }}>
+              <div style={{ display: "grid", gap: "28px", marginBottom: "36px", width: "100%" }}>
                 {/* Phone */}
                 <div style={{ display: "grid", gap: "8px" }}>
                   <label htmlFor="phone" style={labelStyle}>Contact Number</label>
@@ -860,13 +884,11 @@ export default function QuickCreatePage() {
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     style={inputStyle}
-                    onFocus={(e) => e.target.style.borderColor = "#34d399"}
-                    onBlur={(e) => e.target.style.borderColor = "rgba(52, 211, 153, 0.25)"}
                   />
                 </div>
               </div>
 
-              <div className={styles.wizardButtons} style={{ display: "flex", gap: "12px", flexDirection: "row" }}>
+              <div className={styles.wizardButtons} style={{ display: "flex", gap: "12px", flexDirection: "row", width: "100%" }}>
                 <button
                   type="button"
                   onClick={() => handleStepTransition(5)}
