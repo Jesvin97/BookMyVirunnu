@@ -90,6 +90,7 @@ export default function GuestBookingPage() {
     return "";
   });
   const [venueAddress, setVenueAddress] = useState("");
+  const [venueLandmark, setVenueLandmark] = useState("");
   
   const [loading, setLoading] = useState(true);
   const [submitLoading, setSubmitLoading] = useState(false);
@@ -306,7 +307,7 @@ export default function GuestBookingPage() {
           guestName,
           guestEmail,
           guestPhone,
-          venueAddress,
+          venueAddress: venueLandmark.trim() ? `${venueAddress}\nLandmark: ${venueLandmark.trim()}` : venueAddress,
           idempotencyKey
         }
       );
@@ -742,6 +743,32 @@ export default function GuestBookingPage() {
                           />
                         </div>
                       )}
+                    </div>
+                    
+                    <div style={{ display: "grid", gap: "8px" }}>
+                      <label htmlFor="venueLandmark" style={{ fontSize: "0.85rem", color: "#000", fontWeight: 500 }}>
+                        Landmark (Optional)
+                      </label>
+                      <input
+                        id="venueLandmark"
+                        type="text"
+                        placeholder="e.g. Near St. Mary's Church"
+                        value={venueLandmark}
+                        onChange={(e) => setVenueLandmark(e.target.value)}
+                        style={{
+                          width: "100%",
+                          padding: "12px 16px",
+                          borderRadius: "12px",
+                          border: "1px solid rgba(52, 211, 153, 0.25)",
+                          background: "rgba(4, 9, 6, 0.5)",
+                          color: "#fff",
+                          outline: "none",
+                          fontSize: "1rem",
+                          transition: "border-color 200ms ease"
+                        }}
+                        onFocus={(e) => e.target.style.borderColor = "#34d399"}
+                        onBlur={(e) => e.target.style.borderColor = "rgba(52, 211, 153, 0.25)"}
+                      />
                     </div>
 
                   </div>
