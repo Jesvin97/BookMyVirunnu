@@ -276,10 +276,10 @@ function BookingSuccessContent() {
             borderRadius: "18px",
             textAlign: "left"
           }}>
-            <strong style={{ display: "block", color: "#f87171", fontSize: "0.95rem", marginBottom: "4px" }}>
+            <strong style={{ display: "block", color: "rgb(248, 113, 113)", fontSize: "0.95rem", marginBottom: "4px" }}>
               📅 Need to Reschedule or Cancel?
             </strong>
-            <p style={{ fontSize: "0.8rem", color: "rgba(243, 252, 247, 0.55)", margin: "0 0 16px", lineHeight: 1.4 }}>
+            <p style={{ fontSize: "0.8rem", color: "rgb(248, 113, 113)", margin: "0 0 16px", lineHeight: 1.4 }}>
               If you have scheduling conflicts or made an error, you can cancel this slot instantly to free it up, then reserve a new date/time slot.
             </p>
             <button
