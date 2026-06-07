@@ -36,6 +36,13 @@ function BookingSuccessContent() {
   const [error, setError] = useState("");
   const [cancelled, setCancelled] = useState(false);
   const [cancelling, setCancelling] = useState(false);
+  const [countdown, setCountdown] = useState(30);
+
+  const getMealCategory = (startAtStr: string) => {
+    const date = new Date(startAtStr);
+    const hour = date.getHours();
+    return hour < 16 ? "Lunch (Sadhya) 🍛" : "Dinner (Virunnu) 🍽️";
+  };
 
   useEffect(() => {
     if (!bookingId) {
@@ -44,6 +51,24 @@ function BookingSuccessContent() {
     }
     fetchBookingDetails();
   }, [bookingId]);
+
+  useEffect(() => {
+    if (booking && !cancelled && countdown > 0) {
+      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+      return () => clearTimeout(timer);
+    } else if (booking && !cancelled && countdown === 0) {
+      const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(
+        `Hi! We have successfully booked a slot to host you for ${getMealCategory(
+          booking.startAt
+        )} on ${new Date(booking.startAt).toLocaleDateString([], {
+          weekday: "long",
+          month: "short",
+          day: "numeric"
+        })} at our home! We can't wait to welcome you!\n\nFeast Address:\n${booking.venue?.address || ""}`
+      )}`;
+      window.location.href = whatsappUrl;
+    }
+  }, [booking, cancelled, countdown]);
 
   const fetchBookingDetails = async () => {
     try {
@@ -88,12 +113,7 @@ function BookingSuccessContent() {
     );
   }
 
-  // Determine meal category
-  const getMealCategory = (startAtStr: string) => {
-    const date = new Date(startAtStr);
-    const hour = date.getHours();
-    return hour < 16 ? "Lunch (Sadhya) 🍛" : "Dinner (Virunnu) 🍽️";
-  };
+
 
   return (
     <main className={styles.shell} style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "24px 0" }}>
@@ -228,38 +248,45 @@ function BookingSuccessContent() {
 
           <div style={{ display: "flex", flexDirection: "column", gap: "12px", width: "100%" }}>
             {booking && (
-              <a
-                href={`https://wa.me/?text=${encodeURIComponent(
-                  `Hi! We have successfully booked a slot to host you for ${getMealCategory(
-                    booking.startAt
-                  )} on ${new Date(booking.startAt).toLocaleDateString([], {
-                    weekday: "long",
-                    month: "short",
-                    day: "numeric"
-                  })} at our home! We can't wait to welcome you!\n\nFeast Address:\n${booking.venue?.address || ""}`
-                )}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={styles.primaryButton}
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  textDecoration: "none",
-                  gap: "8px",
-                  background: "#25D366", // WhatsApp Green
-                  border: "1px solid #1ebd56",
-                  color: "#fff",
-                  padding: "14px 20px",
-                  fontSize: "1.05rem",
-                  fontWeight: 600,
-                  borderRadius: "14px",
-                  boxShadow: "0 0 25px rgba(37, 211, 102, 0.35)",
-                  transition: "all 150ms ease"
-                }}
-              >
-                Send WhatsApp Confirmation
-              </a>
+              <>
+                <a
+                  href={`https://wa.me/?text=${encodeURIComponent(
+                    `Hi! We have successfully booked a slot to host you for ${getMealCategory(
+                      booking.startAt
+                    )} on ${new Date(booking.startAt).toLocaleDateString([], {
+                      weekday: "long",
+                      month: "short",
+                      day: "numeric"
+                    })} at our home! We can't wait to welcome you!\n\nFeast Address:\n${booking.venue?.address || ""}`
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.primaryButton}
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    textDecoration: "none",
+                    gap: "8px",
+                    background: "#25D366", // WhatsApp Green
+                    border: "1px solid #1ebd56",
+                    color: "#fff",
+                    padding: "14px 20px",
+                    fontSize: "1.05rem",
+                    fontWeight: 600,
+                    borderRadius: "14px",
+                    boxShadow: "0 0 25px rgba(37, 211, 102, 0.35)",
+                    transition: "all 150ms ease"
+                  }}
+                >
+                  Send WhatsApp Confirmation
+                </a>
+                {!cancelled && (
+                  <p style={{ color: "rgba(243, 252, 247, 0.5)", fontSize: "0.85rem", textAlign: "center", margin: "4px 0 8px" }}>
+                    Redirecting to WhatsApp in {countdown}s...
+                  </p>
+                )}
+              </>
             )}
 
             <Link href="/" className={styles.secondaryButton} style={{ textDecoration: "none", padding: "14px 20px", borderRadius: "14px" }}>
