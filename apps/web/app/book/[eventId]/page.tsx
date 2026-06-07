@@ -9,6 +9,7 @@ import { Progress } from "../../../components/ui/progress";
 import { Skeleton } from "../../../components/ui/skeleton";
 import { Textarea } from "../../../components/ui/textarea";
 import { toast } from "../../../components/ui/sonner";
+import { Calendar } from "../../../components/ui/calendar";
 
 interface Event {
   _id: string;
@@ -496,36 +497,25 @@ export default function GuestBookingPage() {
                     </div>
                   ) : (
                     <div>
-                      {/* Horizontal Date Slider Selector */}
+                      {/* Calendar Date Selector */}
                       <span style={{ display: "block", fontSize: "0.85rem", color: "#000", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "12px", textAlign: "center" }}>
                         🗓️ Select Date
                       </span>
-                      <div style={{ display: "flex", flexWrap: "wrap", gap: "10px", marginBottom: "28px", justifyContent: "center" }}>
-                        {Object.keys(getSlotsByDate()).map((dateStr) => {
-                          const isSelected = selectedDate === dateStr;
-                          const isFull = isDateFullyBooked(dateStr);
-                          return (
-                            <button
-                              key={dateStr}
-                              type="button"
-                              onClick={() => setSelectedDate(dateStr)}
-                              style={{
-                                flexShrink: 0,
-                                padding: "10px 18px",
-                                borderRadius: "999px",
-                                background: isSelected ? "rgba(52, 211, 153, 0.08)" : isFull ? "rgba(239, 68, 68, 0.02)" : "#f9fafb",
-                                border: isSelected ? "2px solid #34d399" : isFull ? "1px solid #fecaca" : "1px solid #d1d5db",
-                                color: isSelected ? "#065f46" : isFull ? "#f87171" : "#000",
-                                fontSize: "0.88rem",
-                                fontWeight: isSelected ? 700 : 500,
-                                cursor: "pointer",
-                                transition: "all 150ms ease"
-                              }}
-                            >
-                              {dateStr} {isFull && "🔒"}
-                            </button>
-                          );
-                        })}
+                      <div style={{ marginBottom: "28px" }}>
+                        <Calendar
+                          mode="single"
+                          selected={selectedDate ? new Date(selectedDate) : undefined}
+                          onSelect={(date) => {
+                            const dateStr = date.toLocaleDateString([], {
+                              weekday: "short",
+                              month: "short",
+                              day: "numeric",
+                              year: "numeric"
+                            });
+                            setSelectedDate(dateStr);
+                          }}
+                          availableDates={Object.keys(getSlotsByDate())}
+                        />
                       </div>
 
                       {/* Filtered Slots List */}
