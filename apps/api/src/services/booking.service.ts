@@ -69,9 +69,8 @@ export class BookingService {
 
         const event = await EventModel.findById(input.eventId).session(session);
         if (!event) throw new NotFoundError("Event not found.");
-        if (event.hostUserId.toString() === input.guestUserId.toString()) {
-          throw new BookingConflictError("event_not_bookable", "The host cannot book their own event.");
-        }
+        // Removed the "host cannot book their own event" check.
+        // This allows hosts to manually add bookings on behalf of relatives using the host's own phone number.
 
         const rules = await this.availabilityEngine.listRules(event._id, session);
         this.assertBookingShape(event, input.startAt, input.endAt, input.partySize);
