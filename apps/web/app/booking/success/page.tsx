@@ -36,7 +36,7 @@ function BookingSuccessContent() {
   const [error, setError] = useState("");
   const [cancelled, setCancelled] = useState(false);
   const [cancelling, setCancelling] = useState(false);
-  const [countdown, setCountdown] = useState(30);
+  const [countdown, setCountdown] = useState(20);
 
   const getMealCategory = (startAtStr: string) => {
     const date = new Date(startAtStr);
