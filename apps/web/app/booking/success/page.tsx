@@ -41,7 +41,9 @@ function BookingSuccessContent() {
   const getMealCategory = (startAtStr: string) => {
     const date = new Date(startAtStr);
     const hour = date.getHours();
-    return hour < 16 ? "Lunch (Sadhya) " : "Dinner (Virunnu) ";
+    if (hour < 11) return "Breakfast";
+    if (hour < 16) return "Lunch";
+    return "Dinner";
   };
 
   useEffect(() => {
@@ -58,7 +60,7 @@ function BookingSuccessContent() {
       return () => clearTimeout(timer);
     } else if (booking && !cancelled && countdown === 0) {
       const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(
-        `Hi! We have successfully booked a slot to host you for ${getMealCategory(
+        `Hi! We love to host you for ${getMealCategory(
           booking.startAt
         )} on ${new Date(booking.startAt).toLocaleDateString([], {
           weekday: "long",
@@ -251,7 +253,7 @@ function BookingSuccessContent() {
               <>
                 <a
                   href={`https://wa.me/?text=${encodeURIComponent(
-                    `Hi! We have successfully booked a slot to host you for ${getMealCategory(
+                    `Hi! We love to host you for ${getMealCategory(
                       booking.startAt
                     )} on ${new Date(booking.startAt).toLocaleDateString([], {
                       weekday: "long",
