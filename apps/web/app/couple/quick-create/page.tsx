@@ -478,8 +478,9 @@ export default function QuickCreatePage() {
                     placeholder="e.g. Joyal"
                     value={husbandName}
                     onChange={(e) => {
-                      setHusbandName(e.target.value);
-                      if (e.target.value.length === 1) {
+                      const val = e.target.value.split(" ").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+                      setHusbandName(val);
+                      if (val.length === 1) {
                         const healthUrl = typeof window !== "undefined" ? "/proxy-health" : (process.env.NEXT_PUBLIC_API_URL ? process.env.NEXT_PUBLIC_API_URL.replace(/\/api$/, "") + "/health" : "http://localhost:4000/health");
                         fetch(healthUrl).catch(() => {});
                       }
@@ -496,9 +497,12 @@ export default function QuickCreatePage() {
                     id="wifeName"
                     type="text"
                     required
-                    placeholder="sneha"
+                    placeholder="e.g. Sneha"
                     value={wifeName}
-                    onChange={(e) => setWifeName(e.target.value)}
+                    onChange={(e) => {
+                      const val = e.target.value.split(" ").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+                      setWifeName(val);
+                    }}
                     style={inputStyle}
                     onFocus={(e) => e.target.style.borderColor = "#34d399"}
                     onBlur={(e) => e.target.style.borderColor = "rgba(52, 211, 153, 0.25)"}
