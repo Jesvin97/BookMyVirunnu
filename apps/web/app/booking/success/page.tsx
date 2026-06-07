@@ -165,10 +165,10 @@ function BookingSuccessContent() {
           </div>
 
           <div className={styles.eyebrow} style={{ marginBottom: "16px" }}>Invitation Sent Successfully</div>
-          <h2 style={{ fontFamily: "var(--bv-font-display)", fontSize: "clamp(1.8rem, 6vw, 2.4rem)", margin: "0 0 10px", color: "#fff", lineHeight: 1.1 }}>
+          <h2 style={{ fontFamily: "var(--bv-font-display)", fontSize: "clamp(1.8rem, 6vw, 2.4rem)", margin: "0 0 10px", color: "#8b9e6c", lineHeight: 1.1 }}>
             Feast Slot Reserved!
           </h2>
-          <p style={{ color: "rgba(243, 252, 247, 0.65)", margin: "0 0 32px" }}>
+          <p style={{ color: "#8b9e6c", margin: "0 0 32px" }}>
             You have successfully booked a slot to host the newlyweds. Let's send them a confirmation message!
           </p>
 
@@ -210,14 +210,14 @@ function BookingSuccessContent() {
                 <span style={{ fontSize: "0.75rem", color: "rgba(243, 252, 247, 0.5)", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: "4px" }}>
                   Status
                 </span>
-                <strong style={{ color: "#34d399", textTransform: "capitalize" }}>{booking?.status}</strong>
+                <strong style={{ color: "white", background: "rgb(37, 211, 102)", padding: "2px 8px", borderRadius: "4px", textTransform: "capitalize", display: "inline-block" }}>{booking?.status}</strong>
               </div>
             </div>
 
             {/* Restricted Address Reveal */}
             <hr style={{ border: "0", borderTop: "1px solid rgba(52, 211, 153, 0.12)", margin: "8px 0" }} />
             <div>
-              <span style={{ fontSize: "0.75rem", color: "#34d399", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: "4px" }}>
+              <span style={{ fontSize: "0.75rem", color: "white", background: "rgb(37, 211, 102)", padding: "4px 8px", borderRadius: "6px", textTransform: "uppercase", letterSpacing: "0.08em", display: "inline-block", marginBottom: "8px" }}>
                 📍 Feast Venue (Your Home Address)
               </span>
               <strong style={{ color: "#fff", lineHeight: 1.4, display: "block" }}>
