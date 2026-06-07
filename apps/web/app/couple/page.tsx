@@ -372,7 +372,7 @@ export default function CoupleDashboard() {
                   <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", gap: "16px", marginBottom: "20px" }}>
                     <div>
                       <h2 style={{ fontSize: "2rem", margin: "0 0 8px", color: "#000", fontFamily: "var(--bv-font-display)" }}>
-                        {activeEvent.title}
+                        {activeEvent.title.replace(/ 🍛$/, '')}
                       </h2>
                       <p style={{ color: "#000", fontSize: "0.9rem", margin: 0 }}>
                         Active Calendar Range: {new Date(activeEvent.startDate).toLocaleDateString()} - {new Date(activeEvent.endDate).toLocaleDateString()}
@@ -452,7 +452,7 @@ export default function CoupleDashboard() {
 
                   {/* Bookings & Visits Schedule */}
                   <h3 style={{ fontSize: "1.2rem", color: "#000", margin: "0 0 16px", fontFamily: "var(--bv-font-display)" }}>
-                    Scheduled Home Visits 🍛
+                    Scheduled Home Visits
                   </h3>
                   {bookingsLoading ? (
                     <div style={{ color: "rgba(243, 252, 247, 0.6)", display: "flex", flexDirection: "column", gap: "10px" }}>
