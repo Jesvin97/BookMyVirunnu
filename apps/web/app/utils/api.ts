@@ -1,4 +1,10 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api";
+const getApiBaseUrl = () => {
+  if (typeof window !== "undefined") {
+    return "/proxy-api";
+  }
+  return process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api";
+};
+const API_BASE_URL = getApiBaseUrl();
 
 interface RequestOptions extends RequestInit {
   body?: any;

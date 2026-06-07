@@ -83,13 +83,18 @@ export default function QuickCreatePage() {
   useEffect(() => {
     if (step === 2 && !backendConnected && !pinging) {
       setPinging(true);
-      const hostUrl = process.env.NEXT_PUBLIC_API_URL 
-        ? process.env.NEXT_PUBLIC_API_URL.replace(/\/api$/, "") 
-        : "http://localhost:4000";
+      const healthUrl = typeof window !== "undefined"
+        ? "/proxy-health"
+        : (() => {
+            const hostUrl = process.env.NEXT_PUBLIC_API_URL 
+              ? process.env.NEXT_PUBLIC_API_URL.replace(/\/api$/, "") 
+              : "http://localhost:4000";
+            return `${hostUrl}/health`;
+          })();
 
       const checkConnection = async () => {
         try {
-          const res = await fetch(`${hostUrl}/health`);
+          const res = await fetch(healthUrl);
           if (res.ok) {
             setBackendConnected(true);
             setPinging(false);
@@ -475,10 +480,8 @@ export default function QuickCreatePage() {
                     onChange={(e) => {
                       setHusbandName(e.target.value);
                       if (e.target.value.length === 1) {
-                        const hostUrl = process.env.NEXT_PUBLIC_API_URL 
-                          ? process.env.NEXT_PUBLIC_API_URL.replace(/\/api$/, "") 
-                          : "http://localhost:4000";
-                        fetch(`${hostUrl}/health`).catch(() => {});
+                        const healthUrl = typeof window !== "undefined" ? "/proxy-health" : (process.env.NEXT_PUBLIC_API_URL ? process.env.NEXT_PUBLIC_API_URL.replace(/\/api$/, "") + "/health" : "http://localhost:4000/health");
+                        fetch(healthUrl).catch(() => {});
                       }
                     }}
                     style={inputStyle}
