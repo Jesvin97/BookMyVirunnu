@@ -41,7 +41,7 @@ function BookingSuccessContent() {
   const getMealCategory = (startAtStr: string) => {
     const date = new Date(startAtStr);
     const hour = date.getHours();
-    return hour < 16 ? "Lunch (Sadhya) 🍛" : "Dinner (Virunnu) 🍽️";
+    return hour < 16 ? "Lunch (Sadhya) " : "Dinner (Virunnu) ";
   };
 
   useEffect(() => {
@@ -141,7 +141,7 @@ function BookingSuccessContent() {
             marginBottom: "28px",
             boxShadow: "0 0 35px rgba(239, 68, 68, 0.15)"
           }}>
-            🔓
+            
           </div>
           <h2 style={{ fontFamily: "var(--bv-font-display)", fontSize: "clamp(1.8rem, 6vw, 2.4rem)", margin: "0 0 12px", color: "#fff", lineHeight: 1.1 }}>
             Reservation Cancelled
@@ -238,7 +238,7 @@ function BookingSuccessContent() {
             <hr style={{ border: "0", borderTop: "1px solid rgba(52, 211, 153, 0.12)", margin: "8px 0" }} />
             <div>
               <span style={{ fontSize: "0.75rem", color: "white", background: "rgb(37, 211, 102)", padding: "4px 8px", borderRadius: "6px", textTransform: "uppercase", letterSpacing: "0.08em", display: "inline-block", marginBottom: "8px" }}>
-                📍 Feast Venue (Your Home Address)
+                 Feast Venue (Your Home Address)
               </span>
               <strong style={{ color: "#fff", lineHeight: 1.4, display: "block" }}>
                 {booking?.venue?.address || "Address details"}
@@ -304,7 +304,7 @@ function BookingSuccessContent() {
             textAlign: "left"
           }}>
             <strong style={{ display: "block", color: "rgb(248, 113, 113)", fontSize: "0.95rem", marginBottom: "4px" }}>
-              📅 Need to Reschedule or Cancel?
+               Need to Reschedule or Cancel?
             </strong>
             <p style={{ fontSize: "0.8rem", color: "rgb(248, 113, 113)", margin: "0 0 16px", lineHeight: 1.4 }}>
               If you have scheduling conflicts or made an error, you can cancel this slot instantly to free it up, then reserve a new date/time slot.

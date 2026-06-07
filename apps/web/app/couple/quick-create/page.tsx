@@ -17,11 +17,11 @@ interface Particle {
 }
 
 const DIETARY_OPTIONS = [
-  { value: "Vegetarian 🥬", label: "Vegetarian 🥬" },
-  { value: "No Beef 🚫🥩", label: "No Beef 🚫🥩" },
-  { value: "Eggless 🥚", label: "Eggless 🥚" },
-  { value: "Nut Allergy 🥜", label: "Nut Allergy 🥜" },
-  { value: "No Restrictions ✨", label: "No Restrictions ✨" }
+  { value: "Vegetarian ", label: "Vegetarian " },
+  { value: "No Beef ", label: "No Beef " },
+  { value: "Eggless ", label: "Eggless " },
+  { value: "Nut Allergy ", label: "Nut Allergy " },
+  { value: "No Restrictions ", label: "No Restrictions " }
 ];
 
 export default function QuickCreatePage() {
@@ -64,7 +64,7 @@ export default function QuickCreatePage() {
 
   // Celebratory particles splash
   const triggerParticles = (clientX: number, clientY: number) => {
-    const symbols = ["✨", "🌸", "💍", "🎉", "🌾", "🍛"];
+    const symbols = ["", "", "", "", "", ""];
     const newParticles: Particle[] = [];
     for (let i = 0; i < 20; i++) {
       newParticles.push({
@@ -98,7 +98,7 @@ export default function QuickCreatePage() {
           if (res.ok) {
             setBackendConnected(true);
             setPinging(false);
-            toast.success("Connection to backend established! 🌿");
+            toast.success("Connection to backend established! ");
             return;
           }
         } catch (err) {
@@ -144,10 +144,10 @@ export default function QuickCreatePage() {
   };
 
   const toggleDietary = (val: string) => {
-    if (val === "No Restrictions ✨") {
-      setSelectedDiet(["No Restrictions ✨"]);
+    if (val === "No Restrictions ") {
+      setSelectedDiet(["No Restrictions "]);
     } else {
-      let updated = selectedDiet.filter((d) => d !== "No Restrictions ✨");
+      let updated = selectedDiet.filter((d) => d !== "No Restrictions ");
       if (updated.includes(val)) {
         updated = updated.filter((d) => d !== val);
       } else {
@@ -223,7 +223,7 @@ export default function QuickCreatePage() {
     setLoading(true);
 
     const coupleName = `${husbandName.trim()} & ${wifeName.trim()}`;
-    const generatedTitle = `${coupleName}'s Feast Schedule 🍛`;
+    const generatedTitle = `${coupleName}'s Feast Schedule `;
 
     const finalDietary = [...selectedDiet];
     if (customDiet.trim()) {
@@ -372,7 +372,7 @@ export default function QuickCreatePage() {
                 </code>
                 <CopyButton
                   content={typeof window !== "undefined" ? `${window.location.origin}${successData.bookingUrl}` : successData.bookingUrl}
-                  successMessage="Relative Booking Link copied successfully! 🍛"
+                  successMessage="Relative Booking Link copied successfully! "
                 />
               </div>
             </div>
@@ -388,7 +388,7 @@ export default function QuickCreatePage() {
                 </code>
                 <CopyButton
                   content={typeof window !== "undefined" ? `${window.location.origin}${successData.dashboardUrl}` : successData.dashboardUrl}
-                  successMessage="Dashboard Manage Link copied successfully! 🔑"
+                  successMessage="Dashboard Manage Link copied successfully! "
                 />
               </div>
             </div>
@@ -399,7 +399,7 @@ export default function QuickCreatePage() {
             Go to Dashboard & View Feasts
           </Link>
 
-          <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "16px", opacity: 0.35, fontSize: "0.8rem", color: "#34d399" }}>🌿</div>
+          <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "16px", opacity: 0.35, fontSize: "0.8rem", color: "#34d399" }}></div>
         </div>
       </main>
     );
@@ -470,7 +470,7 @@ export default function QuickCreatePage() {
 
               <div style={{ display: "grid", gap: "24px", marginBottom: "36px", width: "100%" }}>
                 <div style={{ display: "grid", gap: "8px" }}>
-                  <label htmlFor="husbandName" style={labelStyle}>Husband's Name 🤵</label>
+                  <label htmlFor="husbandName" style={labelStyle}>Husband's Name </label>
                   <input
                     id="husbandName"
                     type="text"
@@ -491,7 +491,7 @@ export default function QuickCreatePage() {
                 </div>
 
                 <div style={{ display: "grid", gap: "8px" }}>
-                  <label htmlFor="wifeName" style={labelStyle}>Wife's Name 👰</label>
+                  <label htmlFor="wifeName" style={labelStyle}>Wife's Name </label>
                   <input
                     id="wifeName"
                     type="text"
@@ -644,7 +644,7 @@ export default function QuickCreatePage() {
                             fontWeight: 600
                           }}
                         >
-                          🚫 {new Date(date).toLocaleDateString([], { month: "short", day: "numeric", year: "numeric" })}
+                           {new Date(date).toLocaleDateString([], { month: "short", day: "numeric", year: "numeric" })}
                           <button
                             type="button"
                             onClick={() => removeRestDate(date)}

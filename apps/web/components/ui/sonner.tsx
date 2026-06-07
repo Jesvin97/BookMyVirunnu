@@ -133,7 +133,7 @@ export function Toaster() {
                   <span style={{ color: "#f87171", fontSize: "1.1rem" }}>🛇</span>
                 )}
                 {isWarning && (
-                  <span style={{ color: "#fbbf24", fontSize: "1.1rem" }}>⚠</span>
+                  <span style={{ color: "#fbbf24", fontSize: "1.1rem" }}></span>
                 )}
                 <span style={{ fontWeight: 600, fontSize: "0.95rem" }}>{t.message}</span>
               </div>

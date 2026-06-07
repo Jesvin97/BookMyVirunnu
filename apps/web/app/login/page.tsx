@@ -132,7 +132,7 @@ export default function LoginPage() {
               transition: "all 150ms ease"
             }}
           >
-            Feast ID Login 🔑
+            Feast ID Login 
           </button>
         </div>
 
@@ -196,7 +196,7 @@ export default function LoginPage() {
           ) : (
             <div style={{ display: "grid", gap: "8px" }}>
               <label htmlFor="eventId" style={{ fontSize: "0.85rem", color: "#8b9e6c", fontWeight: 500 }}>
-                Wedding Feast ID 🔑
+                Wedding Feast ID 
               </label>
               <input
                 id="eventId"

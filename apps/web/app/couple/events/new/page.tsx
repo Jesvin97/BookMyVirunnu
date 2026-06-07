@@ -184,7 +184,7 @@ export default function NewEventPage() {
                 <input
                   type="text"
                   required
-                  placeholder="Joyal & Anjali's Feast Schedule 🍛"
+                  placeholder="Joyal & Anjali's Feast Schedule "
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   style={inputStyle}
@@ -265,7 +265,7 @@ export default function NewEventPage() {
                   style={{ width: "20px", height: "20px", cursor: "pointer", accentColor: "#34d399" }}
                 />
                 <div>
-                  <strong style={{ color: "#fff", display: "block", fontSize: "1.05rem" }}>Lunch (Sadhya) 🍛</strong>
+                  <strong style={{ color: "#fff", display: "block", fontSize: "1.05rem" }}>Lunch (Sadhya) </strong>
                   <span style={{ fontSize: "0.85rem", color: "rgba(243, 252, 247, 0.5)" }}>Banquet Window: 12:00 PM - 3:00 PM</span>
                 </div>
                 <div style={{ fontSize: "0.85rem", color: "#34d399", fontWeight: 600 }}>
@@ -291,7 +291,7 @@ export default function NewEventPage() {
                   style={{ width: "20px", height: "20px", cursor: "pointer", accentColor: "#34d399" }}
                 />
                 <div>
-                  <strong style={{ color: "#fff", display: "block", fontSize: "1.05rem" }}>Dinner (Virunnu) 🍽️</strong>
+                  <strong style={{ color: "#fff", display: "block", fontSize: "1.05rem" }}>Dinner (Virunnu) </strong>
                   <span style={{ fontSize: "0.85rem", color: "rgba(243, 252, 247, 0.5)" }}>Banquet Window: 7:00 PM - 10:00 PM</span>
                 </div>
                 <div style={{ fontSize: "0.85rem", color: "#34d399", fontWeight: 600 }}>
@@ -332,7 +332,7 @@ export default function NewEventPage() {
             className={styles.primaryButton}
             style={{ width: "100%", border: "0", cursor: loading ? "not-allowed" : "pointer", minHeight: "54px", fontSize: "1.05rem" }}
           >
-            {loading ? "Creating Feast Calendar..." : "Generate Available Slots ✨"}
+            {loading ? "Creating Feast Calendar..." : "Generate Available Slots "}
           </button>
         </form>
       </section>

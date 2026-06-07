@@ -212,7 +212,7 @@ export default function CoupleDashboard() {
   const handleStatusChange = async (eventId: string, action: "publish" | "pause" | "cancel") => {
     try {
       await api.post(`/events/${eventId}/${action}`);
-      toast.success(`Feast calendar status updated to ${action}ed! 🍛`);
+      toast.success(`Feast calendar status updated to ${action}ed! `);
       fetchEvents();
     } catch (err: any) {
       console.error(`Error performing ${action}:`, err);
@@ -240,7 +240,7 @@ export default function CoupleDashboard() {
         priority: 10,
         reason: "Blocked by couple for private plans"
       });
-      toast.success("Feast slot successfully blocked! 🚫");
+      toast.success("Feast slot successfully blocked! ");
       await refreshDashboardData(selectedEventId);
     } catch (err: any) {
       console.error("Failed to block slot:", err);
@@ -269,7 +269,7 @@ export default function CoupleDashboard() {
     setActionLoading(slot._id);
     try {
       await api.delete(`/availability-rules/${ruleToDelete._id}`);
-      toast.success("Feast slot unblocked! 🔓");
+      toast.success("Feast slot unblocked! ");
       await refreshDashboardData(selectedEventId);
     } catch (err: any) {
       console.error("Failed to unblock slot:", err);
@@ -339,10 +339,10 @@ export default function CoupleDashboard() {
           <div>
             <div className={styles.eyebrow} style={{ color: "var(--color-primary)" }}>Newlywed Feasts Portal</div>
             <h1 style={{ fontFamily: "var(--bv-font-display)", fontSize: "3rem", margin: "16px 0 8px", color: "#000" }}>
-              Namaskaram, {user?.name || "Couple"} 👋
+              Namaskaram, {user?.name || "Couple"} 
             </h1>
             <p style={{ color: "#6b7280", margin: "0 0 12px", fontSize: "1.05rem", fontWeight: 500 }}>
-              📞 {user?.phone || "No phone linked"}
+               {user?.phone || "No phone linked"}
             </p>
             <p style={{ color: "#000", margin: 0 }}>
               Manage invitations from family and block dates to rest.
@@ -377,7 +377,7 @@ export default function CoupleDashboard() {
                   <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", gap: "16px", marginBottom: "20px" }}>
                     <div>
                       <h2 style={{ fontSize: "2rem", margin: "0 0 8px", color: "#000", fontFamily: "var(--bv-font-display)" }}>
-                        {activeEvent.title.replace(/ 🍛$/, '')}
+                        {activeEvent.title.replace(/ $/, '')}
                       </h2>
                       <p style={{ color: "#000", fontSize: "0.9rem", margin: 0 }}>
                         Active Calendar Range: {new Date(activeEvent.startDate).toLocaleDateString()} - {new Date(activeEvent.endDate).toLocaleDateString()}
@@ -418,7 +418,7 @@ export default function CoupleDashboard() {
                   {activeEvent.status === "published" && (
                     <div className={styles.notice} style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: "16px", padding: "12px 16px", marginBottom: "16px", minWidth: 0, flexShrink: 1, overflowWrap: "anywhere", wordBreak: "break-word" }}>
                       <div style={{ minWidth: 0, flexShrink: 1 }}>
-                        <strong style={{ display: "block", color: "#000", marginBottom: "4px" }}>Share Your Invite Portal Link 🔗</strong>
+                        <strong style={{ display: "block", color: "#000", marginBottom: "4px" }}>Share Your Invite Portal Link </strong>
                         <span style={{ fontSize: "0.85rem", color: "#000" }}>Send this link to families and friends so they can call you for meals:</span>
                       </div>
                       <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap", minWidth: 0, flexShrink: 1 }}>
@@ -427,7 +427,7 @@ export default function CoupleDashboard() {
                         </code>
                         <CopyButton
                           content={typeof window !== "undefined" ? `${window.location.origin}/book/${activeEvent._id}` : `/book/${activeEvent._id}`}
-                          successMessage="Invitation Link copied successfully! 🍛"
+                          successMessage="Invitation Link copied successfully! "
                         />
                         <ShareButton
                           url={`/book/${activeEvent._id}`}
@@ -444,7 +444,7 @@ export default function CoupleDashboard() {
                   {/* Private Dashboard Link Card */}
                   <div className={styles.panelAccent} style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: "16px", padding: "12px 16px", marginBottom: "32px", background: "#fef2f2", border: "1px solid #fecaca", minWidth: 0, maxWidth: "100%", flexShrink: 1, boxSizing: "border-box", overflowWrap: "anywhere", wordBreak: "break-word" }}>
                     <div style={{ minWidth: 0, flexShrink: 1 }}>
-                      <strong style={{ display: "block", color: "#ef4444", marginBottom: "4px" }}>Feast ID & Private Dashboard Manager 🔑</strong>
+                      <strong style={{ display: "block", color: "#ef4444", marginBottom: "4px" }}>Feast ID & Private Dashboard Manager </strong>
                       <span style={{ fontSize: "0.85rem", color: "#000" }}>Bookmark this link to access your dashboard passwordlessly on other devices:</span>
                     </div>
                     <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap", minWidth: 0, flexShrink: 1 }}>
@@ -453,7 +453,7 @@ export default function CoupleDashboard() {
                       </code>
                       <CopyButton
                         content={typeof window !== "undefined" ? `${window.location.origin}/couple?id=${activeEvent._id}` : `${activeEvent._id}`}
-                        successMessage="Private Manage Link copied successfully! 🔑"
+                        successMessage="Private Manage Link copied successfully! "
                         style={{ padding: "0 14px", minHeight: "32px", fontSize: "0.8rem", border: "1px solid #fca5a5", background: "#fff", color: "#ef4444" }}
                       />
                     </div>
@@ -495,7 +495,7 @@ export default function CoupleDashboard() {
                                   <span style={{ color: "#000" }}>{b.venue?.name || "Host Family"}</span>
                                   {b.venue?.phone && (
                                     <span style={{ fontSize: "0.8rem", color: "#000" }}>
-                                      📞 {b.venue.phone}
+                                       {b.venue.phone}
                                     </span>
                                   )}
                                 </div>
@@ -525,7 +525,7 @@ export default function CoupleDashboard() {
                               <TableCell>
                                 {b.venue?.address ? (
                                   <a href={mapsUrl} target="_blank" rel="noopener noreferrer" className={styles.secondaryButton} style={{ textDecoration: "none", fontSize: "0.75rem", padding: "6px 12px", minHeight: "30px", background: "rgba(52, 211, 153, 0.05)", border: "1px solid rgba(52, 211, 153, 0.2)", color: "var(--color-primary)" }}>
-                                    🗺️ Maps
+                                     Maps
                                   </a>
                                 ) : (
                                   <span style={{ fontSize: "0.75rem", color: "rgba(0,0,0,0.5)", fontStyle: "italic" }}>
@@ -549,7 +549,7 @@ export default function CoupleDashboard() {
                     
                     {/* Selected Calendar Range & Configured Meals Status */}
                     <div className={styles.panelAccent} style={{ padding: "20px", borderRadius: "16px", background: "#f9fafb", border: "1px solid #d1d5db", display: "flex", flexDirection: "column", gap: "16px", minWidth: 0, maxWidth: "100%", flexShrink: 1, boxSizing: "border-box", overflowWrap: "anywhere", wordBreak: "break-word" }}>
-                      <h4 style={{ margin: 0, color: "#000", fontSize: "1.05rem", fontWeight: 600 }}>Feast Setup Summary 🌿</h4>
+                      <h4 style={{ margin: 0, color: "#000", fontSize: "1.05rem", fontWeight: 600 }}>Feast Setup Summary </h4>
                       
                       <div style={{ fontSize: "0.9rem", color: "#000" }}>
                         <strong style={{ display: "block", color: "var(--color-primary)", fontSize: "0.8rem", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "4px" }}>Selected Calendar Range</strong>
@@ -599,7 +599,7 @@ export default function CoupleDashboard() {
 
                     {/* Block New Rest Date Form */}
                     <div className={styles.panelAccent} style={{ padding: "20px", borderRadius: "16px", background: "#fef2f2", border: "1px solid #fecaca", display: "flex", flexDirection: "column", gap: "14px", minWidth: 0, maxWidth: "100%", flexShrink: 1, boxSizing: "border-box", overflowWrap: "anywhere", wordBreak: "break-word" }}>
-                      <h4 style={{ margin: 0, color: "#000", fontSize: "1.05rem", fontWeight: 600 }}>Block a Rest Date 🚫</h4>
+                      <h4 style={{ margin: 0, color: "#000", fontSize: "1.05rem", fontWeight: 600 }}>Block a Rest Date </h4>
                       <p style={{ margin: 0, fontSize: "0.8rem", color: "#000", lineHeight: 1.4 }}>
                         Add dates (e.g., honeymoon, personal plans) to completely hide all meals on that day from relatives.
                       </p>
@@ -637,7 +637,7 @@ export default function CoupleDashboard() {
                                 priority: 10,
                                 reason: "Blocked Rest Day"
                               });
-                              toast.success("Rest date successfully blocked! 🚫");
+                              toast.success("Rest date successfully blocked! ");
                               setNewRestDate("");
                               await refreshDashboardData(selectedEventId);
                             } catch (err: any) {
@@ -659,7 +659,7 @@ export default function CoupleDashboard() {
                             opacity: (!newRestDate || actionLoading === "block-rest") ? 0.6 : 1
                           }}
                         >
-                          {actionLoading === "block-rest" ? "Blocking..." : "🚫 Block Date"}
+                          {actionLoading === "block-rest" ? "Blocking..." : " Block Date"}
                         </button>
                       </div>
                     </div>
@@ -679,7 +679,7 @@ export default function CoupleDashboard() {
                         const dateLabel = ruleDate ? ruleDate.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" }) : rule.date;
                         return (
                           <div key={rule._id} style={{ display: "flex", alignItems: "center", gap: "10px", padding: "6px 12px", borderRadius: "10px", background: "#fef2f2", border: "1px solid #fecaca" }}>
-                            <span style={{ fontSize: "0.85rem", color: "#b91c1c", fontWeight: 600 }}>🚫 {dateLabel}</span>
+                            <span style={{ fontSize: "0.85rem", color: "#b91c1c", fontWeight: 600 }}> {dateLabel}</span>
                             <button
                               type="button"
                               disabled={actionLoading === rule._id}
@@ -687,7 +687,7 @@ export default function CoupleDashboard() {
                                 setActionLoading(rule._id);
                                 try {
                                   await api.delete(`/availability-rules/${rule._id}`);
-                                  toast.success("Rest date unblocked! 🔓");
+                                  toast.success("Rest date unblocked! ");
                                   if (selectedEventId) {
                                     await refreshDashboardData(selectedEventId);
                                   }

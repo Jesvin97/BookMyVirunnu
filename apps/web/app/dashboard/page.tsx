@@ -142,7 +142,7 @@ export default function AdminDashboard() {
           <div>
             <div className={styles.eyebrow} style={{ color: "var(--color-primary)" }}>Platform Administration</div>
             <h1 style={{ fontFamily: "var(--bv-font-display)", fontSize: "3rem", margin: "16px 0 8px", color: "#000" }}>
-              Admin Full View 👑
+              Admin Full View 
             </h1>
             <p style={{ color: "#000", margin: 0 }}>
               Overview of all couples, events, and bookings on the platform.
@@ -217,7 +217,7 @@ export default function AdminDashboard() {
                                         </span>
                                         {b.guest.phone && (
                                           <span style={{ fontSize: "0.8rem", color: "#000" }}>
-                                            📞 {b.guest.phone}
+                                             {b.guest.phone}
                                           </span>
                                         )}
                                       </div>

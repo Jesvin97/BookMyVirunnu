@@ -166,7 +166,7 @@ export default function GuestBookingPage() {
   };
 
   const triggerParticles = (clientX: number, clientY: number) => {
-    const symbols = ["🍛", "🍽️", "✨", "🌟", "🎉", "🌾", "🍛"];
+    const symbols = ["", "", "", "", "", "", ""];
     const newParticles: Particle[] = [];
     for (let i = 0; i < 20; i++) {
       newParticles.push({
@@ -239,15 +239,15 @@ export default function GuestBookingPage() {
         const data = await res.json();
         if (data && data.display_name) {
           setVenueAddress(data.display_name);
-          toast.success("Location successfully pinpointed! 📍");
+          toast.success("Location successfully pinpointed! ");
         } else {
           setVenueAddress(`Coordinates: Lat ${latitude.toFixed(6)}, Lng ${longitude.toFixed(6)}`);
-          toast.success("Coordinates captured! 📍");
+          toast.success("Coordinates captured! ");
         }
       } catch (err) {
         console.error("Reverse geocoding error:", err);
         setVenueAddress(`Coordinates: Lat ${latitude.toFixed(6)}, Lng ${longitude.toFixed(6)}`);
-        toast.success("Coordinates captured! 📍");
+        toast.success("Coordinates captured! ");
         setLocateError(true);
       } finally {
         setLocating(false);
@@ -316,7 +316,7 @@ export default function GuestBookingPage() {
           localStorage.setItem("bv_last_host_name", guestName.trim());
           localStorage.setItem("bv_last_host_phone", guestPhone.trim());
         }
-        toast.success("Feast invitation successfully sent to couple! ✉️");
+        toast.success("Feast invitation successfully sent to couple! ");
         router.push(`/booking/success?bookingId=${response.booking._id}`);
       }
     } catch (err: any) {
@@ -418,7 +418,7 @@ export default function GuestBookingPage() {
           <header className={styles.hero} style={{ padding: "0 0 28px", textAlign: "center" }}>
             <div className={styles.eyebrow} style={{ color: "var(--color-primary)", margin: "0 auto 8px" }}>Invitation Portal</div>
             <h1 style={{ fontFamily: "var(--bv-font-display)", fontSize: "2.8rem", margin: "8px 0 6px", color: "#000", lineHeight: 1.1 }}>
-              Invite {event.title.replace("'s Feast Schedule 🍛", "").replace("'s Feast Schedule", "")}
+              Invite {event.title.replace("'s Feast Schedule ", "").replace("'s Feast Schedule", "")}
             </h1>
 
             {/* Newlyweds Dietary Preferences Notification */}
@@ -437,7 +437,7 @@ export default function GuestBookingPage() {
                 boxShadow: "0 4px 20px rgba(0,0,0,0.05)"
               }}>
                 <span style={{ fontSize: "0.82rem", color: "#000", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                  🥗 Note from Newlyweds: Dietary Preferences
+                   Note from Newlyweds: Dietary Preferences
                 </span>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", justifyContent: "center" }}>
                   {event.dietaryRestrictions.map((diet) => (
@@ -499,7 +499,7 @@ export default function GuestBookingPage() {
                     <div>
                       {/* Calendar Date Selector */}
                       <span style={{ display: "block", fontSize: "0.85rem", color: "#000", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "12px", textAlign: "center" }}>
-                        🗓️ Select Date
+                         Select Date
                       </span>
                       <div style={{ marginBottom: "28px" }}>
                         <Calendar
@@ -560,7 +560,7 @@ export default function GuestBookingPage() {
                                   {meal.name}
                                 </strong>
                                 <span style={{ display: "block", fontSize: "0.75rem", marginTop: "12px", fontWeight: 600, color: isLocked ? "#ef4444" : isSelected ? "#065f46" : "#000" }}>
-                                  {isLocked ? "🔒 Reserved / Blocked" : isSelected ? "Selected ✅" : "Open Slot"}
+                                  {isLocked ? " Reserved / Blocked" : isSelected ? "Selected " : "Open Slot"}
                                 </span>
                               </button>
                             );
@@ -675,7 +675,7 @@ export default function GuestBookingPage() {
                       className={styles.secondaryButton}
                       style={{ flex: 1, padding: "14px" }}
                     >
-                      ⬅ Back
+                       Back
                     </button>
                     <button
                       type="button"
@@ -692,7 +692,7 @@ export default function GuestBookingPage() {
               {step === 3 && (
                 <form onSubmit={handleBooking}>
                   <h2 style={{ fontFamily: "var(--bv-font-display)", fontSize: "2.2rem", color: "#000", margin: "0 0 8px", textAlign: "center" }}>
-                    Feast Venue Location 📍
+                    Feast Venue Location 
                   </h2>
                   <p style={{ color: "#000", fontSize: "0.95rem", textAlign: "center", marginBottom: "32px" }}>
                     Pinpoint your home address so the newlyweds can navigate easily.
@@ -725,7 +725,7 @@ export default function GuestBookingPage() {
                             transition: "all 150ms ease"
                           }}
                         >
-                          {locating ? "⏳ Pinpointing..." : locateError ? "🔄 Retry Locate Me" : "📍 Locate Me"}
+                          {locating ? " Pinpointing..." : locateError ? " Retry Locate Me" : " Locate Me"}
                         </button>
                       </div>
                       {locating ? (
@@ -753,7 +753,7 @@ export default function GuestBookingPage() {
                       className={styles.secondaryButton}
                       style={{ flex: 1, padding: "14px" }}
                     >
-                      ⬅ Back
+                       Back
                     </button>
                     <button
                       type="submit"
@@ -761,7 +761,7 @@ export default function GuestBookingPage() {
                       className={styles.primaryButton}
                       style={{ flex: 1, border: 0, padding: "14px", fontSize: "1.05rem", cursor: (submitLoading || locating) ? "not-allowed" : "pointer" }}
                     >
-                      {submitLoading ? "Reserving Slot..." : "Send Invitation ✉️"}
+                      {submitLoading ? "Reserving Slot..." : "Send Invitation "}
                     </button>
                   </div>
                 </form>

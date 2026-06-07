@@ -41,7 +41,7 @@ export function ShareButton({
       // Graceful fallback to copying url
       try {
         await navigator.clipboard.writeText(shareData.url);
-        toast.success("Link copied to clipboard for sharing! 🔗");
+        toast.success("Link copied to clipboard for sharing! ");
       } catch (err) {
         console.error("Fallback sharing failed:", err);
         toast.error("Unable to share or copy link.");

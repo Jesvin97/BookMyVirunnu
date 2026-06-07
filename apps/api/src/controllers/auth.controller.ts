@@ -100,7 +100,7 @@ export class AuthController {
     const eventService = new EventService();
 
     // Auto-generate title and description if missing
-    const generatedTitle = input.title || `${input.coupleName}'s Feast Schedule 🍛`;
+    const generatedTitle = input.title || `${input.coupleName}'s Feast Schedule `;
     const generatedDescription = input.description || `A warm invitation from ${input.coupleName} to call us to your home for a beautiful Sadhya (Lunch) or Virunnu (Dinner) feast!`;
 
     // Create the feast calendar as DRAFT first — no slot sync yet (no rules exist)
