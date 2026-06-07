@@ -567,7 +567,7 @@ export default function QuickCreatePage() {
                   className={styles.secondaryButton}
                   style={{ flex: 1, padding: "14px" }}
                 >
-                  ⬅ Back
+                  Back
                 </button>
                 <button
                   type="button"
@@ -619,7 +619,7 @@ export default function QuickCreatePage() {
                       type="button"
                       onClick={addRestDate}
                       className={styles.primaryButton}
-                      style={{ padding: "14px 18px", border: 0, height: "100%" }}
+                      style={{ padding: "14px", border: 0, height: "100%" }}
                     >
                       + Block
                     </button>
@@ -675,7 +675,7 @@ export default function QuickCreatePage() {
                   className={styles.secondaryButton}
                   style={{ flex: 1, padding: "14px" }}
                 >
-                  ⬅ Back
+                  Back
                 </button>
                 <button
                   type="button"
@@ -776,7 +776,7 @@ export default function QuickCreatePage() {
                   className={styles.secondaryButton}
                   style={{ flex: 1, padding: "14px" }}
                 >
-                  ⬅ Back
+                  Back
                 </button>
                 <button
                   type="button"
@@ -852,7 +852,7 @@ export default function QuickCreatePage() {
                   className={styles.secondaryButton}
                   style={{ flex: 1, padding: "14px" }}
                 >
-                  ⬅ Back
+                  Back
                 </button>
                 <button
                   type="button"
@@ -898,7 +898,7 @@ export default function QuickCreatePage() {
                   className={styles.secondaryButton}
                   style={{ flex: 1, padding: "14px" }}
                 >
-                  ⬅ Back
+                  Back
                 </button>
                 <button
                   type="submit"
