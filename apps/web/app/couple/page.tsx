@@ -72,7 +72,7 @@ export default function CoupleDashboard() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [slots, setSlots] = useState<Slot[]>([]);
   const [rules, setRules] = useState<Rule[]>([]);
-  const [user, setUser] = useState<{ name: string; role: string } | null>(null);
+  const [user, setUser] = useState<{ name: string; role: string; phone?: string } | null>(null);
   
   const [loading, setLoading] = useState(true);
   const [bookingsLoading, setBookingsLoading] = useState(false);
@@ -341,6 +341,9 @@ export default function CoupleDashboard() {
             <h1 style={{ fontFamily: "var(--bv-font-display)", fontSize: "3rem", margin: "16px 0 8px", color: "#000" }}>
               Namaskaram, {user?.name || "Couple"} 👋
             </h1>
+            <p style={{ color: "#6b7280", margin: "0 0 12px", fontSize: "1.05rem", fontWeight: 500 }}>
+              📞 {user?.phone || "No phone linked"}
+            </p>
             <p style={{ color: "#000", margin: 0 }}>
               Manage invitations from family and block dates to rest.
             </p>
