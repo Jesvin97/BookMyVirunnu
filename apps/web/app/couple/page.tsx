@@ -346,12 +346,14 @@ export default function CoupleDashboard() {
             </p>
           </div>
 
-          <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
-            <ThemeTogglerButton />
-            <button onClick={handleLogout} className={styles.secondaryButton} style={{ cursor: "pointer", border: "1px solid rgba(239, 68, 68, 0.2)", background: "rgba(239, 68, 68, 0.05)", color: "#f87171" }}>
-              Sign Out
-            </button>
-          </div>
+          {events.length === 0 && (
+            <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+              <ThemeTogglerButton />
+              <button onClick={handleLogout} className={styles.secondaryButton} style={{ cursor: "pointer", border: "1px solid rgba(239, 68, 68, 0.2)", background: "rgba(239, 68, 68, 0.05)", color: "#f87171" }}>
+                Sign Out
+              </button>
+            </div>
+          )}
         </header>
 
         <section className={styles.section}>
@@ -379,7 +381,11 @@ export default function CoupleDashboard() {
                       </p>
                     </div>
 
-                    <div style={{ display: "flex", gap: "10px", alignItems: "start" }}>
+                    <div style={{ display: "flex", gap: "10px", alignItems: "start", flexWrap: "wrap" }}>
+                      <ThemeTogglerButton />
+                      <button onClick={handleLogout} className={styles.secondaryButton} style={{ padding: "0 18px", minHeight: "40px", fontSize: "0.9rem", cursor: "pointer", border: "1px solid rgba(239, 68, 68, 0.2)", background: "rgba(239, 68, 68, 0.05)", color: "#f87171" }}>
+                        Sign Out
+                      </button>
                       {activeEvent.status === "draft" && (
                         <button onClick={() => handleStatusChange(activeEvent._id, "publish")} className={styles.primaryButton} style={{ border: 0, padding: "0 18px", minHeight: "40px", fontSize: "0.9rem", cursor: "pointer" }}>
                           Open Invitations
