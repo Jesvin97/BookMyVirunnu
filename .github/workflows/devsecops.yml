@@ -1,72 +1,218 @@
-name: DevSecOps
+name: DevSecOps Pipeline
 
 on:
   push:
-    branches: [main, develop]
+    branches:
+      - main
+      - develop
   pull_request:
 
 permissions:
   contents: read
   security-events: write
+  actions: read
 
 env:
+  NODE_VERSION: 20
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
-  # Job 1: Secrets Scanning & SCA (Software Composition Analysis)
+
+  ##############################################################################
+  # Job 1 - Security Scan (SCA + Secrets)
+  ##############################################################################
   security-scan:
-    name: Secrets & Dependency Auditing (SCA)
+    name: Security Scan (SCA & Secrets)
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout repository
+      - name: Checkout Repository
         uses: actions/checkout@v7
         with:
-          fetch-depth: 0
+          fetch-depth: 0   # required: full history so Trivy/Gitleaks/TruffleHog can diff properly
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: 20
+          node-version: ${{ env.NODE_VERSION }}
           cache: npm
 
-      - name: Install dependencies
-        run: npm install
+      - name: Install Dependencies
+        run: npm ci   # fix #10: deterministic, faster than npm install in CI
 
-      - name: Dependency Vulnerability Audit (SCA)
+      - name: Dependency Review
+        if: github.event_name == 'pull_request'
+        uses: actions/dependency-review-action@v4
+
+      - name: Dependency Audit
         run: npm audit --workspaces --audit-level=high
 
-      - name: Secrets Scanning (Gitleaks)
-        uses: gitleaks/gitleaks-action@v3
-
-      - name: Filesystem Security Scan (Trivy)
+      - name: Trivy Filesystem Scan
         uses: aquasecurity/trivy-action@v0.36.0
         with:
           scan-type: fs
           scan-ref: .
           severity: HIGH,CRITICAL
           exit-code: 1
+          format: sarif
+          output: trivy-results.sarif
 
-  # Job 2: Typecheck and Build (SAST & Quality)
-  build:
-    name: Build & Type Check (SAST)
+      - name: Upload Trivy SARIF          # fix #8: SARIF upload for fs scan too
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: trivy-results.sarif
+          category: trivy-fs
+
+      - name: Gitleaks Scan
+        uses: gitleaks/gitleaks-action@v3
+
+      - name: TruffleHog Scan             # fix #3: no brittle HEAD~1 base, scan full history via checkout depth
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          extra_args: --results=verified,unknown
+
+      - name: Install License Checker
+        run: npm install -g license-checker
+
+      - name: Check Licenses
+        run: license-checker --summary
+
+      - name: Generate CycloneDX SBOM
+        run: npx @cyclonedx/cyclonedx-npm --output-file sbom.json
+
+      - name: Upload SBOM
+        uses: actions/upload-artifact@v7
+        with:
+          name: sbom
+          path: sbom.json
+
+      ##########################################################################
+      # AI-specific checks (fix #9) - lightweight, non-blocking guardrails
+      ##########################################################################
+      - name: Validate Required Environment Variables
+        run: |
+          missing=0
+          for var in OPENAI_API_KEY ANTHROPIC_API_KEY; do
+            if [ -z "${!var:-}" ] && grep -rq "$var" src/ apps/ packages/ 2>/dev/null; then
+              echo "::warning::$var is referenced in code but not set in this environment"
+              missing=1
+            fi
+          done
+          exit 0   # advisory only, does not fail the build
+
+      - name: Prompt Injection / Prompt Validation Tests
+        if: hashFiles('tests/ai/prompt-injection.test.*') != ''
+        run: npm run test:ai-security
+        continue-on-error: true   # advisory until suite is mature; flip to blocking later
+
+  ##############################################################################
+  # Job 2 - CodeQL (fix #2: split into its own job, runs ahead of build)
+  ##############################################################################
+  codeql:
+    name: CodeQL Analysis
     runs-on: ubuntu-latest
+    needs: security-scan
+    permissions:
+      contents: read
+      security-events: write
+
     steps:
-      - name: Checkout repository
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: codeql-javascript
+          # analyze uploads SARIF to code scanning automatically (fix #8)
+
+  ##############################################################################
+  # Job 3 - Static Analysis (SAST & Code Quality)
+  ##############################################################################
+  static-analysis:
+    name: Static Analysis (SAST & Code Quality)
+    runs-on: ubuntu-latest
+    needs: security-scan
+
+    steps:
+      - name: Checkout Repository
         uses: actions/checkout@v7
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: 20
+          node-version: ${{ env.NODE_VERSION }}
           cache: npm
 
-      - name: Install dependencies
-        run: npm install
+      - name: Install Dependencies
+        run: npm ci
 
-      - name: Type Check Workspaces
+      - name: Type Check
         run: npm run check
 
-      - name: Compile and Build Apps
+      - name: Run Semgrep
+        uses: semgrep/semgrep-action@v1
+        with:
+          config: auto
+          generateSarif: "1"
+
+      - name: Upload Semgrep SARIF        # fix #8
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: semgrep.sarif
+          category: semgrep
+
+      ##########################################################################
+      # SonarQube (fix #1: project must be declared, either via
+      # sonar-project.properties at repo root, or explicit args below)
+      ##########################################################################
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v5
+        with:
+          args: >
+            -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY }}
+            -Dsonar.organization=${{ vars.SONAR_ORG }}
+            -Dsonar.sources=.
+            -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/tests/**
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
+        # NOTE: set repo variables SONAR_PROJECT_KEY / SONAR_ORG / SONAR_HOST_URL,
+        # or delete `args:` and commit a sonar-project.properties file instead.
+
+  ##############################################################################
+  # Job 4 - Build
+  ##############################################################################
+  build:
+    name: Build Application
+    runs-on: ubuntu-latest
+    needs: [codeql, static-analysis]
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build Application
         run: npm run build
 
       - name: Upload Build Artifacts
@@ -76,30 +222,105 @@ jobs:
           path: |
             apps/api/dist
             packages/shared/dist
-          retention-days: 1
+          retention-days: 7
 
-  # Job 3: API Integration Testing (DAST)
-  api-testing:
-    name: API Dynamic Integration Testing
+  ##############################################################################
+  # Job 5 - Testing
+  ##############################################################################
+  testing:
+    name: Unit & API Integration Tests
     runs-on: ubuntu-latest
     needs: build
+
     steps:
-      - name: Checkout repository
+      - name: Checkout Repository
         uses: actions/checkout@v7
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: 20
+          node-version: ${{ env.NODE_VERSION }}
           cache: npm
 
-      - name: Install dependencies
-        run: npm install
+      - name: Install Dependencies
+        run: npm ci
 
+      # fix #5/#6: fail fast with a clear message instead of an opaque
+      # "missing script" error if package.json doesn't define these yet
+      - name: Verify Required npm Scripts Exist
+        run: |
+          for script in test test:api; do
+            if ! node -e "process.exit(require('./package.json').scripts?.['$script'] ? 0 : 1)"; then
+              echo "::error::package.json is missing required script '$script'"
+              exit 1
+            fi
+          done
+
+      - name: Run Unit Tests
+        run: npm test
+
+      - name: Run API Integration Tests
+        run: npm run test:api
+
+  ##############################################################################
+  # Job 6 - Performance & Rate Limiting Validation (k6)
+  ##############################################################################
+  performance-testing:
+    name: Performance & Rate Limiting (k6)
+    runs-on: ubuntu-latest
+    needs: testing
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install Dependencies
+        run: npm ci
+
+      # fix #7: this job actually runs the server, so it should run the
+      # already-built artifact instead of rebuilding/using raw source
       - name: Download Build Artifacts
         uses: actions/download-artifact@v8
         with:
           name: build-dist
+          path: .
 
-      - name: Run Dynamic API Smoke Tests
-        run: npm run test:api
+      - name: Start API Server
+        run: npm run start &
+
+      # fix #4: replace fixed sleep with an actual readiness check
+      - name: Wait for API Health Check
+        run: |
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:3000/health; then
+              echo "API is up"
+              exit 0
+            fi
+            echo "Waiting for API... ($i/30)"
+            sleep 2
+          done
+          echo "::error::API did not become healthy in time"
+          exit 1
+
+      - name: Setup k6
+        uses: grafana/setup-k6-action@v1
+
+      - name: Run Rate Limiting Test
+        run: k6 run tests/performance/rate-limit.js
+
+      - name: Run Load Test
+        run: k6 run tests/performance/load-test.js
+
+      - name: Upload Performance Reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: performance-reports
+          path: tests/performance/reports
+          if-no-files-found: ignore
