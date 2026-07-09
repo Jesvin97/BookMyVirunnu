@@ -1,0 +1,82 @@
+{
+  "version": "2.1.0",
+  "$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/main/sarif-2.1/schema/sarif-schema-2.1.0.json",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "fullName": "Trivy Vulnerability Scanner",
+          "informationUri": "https://github.com/aquasecurity/trivy",
+          "name": "Trivy",
+          "rules": [
+            {
+              "id": "CVE-2026-41305",
+              "name": "LanguageSpecificPackageVulnerability",
+              "shortDescription": {
+                "text": "postcss: PostCSS: Cross-Site Scripting (XSS) via improper escaping of style closing tags"
+              },
+              "fullDescription": {
+                "text": "PostCSS takes a CSS file and provides an API to analyze and modify its rules by transforming the rules into an Abstract Syntax Tree. Versions prior to 8.5.10 do not escape `\u003c/style\u003e` sequences when stringifying CSS ASTs. When user-submitted CSS is parsed and re-stringified for embedding in HTML `\u003cstyle\u003e` tags, `\u003c/style\u003e` in CSS values breaks out of the style context, enabling XSS. Version 8.5.10 fixes the issue."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "helpUri": "https://avd.aquasec.com/nvd/cve-2026-41305",
+              "help": {
+                "text": "Vulnerability CVE-2026-41305\nSeverity: MEDIUM\nPackage: postcss\nFixed Version: 8.5.10\nLink: [CVE-2026-41305](https://avd.aquasec.com/nvd/cve-2026-41305)\nPostCSS takes a CSS file and provides an API to analyze and modify its rules by transforming the rules into an Abstract Syntax Tree. Versions prior to 8.5.10 do not escape `\u003c/style\u003e` sequences when stringifying CSS ASTs. When user-submitted CSS is parsed and re-stringified for embedding in HTML `\u003cstyle\u003e` tags, `\u003c/style\u003e` in CSS values breaks out of the style context, enabling XSS. Version 8.5.10 fixes the issue.",
+                "markdown": "**Vulnerability CVE-2026-41305**\n| Severity | Package | Fixed Version | Link |\n| --- | --- | --- | --- |\n|MEDIUM|postcss|8.5.10|[CVE-2026-41305](https://avd.aquasec.com/nvd/cve-2026-41305)|\n\nPostCSS takes a CSS file and provides an API to analyze and modify its rules by transforming the rules into an Abstract Syntax Tree. Versions prior to 8.5.10 do not escape `\u003c/style\u003e` sequences when stringifying CSS ASTs. When user-submitted CSS is parsed and re-stringified for embedding in HTML `\u003cstyle\u003e` tags, `\u003c/style\u003e` in CSS values breaks out of the style context, enabling XSS. Version 8.5.10 fixes the issue."
+              },
+              "properties": {
+                "cvssv3_baseScore": 6.1,
+                "cvssv3_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N",
+                "precision": "very-high",
+                "security-severity": "6.1",
+                "tags": [
+                  "vulnerability",
+                  "security",
+                  "MEDIUM"
+                ]
+              }
+            }
+          ],
+          "version": "0.70.0"
+        }
+      },
+      "results": [
+        {
+          "ruleId": "CVE-2026-41305",
+          "ruleIndex": 0,
+          "level": "warning",
+          "message": {
+            "text": "Package: postcss\nInstalled Version: 8.4.31\nVulnerability CVE-2026-41305\nSeverity: MEDIUM\nFixed Version: 8.5.10\nLink: [CVE-2026-41305](https://avd.aquasec.com/nvd/cve-2026-41305)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "package-lock.json",
+                  "uriBaseId": "ROOTPATH"
+                },
+                "region": {
+                  "startLine": 2365,
+                  "startColumn": 1,
+                  "endLine": 2392,
+                  "endColumn": 1
+                }
+              },
+              "message": {
+                "text": "package-lock.json: postcss@8.4.31"
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits",
+      "originalUriBaseIds": {
+        "ROOTPATH": {
+          "uri": "file:///home/runner/work/BookMyVirunnu/BookMyVirunnu/"
+        }
+      }
+    }
+  ]
+}
