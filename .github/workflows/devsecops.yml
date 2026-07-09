@@ -62,7 +62,7 @@ jobs:
           fi
 
       - name: Trivy Filesystem Scan (JSON)
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.36.0
         continue-on-error: true
         with:
           scan-type: fs
@@ -73,7 +73,7 @@ jobs:
           output: trivy-fs-results.json
 
       - name: Trivy Filesystem Scan (SARIF)
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.36.0
         continue-on-error: true
         with:
           scan-type: fs
@@ -232,7 +232,7 @@ jobs:
           category: semgrep
 
       - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@v5
+        uses: SonarSource/sonarqube-scan-action@v6
         continue-on-error: true
         if: vars.SONAR_PROJECT_KEY != ''
         with:
