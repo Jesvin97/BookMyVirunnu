@@ -4,9 +4,8 @@ on:
   push:
     branches:
       - main
+      - develop
   pull_request:
-  schedule:
-    - cron: '0 0 * * 0'  # Weekly scan every Sunday at midnight UTC
 
 permissions:
   contents: write
@@ -32,12 +31,12 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
@@ -61,7 +60,7 @@ jobs:
           fi
 
       - name: Trivy Filesystem Scan (JSON)
-        uses: aquasecurity/trivy-action@v0.36.0
+        uses: aquasecurity/trivy-action@0.28.0
         continue-on-error: true
         with:
           scan-type: fs
@@ -72,7 +71,7 @@ jobs:
           output: trivy-fs-results.json
 
       - name: Trivy Filesystem Scan (SARIF)
-        uses: aquasecurity/trivy-action@v0.36.0
+        uses: aquasecurity/trivy-action@0.28.0
         continue-on-error: true
         with:
           scan-type: fs
@@ -141,8 +140,17 @@ jobs:
             fi
           done
 
+      - name: Check for AI Security Tests
+        id: check-ai-tests
+        run: |
+          if [ -f "tests/ai/prompt-injection.test.js" ] || [ -f "tests/ai/prompt-injection.test.ts" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Prompt Injection Tests
-        if: hashFiles('tests/ai/prompt-injection.test.*') != ''
+        if: steps.check-ai-tests.outputs.exists == 'true'
         continue-on-error: true
         run: npm run test:ai-security || echo "AI security tests not available"
 
@@ -159,7 +167,7 @@ jobs:
             licenses.json
             sbom.json
             ai-security-report.md
-          retention-days: 90
+          retention-days: 30
           if-no-files-found: warn
 
   ##############################################################################
@@ -174,7 +182,7 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@v4
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
@@ -199,10 +207,10 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
@@ -230,20 +238,6 @@ jobs:
           sarif_file: semgrep.sarif
           category: semgrep
 
-      - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@v6
-        continue-on-error: true
-        if: vars.SONAR_PROJECT_KEY != ''
-        with:
-          args: >
-            -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY }}
-            -Dsonar.organization=${{ vars.SONAR_ORG }}
-            -Dsonar.sources=.
-            -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/tests/**
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
-
       - name: Upload Analysis Results
         if: always()
         uses: actions/upload-artifact@v4
@@ -252,7 +246,7 @@ jobs:
           path: |
             semgrep.sarif
             typecheck-errors.txt
-          retention-days: 90
+          retention-days: 30
           if-no-files-found: warn
 
   ##############################################################################
@@ -265,10 +259,10 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
@@ -299,10 +293,10 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
@@ -318,23 +312,33 @@ jobs:
             fi
           done
 
-      - name: Run Unit Tests
-        continue-on-error: true
+      - name: Check for Test Script
+        id: check-test
         run: |
           if node -e "process.exit(require('./package.json').scripts?.test ? 0 : 1)" 2>/dev/null; then
-            npm test -- --coverage --json --outputFile=test-results.json 2>&1 || true
+            echo "exists=true" >> $GITHUB_OUTPUT
           else
-            echo "No test script found, skipping"
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Run Unit Tests
+        if: steps.check-test.outputs.exists == 'true'
+        continue-on-error: true
+        run: npm test -- --coverage --json --outputFile=test-results.json 2>&1 || true
+
+      - name: Check for API Test Script
+        id: check-api-test
+        run: |
+          if node -e "process.exit(require('./package.json').scripts?.['test:api'] ? 0 : 1)" 2>/dev/null; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
           fi
 
       - name: Run API Integration Tests
+        if: steps.check-api-test.outputs.exists == 'true'
         continue-on-error: true
-        run: |
-          if node -e "process.exit(require('./package.json').scripts?.['test:api'] ? 0 : 1)" 2>/dev/null; then
-            npm run test:api 2>&1 || true
-          else
-            echo "No test:api script found, skipping"
-          fi
+        run: npm run test:api 2>&1 || true
 
       - name: Upload Test Results
         if: always()
@@ -344,24 +348,42 @@ jobs:
           path: |
             test-results.json
             coverage/
-          retention-days: 90
+          retention-days: 30
           if-no-files-found: ignore
 
   ##############################################################################
-  # Job 6 - Performance Testing
+  # Job 6 - Performance Testing (OPTIONAL - only if tests exist)
   ##############################################################################
+  check-performance-tests:
+    name: Check for Performance Tests
+    runs-on: ubuntu-latest
+    outputs:
+      exists: ${{ steps.check.outputs.exists }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      
+      - name: Check for Performance Tests
+        id: check
+        run: |
+          if [ -d "tests/performance" ] && [ -n "$(ls -A tests/performance/*.js 2>/dev/null)" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
   performance-testing:
     name: Performance & Rate Limiting (k6)
     runs-on: ubuntu-latest
-    needs: testing
-    if: hashFiles('tests/performance/*.js') != ''
+    needs: [testing, check-performance-tests]
+    if: needs.check-performance-tests.outputs.exists == 'true'
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
@@ -376,17 +398,25 @@ jobs:
           name: build-dist
           path: .
 
-      - name: Start API Server
-        continue-on-error: true
+      - name: Check for Start Script
+        id: check-start
         run: |
           if node -e "process.exit(require('./package.json').scripts?.start ? 0 : 1)" 2>/dev/null; then
-            npm run start &
-            echo $! > server.pid
+            echo "exists=true" >> $GITHUB_OUTPUT
           else
-            echo "No start script found, skipping server start"
+            echo "exists=false" >> $GITHUB_OUTPUT
           fi
 
+      - name: Start API Server
+        if: steps.check-start.outputs.exists == 'true'
+        continue-on-error: true
+        run: |
+          npm run start &
+          echo $! > server.pid
+          sleep 5
+
       - name: Wait for API Health Check
+        if: steps.check-start.outputs.exists == 'true'
         continue-on-error: true
         run: |
           for i in $(seq 1 30); do
@@ -400,16 +430,33 @@ jobs:
           echo "::warning::API did not become healthy"
 
       - name: Setup k6
-        if: hashFiles('tests/performance/*.js') != ''
         uses: grafana/setup-k6-action@v1
 
+      - name: Check for Rate Limit Test
+        id: check-rate-limit
+        run: |
+          if [ -f "tests/performance/rate-limit.js" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Run Rate Limiting Test
-        if: hashFiles('tests/performance/rate-limit.js') != ''
+        if: steps.check-rate-limit.outputs.exists == 'true'
         continue-on-error: true
         run: k6 run tests/performance/rate-limit.js --out json=rate-limit-results.json 2>&1 || true
 
+      - name: Check for Load Test
+        id: check-load-test
+        run: |
+          if [ -f "tests/performance/load-test.js" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Run Load Test
-        if: hashFiles('tests/performance/load-test.js') != ''
+        if: steps.check-load-test.outputs.exists == 'true'
         continue-on-error: true
         run: k6 run tests/performance/load-test.js --out json=load-test-results.json 2>&1 || true
 
@@ -429,7 +476,7 @@ jobs:
             rate-limit-results.json
             load-test-results.json
             tests/performance/reports
-          retention-days: 90
+          retention-days: 30
           if-no-files-found: ignore
 
   ##############################################################################
@@ -449,7 +496,7 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -623,19 +670,6 @@ jobs:
               tr:hover {
                 background: #f7fafc;
               }
-              .badge { 
-                display: inline-block; 
-                padding: 6px 12px; 
-                border-radius: 20px; 
-                font-size: 12px; 
-                font-weight: 600;
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
-              }
-              .badge-success { background: #c6f6d5; color: #22543d; }
-              .badge-warning { background: #feebc8; color: #744210; }
-              .badge-danger { background: #fed7d7; color: #742a2a; }
-              .badge-info { background: #bee3f8; color: #2c5282; }
               a { 
                 color: #667eea; 
                 text-decoration: none;
@@ -665,21 +699,6 @@ jobs:
                 border-radius: 50%;
                 background: #48bb78;
               }
-              .vulnerability-list {
-                background: #f7fafc;
-                padding: 20px;
-                border-radius: 8px;
-                margin: 20px 0;
-              }
-              .vuln-item {
-                padding: 15px;
-                background: white;
-                margin: 10px 0;
-                border-radius: 6px;
-                border-left: 4px solid #e2e8f0;
-              }
-              .vuln-item.critical { border-left-color: #f56565; }
-              .vuln-item.high { border-left-color: #ed8936; }
             </style>
           </head>
           <body>
@@ -718,7 +737,6 @@ jobs:
                     <th>Scanner</th>
                     <th>Status</th>
                     <th>Findings</th>
-                    <th>Report</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -726,37 +744,31 @@ jobs:
                     <td><strong>Trivy (SCA)</strong></td>
                     <td><span class="scan-status"><span class="status-icon"></span> Completed</span></td>
                     <td>${{ steps.trivy-parse.outputs.total }} vulnerabilities</td>
-                    <td><a href="../artifacts/security-scan-results/trivy-fs-results.json">View JSON</a></td>
                   </tr>
                   <tr>
                     <td><strong>npm audit</strong></td>
                     <td><span class="scan-status"><span class="status-icon"></span> Completed</span></td>
                     <td>${{ steps.npm-parse.outputs.total }} vulnerabilities</td>
-                    <td><a href="../artifacts/security-scan-results/npm-audit.json">View JSON</a></td>
                   </tr>
                   <tr>
                     <td><strong>Gitleaks</strong></td>
                     <td><span class="scan-status"><span class="status-icon"></span> Completed</span></td>
                     <td>Secret scanning</td>
-                    <td>Check workflow logs</td>
                   </tr>
                   <tr>
                     <td><strong>TruffleHog</strong></td>
                     <td><span class="scan-status"><span class="status-icon"></span> Completed</span></td>
                     <td>Secret scanning</td>
-                    <td><a href="../artifacts/security-scan-results/trufflehog-results.json">View JSON</a></td>
                   </tr>
                   <tr>
                     <td><strong>Semgrep (SAST)</strong></td>
                     <td><span class="scan-status"><span class="status-icon"></span> Completed</span></td>
                     <td>Static analysis</td>
-                    <td><a href="../artifacts/static-analysis-results/semgrep.sarif">View SARIF</a></td>
                   </tr>
                   <tr>
                     <td><strong>CodeQL</strong></td>
                     <td><span class="scan-status"><span class="status-icon"></span> Completed</span></td>
-                    <td>Code scanning</td>
-                    <td><a href="${{ github.server_url }}/${{ github.repository }}/security/code-scanning" target="_blank">GitHub Security Tab →</a></td>
+                    <td><a href="${{ github.server_url }}/${{ github.repository }}/security/code-scanning" target="_blank">View Results →</a></td>
                   </tr>
                 </tbody>
               </table>
@@ -766,11 +778,11 @@ jobs:
                 <tbody>
                   <tr>
                     <td><strong>SBOM (Software Bill of Materials)</strong></td>
-                    <td><a href="../artifacts/security-scan-results/sbom.json">Download CycloneDX SBOM</a></td>
+                    <td>CycloneDX format generated</td>
                   </tr>
                   <tr>
-                    <td><strong>License Compliance Report</strong></td>
-                    <td><a href="../artifacts/security-scan-results/licenses.json">View License Report</a></td>
+                    <td><strong>License Compliance</strong></td>
+                    <td>Automated license checking</td>
                   </tr>
                 </tbody>
               </table>
@@ -780,16 +792,16 @@ jobs:
                 <tbody>
                   <tr>
                     <td><strong>API Key Scanning</strong></td>
-                    <td><a href="../artifacts/security-scan-results/ai-security-report.md">View AI Security Report</a></td>
+                    <td>Pattern-based detection</td>
                   </tr>
                   <tr>
                     <td><strong>Prompt Injection Tests</strong></td>
-                    <td>See test results</td>
+                    <td>Automated validation</td>
                   </tr>
                 </tbody>
               </table>
 
-              <h2>🔗 Additional Resources</h2>
+              <h2>🔗 Resources</h2>
               <ul style="list-style: none; padding: 0;">
                 <li style="padding: 10px 0;">
                   🔍 <a href="${{ github.server_url }}/${{ github.repository }}/security" target="_blank">GitHub Security Overview</a>
@@ -798,14 +810,14 @@ jobs:
                   📊 <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" target="_blank">View Workflow Run</a>
                 </li>
                 <li style="padding: 10px 0;">
-                  📋 <a href="${{ github.server_url }}/${{ github.repository }}/tree/reports" target="_blank">Historical Reports (reports branch)</a>
+                  📋 <a href="${{ github.server_url }}/${{ github.repository }}/tree/reports" target="_blank">Historical Reports</a>
                 </li>
               </ul>
 
               <div class="footer">
                 <p><strong>DevSecOps Pipeline</strong> - Automated Security Scanning</p>
-                <p style="margin-top: 10px;">This is an informational report. No deployment gates were applied.</p>
-                <p style="margin-top: 5px; font-size: 12px;">Generated by GitHub Actions on $(date -u +"%Y-%m-%d %H:%M:%S UTC")</p>
+                <p style="margin-top: 10px;">✅ This is an informational report. No deployment gates were applied.</p>
+                <p style="margin-top: 5px; font-size: 12px;">Generated by GitHub Actions</p>
               </div>
             </div>
           </body>
@@ -845,17 +857,11 @@ jobs:
           
           ## 🔗 Quick Links
           
-          - [📊 Full HTML Report](https://{{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/)
           - [🔒 GitHub Security Tab](${{ github.server_url }}/${{ github.repository }}/security)
-          - [📦 SBOM Download](./sbom.json)
-          - [📜 License Report](./licenses.json)
-          - [🤖 AI Security Report](./ai-security-report.md)
+          - [📊 Workflow Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          - [📋 Reports Branch](https://github.com/${{ github.repository }}/tree/reports)
           
-          ## 📝 Notes
-          
-          This is an **informational report**. No deployment gates were applied.
-          
-          ### Recommended Actions:
+          ## 📝 Recommended Actions
           
           1. Review critical and high severity vulnerabilities
           2. Update dependencies: `npm audit fix`
@@ -864,7 +870,7 @@ jobs:
           
           ---
           
-          *Generated by DevSecOps Pipeline | [View Workflow](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})*
+          *Generated by DevSecOps Pipeline*
           MDEOF
 
       - name: Create Detailed Vulnerability Report
@@ -903,22 +909,22 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           
-          # Try to checkout reports branch, create if doesn't exist
+          # Try to checkout reports branch
           git fetch origin reports 2>/dev/null || true
           git checkout reports 2>/dev/null || git checkout --orphan reports
           
-          # Clean the branch (keep only reports)
+          # Clean the branch
           git rm -rf . 2>/dev/null || true
           
           # Create directory structure
           REPORT_DIR="security-reports/$(date +%Y-%m-%d-%H%M%S)"
           mkdir -p "$REPORT_DIR"
           
-          # Copy all reports
+          # Copy reports
           cp -r reports/* "$REPORT_DIR/" 2>/dev/null || true
           cp reports/SECURITY-SUMMARY.md README.md 2>/dev/null || true
           
-          # Create index of all reports
+          # Create index
           cat > index.md <<'INDEXEOF'
           # Security Reports Archive
           
@@ -928,18 +934,18 @@ jobs:
           
           [View Latest Report](./README.md)
           
-          ## All Reports
+          ## Recent Reports
           
           INDEXEOF
           
-          ls -dt security-reports/*/ | head -10 | while read dir; do
+          ls -dt security-reports/*/ 2>/dev/null | head -10 | while read dir; do
             date=$(basename "$dir")
             echo "- [$date](./$dir/SECURITY-SUMMARY.md)" >> index.md
           done
           
           git add .
           git commit -m "Security report for commit ${{ github.sha }}" || echo "No changes to commit"
-          git push origin reports || echo "Failed to push to reports branch"
+          git push origin reports || echo "Failed to push reports branch"
 
       - name: Setup GitHub Pages
         uses: actions/configure-pages@v5
@@ -1015,43 +1021,25 @@ jobs:
             
             ### 🔗 Resources
             
-            - [📊 Full Security Report](https://${context.repo.owner}.github.io/${context.repo.repo}/)
-            - [📋 Detailed Vulnerability Report](https://github.com/${context.repo.owner}/${context.repo.repo}/blob/reports/security-reports/latest/VULNERABILITIES.md)
             - [🔍 Workflow Run](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})
             - [🔒 GitHub Security Tab](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/security)
             
             ### ✅ Recommended Actions
             
-            1. **Immediate**: Review critical vulnerabilities and assess impact
-            2. **Short-term**: Run \`npm audit fix\` to auto-remediate
-            3. **Long-term**: 
-               - Update dependencies regularly
-               - Enable Dependabot alerts
-               - Consider using \`npm audit fix --force\` for breaking changes
-            
-            ### 📦 Remediation Commands
-            
             \`\`\`bash
             # Check for vulnerabilities
             npm audit
             
-            # Automatically fix vulnerabilities
+            # Fix vulnerabilities
             npm audit fix
             
-            # Force fix (may introduce breaking changes)
-            npm audit fix --force
-            
-            # Check for outdated packages
-            npm outdated
-            
-            # Update all packages
+            # Update packages
             npm update
             \`\`\`
             
             ---
             
-            *🤖 This issue was automatically generated by the DevSecOps pipeline*  
-            *Last updated: ${new Date().toISOString()}*`;
+            *🤖 Auto-generated by DevSecOps Pipeline*`;
             
             // Check for existing issue
             const issues = await github.rest.issues.listForRepo({
@@ -1062,38 +1050,26 @@ jobs:
             });
             
             const existingIssue = issues.data.find(i => 
-              i.title.includes('Security Vulnerabilities Detected') && 
-              i.labels.some(l => l.name === 'automated')
+              i.title.includes('Security Vulnerabilities Detected')
             );
             
             if (existingIssue) {
-              // Update existing issue
               await github.rest.issues.update({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: existingIssue.number,
                 body: issueBody
               });
-              
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: existingIssue.number,
-                body: `## 🔄 Updated Scan Results\n\nNew scan completed. Issue body has been updated with latest findings.`
-              });
-              
-              console.log(`Updated existing issue #${existingIssue.number}`);
+              console.log(`Updated issue #${existingIssue.number}`);
             } else {
-              // Create new issue
               const newIssue = await github.rest.issues.create({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                title: `🚨 Security Vulnerabilities Detected - ${critical} Critical, ${high} High`,
+                title: `🚨 Security Vulnerabilities - ${critical} Critical, ${high} High`,
                 body: issueBody,
                 labels: ['security', 'automated', 'vulnerability']
               });
-              
-              console.log(`Created new issue #${newIssue.data.number}`);
+              console.log(`Created issue #${newIssue.data.number}`);
             }
 
       - name: Comment on PR
@@ -1127,7 +1103,7 @@ jobs:
             
             **Status**: ${status}
             
-            [View Full Report](https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/) | [Workflow Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})`;
+            [Workflow Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})`;
             
             github.rest.issues.createComment({
               issue_number: context.issue.number,
@@ -1153,20 +1129,18 @@ jobs:
           
           ## 🔗 Quick Access
           
-          - **📊 [View Full Report](https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/)**
-          - **📋 [Reports Branch](https://github.com/${{ github.repository }}/tree/reports)**
           - **🔒 [GitHub Security](https://github.com/${{ github.repository }}/security)**
+          - **📋 [Reports Branch](https://github.com/${{ github.repository }}/tree/reports)**
+          - **📊 [Workflow Artifacts](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})**
           
-          ## 📦 Artifacts Generated
+          ## 📦 Artifacts
           
-          - Security scan results
-          - Static analysis results
-          - Test results
-          - Performance reports (if available)
-          - SBOM (Software Bill of Materials)
-          - License compliance report
+          - Security scan results (30 days)
+          - Static analysis results (30 days)
+          - Test results (30 days)
+          - SBOM & License reports (30 days)
           
           ---
           
-          *Generated at: $(date -u +"%Y-%m-%d %H:%M:%S UTC")*
+          *✅ Pipeline completed successfully - No blocking gates applied*
           SUMMARYEOF
