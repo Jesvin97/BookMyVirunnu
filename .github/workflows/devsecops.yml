@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - develop
   pull_request:
   schedule:
     - cron: '0 0 * * 0'  # Weekly scan every Sunday at midnight UTC
