@@ -957,7 +957,7 @@ jobs:
 
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
 
       - name: Create/Update GitHub Issue for Critical Findings
         if: github.ref == 'refs/heads/main' && (steps.trivy-parse.outputs.critical > 0 || steps.trivy-parse.outputs.high > 0)
