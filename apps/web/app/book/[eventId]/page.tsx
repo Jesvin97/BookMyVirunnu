@@ -170,11 +170,14 @@ export default function GuestBookingPage() {
     const symbols = ["", "", "", "", "", "", ""];
     const newParticles: Particle[] = [];
     for (let i = 0; i < 20; i++) {
+      const randomVal = typeof window !== "undefined" && window.crypto
+        ? window.crypto.getRandomValues(new Uint32Array(1))[0] / (0xffffffff + 1)
+        : 0.5;
       newParticles.push({
-        id: Date.now() + i + Math.random(),
+        id: Date.now() + i + randomVal,
         x: clientX || (typeof window !== "undefined" ? window.innerWidth / 2 : 400),
         y: clientY || (typeof window !== "undefined" ? window.innerHeight / 2 : 300),
-        symbol: symbols[Math.floor(Math.random() * symbols.length)]
+        symbol: symbols[Math.floor(randomVal * symbols.length)]
       });
     }
     setParticles((prev) => [...prev, ...newParticles]);
@@ -296,7 +299,18 @@ export default function GuestBookingPage() {
     setSubmitLoading(true);
 
     try {
-      const idempotencyKey = `bk-${selectedSlot._id}-${Date.now()}`;
+      const randomToken = typeof window !== "undefined" && window.crypto && window.crypto.randomUUID
+        ? window.crypto.randomUUID().slice(0, 8)
+        : Date.now().toString(36);
+      const idempotencyKey = `bk-${selectedSlot._id}-${Date.now()}-${randomToken}`;
+
+      const sanitizedName = guestName.trim().slice(0, 100);
+      const sanitizedAddress = venueAddress.trim().slice(0, 300);
+      const sanitizedLandmark = venueLandmark.trim().slice(0, 150);
+      const fullAddress = sanitizedLandmark
+        ? `${sanitizedAddress}\nLandmark: ${sanitizedLandmark}`
+        : sanitizedAddress;
+
       const response = await api.post<{ booking: { _id: string; status: string } }>(
         "/bookings",
         {
@@ -304,10 +318,10 @@ export default function GuestBookingPage() {
           startAt: selectedSlot.startAt,
           endAt: selectedSlot.endAt,
           partySize: 1, // newlyweds couple slot unit
-          guestName,
-          guestEmail,
-          guestPhone,
-          venueAddress: venueLandmark.trim() ? `${venueAddress}\nLandmark: ${venueLandmark.trim()}` : venueAddress,
+          guestName: sanitizedName,
+          guestEmail: guestEmail.trim().slice(0, 100),
+          guestPhone: guestPhone.trim(),
+          venueAddress: fullAddress,
           idempotencyKey
         }
       );
