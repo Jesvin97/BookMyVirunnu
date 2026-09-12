@@ -129,7 +129,7 @@ export default function GuestBookingPage() {
     try {
       setLoading(true);
       const response = await api.get<{ event: Event }>(`/events/${eventId}`);
-      if (response && response.event) {
+      if (response?.event) {
         setEvent(response.event);
         fetchSlots(response.event);
       }
@@ -147,7 +147,7 @@ export default function GuestBookingPage() {
       const response = await api.get<{ slots: Slot[] }>(
         `/events/${evt._id}/availability?rangeStart=${start}&rangeEnd=${end}`
       );
-      if (response && response.slots) {
+      if (response?.slots) {
         setSlots(response.slots);
         if (response.slots.length > 0) {
           const firstDateStr = new Date(response.slots[0].startAt).toLocaleDateString([], {
@@ -326,7 +326,7 @@ export default function GuestBookingPage() {
         }
       );
 
-      if (response && response.booking) {
+      if (response?.booking) {
         if (typeof window !== "undefined") {
           localStorage.setItem("bv_last_host_name", guestName.trim());
           localStorage.setItem("bv_last_host_phone", guestPhone.trim());
@@ -756,6 +756,7 @@ export default function GuestBookingPage() {
                             gap: "4px",
                             transition: "all 150ms ease"
                           }}
+                        >
                         {(() => {
                           let locateText = " Locate Me";
                           if (locating) {

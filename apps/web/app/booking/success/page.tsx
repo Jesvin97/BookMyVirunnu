@@ -76,11 +76,11 @@ function BookingSuccessContent() {
     try {
       setLoading(true);
       const response = await api.get<{ booking: Booking }>(`/bookings/${bookingId}`);
-      if (response && response.booking) {
+      if (response?.booking) {
         setBooking(response.booking);
         
         const eventResponse = await api.get<{ event: Event }>(`/events/${response.booking.eventId}`);
-        if (eventResponse && eventResponse.event) {
+        if (eventResponse?.event) {
           setEvent(eventResponse.event);
         }
       }

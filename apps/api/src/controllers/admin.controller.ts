@@ -6,7 +6,7 @@ import { BookingModel } from "../models/Booking";
 import type { AdminDashboardData, CoupleDashboardSummary, DashboardEvent, DashboardBooking, DomainUser } from "@bookmyvirunnu/shared";
 
 export class AdminController {
-  static getAdminDashboard = asyncHandler(async (req: Request, res: Response) => {
+  static readonly getAdminDashboard = asyncHandler(async (req: Request, res: Response) => {
     // 1. Fetch all couples
     const couples = await UserModel.find({ role: "couple" }).lean().exec() as unknown as DomainUser[];
 

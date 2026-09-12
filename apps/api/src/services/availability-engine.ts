@@ -364,7 +364,7 @@ export class AvailabilityEngine {
 
     for (let i = 1; i < sorted.length; i += 1) {
       const current = sorted[i];
-      const last = merged[merged.length - 1];
+      const last = merged.at(-1)!;
       if (current.start.getTime() <= last.end.getTime()) {
         last.end = new Date(Math.max(last.end.getTime(), current.end.getTime()));
         const unique = new Set([...last.ruleIds.map(String), ...current.ruleIds.map(String)]);

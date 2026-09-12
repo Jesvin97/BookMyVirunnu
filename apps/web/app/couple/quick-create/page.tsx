@@ -25,7 +25,6 @@ const DIETARY_OPTIONS = [
 ];
 
 export default function QuickCreatePage() {
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [successData, setSuccessData] = useState<{
@@ -54,9 +53,6 @@ export default function QuickCreatePage() {
   const [enableLunch, setEnableLunch] = useState(false);
   const [enableDinner, setEnableDinner] = useState(false);
   const [selectedDiet, setSelectedDiet] = useState<string[]>([]);
-
-  const [copiedBooking, setCopiedBooking] = useState(false);
-  const [copiedDashboard, setCopiedDashboard] = useState(false);
   const [customDiet, setCustomDiet] = useState("");
 
   const [backendConnected, setBackendConnected] = useState(false);
@@ -270,37 +266,20 @@ export default function QuickCreatePage() {
     }
   };
 
-  const copyToClipboard = async (text: string, type: "booking" | "dashboard") => {
-    const fullText = typeof window !== "undefined" ? `${window.location.origin}${text}` : text;
-    try {
-      await navigator.clipboard.writeText(fullText);
-      if (type === "booking") {
-        setCopiedBooking(true);
-        setTimeout(() => setCopiedBooking(false), 2000);
+    // Progressive Sadhya progress calculation
+    let progressPercent = 0;
+    let progressText = "";
+
+    if (step === 1) {
+      if (husbandName.trim() && wifeName.trim()) {
+        progressPercent = 16;
+        progressText = "Banana chips came...";
+      } else if (husbandName.trim()) {
+        progressPercent = 8;
+        progressText = "Placing a banana leaf...";
       } else {
-        setCopiedDashboard(true);
-        setTimeout(() => setCopiedDashboard(false), 2000);
+        progressText = "Preparing the feast hall...";
       }
-    } catch (err) {
-      console.error("Failed to copy text: ", err);
-    }
-  };
-
-  // Progressive Sadhya progress calculation
-  let progressPercent = 0;
-  let progressText = "";
-
-  if (step === 1) {
-    if (husbandName.trim() && wifeName.trim()) {
-      progressPercent = 16;
-      progressText = "Banana chips came...";
-    } else if (husbandName.trim()) {
-      progressPercent = 8;
-      progressText = "Placing a banana leaf...";
-    } else {
-      progressPercent = 0;
-      progressText = "Preparing the feast hall...";
-    }
   } else if (step === 2) {
     if (startDate && endDate) {
       progressPercent = 33;

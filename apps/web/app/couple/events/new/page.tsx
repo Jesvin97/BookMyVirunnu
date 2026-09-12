@@ -76,7 +76,7 @@ export default function NewEventPage() {
         }
       });
 
-      if (eventResponse && eventResponse.event) {
+      if (eventResponse?.event) {
         const eventId = eventResponse.event._id;
 
         // 2. Automatically create availability rules for each enabled meal

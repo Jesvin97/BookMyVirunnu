@@ -95,7 +95,7 @@ export default function CoupleDashboard() {
               "/auth/access-id",
               { eventId: queryId.trim() }
             );
-            if (response && response.token) {
+            if (response?.token) {
               localStorage.setItem("bv_token", response.token);
               localStorage.setItem("bv_user", JSON.stringify(response.user));
               token = response.token;
@@ -126,7 +126,7 @@ export default function CoupleDashboard() {
           
           // Fetch events
           const response = await api.get<{ events: Event[] }>("/events/me");
-          if (response && response.events) {
+          if (response?.events) {
             setEvents(response.events);
             if (response.events.length > 0) {
               const matchingEvent = response.events.find(e => e._id === queryId);
@@ -152,7 +152,7 @@ export default function CoupleDashboard() {
     try {
       setLoading(true);
       const response = await api.get<{ events: Event[] }>("/events/me");
-      if (response && response.events) {
+      if (response?.events) {
         setEvents(response.events);
         if (response.events.length > 0) {
           setSelectedEventId(response.events[0]._id);
@@ -180,13 +180,13 @@ export default function CoupleDashboard() {
     try {
       // 1. Fetch bookings
       const bookingsRes = await api.get<{ bookings: Booking[] }>(`/events/${eventId}/bookings`);
-      if (bookingsRes && bookingsRes.bookings) {
+      if (bookingsRes?.bookings) {
         setBookings(bookingsRes.bookings);
       }
 
       // 2. Fetch all availability rules
       const rulesRes = await api.get<{ rules: Rule[] }>(`/events/${eventId}/availability-rules`);
-      if (rulesRes && rulesRes.rules) {
+      if (rulesRes?.rules) {
         setRules(rulesRes.rules);
       }
 
@@ -198,7 +198,7 @@ export default function CoupleDashboard() {
         const slotsRes = await api.get<{ slots: Slot[] }>(
           `/events/${eventId}/availability?rangeStart=${start}&rangeEnd=${end}`
         );
-        if (slotsRes && slotsRes.slots) {
+        if (slotsRes?.slots) {
           setSlots(slotsRes.slots);
         }
       }

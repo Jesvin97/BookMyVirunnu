@@ -1,6 +1,6 @@
-const { spawn } = require("child_process");
-const http = require("http");
-const crypto = require("crypto");
+const { spawn } = require("node:child_process");
+const http = require("node:http");
+const crypto = require("node:crypto");
 
 async function wait(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
