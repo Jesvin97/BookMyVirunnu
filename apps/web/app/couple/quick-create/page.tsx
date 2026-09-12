@@ -67,11 +67,14 @@ export default function QuickCreatePage() {
     const symbols = ["", "", "", "", "", ""];
     const newParticles: Particle[] = [];
     for (let i = 0; i < 20; i++) {
+      const randomVal = typeof window !== "undefined" && window.crypto
+        ? window.crypto.getRandomValues(new Uint32Array(1))[0] / (0xffffffff + 1)
+        : 0.5;
       newParticles.push({
-        id: Date.now() + i + Math.random(),
+        id: Date.now() + i + randomVal,
         x: clientX || (typeof window !== "undefined" ? window.innerWidth / 2 : 400),
         y: clientY || (typeof window !== "undefined" ? window.innerHeight / 2 : 300),
-        symbol: symbols[Math.floor(Math.random() * symbols.length)]
+        symbol: symbols[Math.floor(randomVal * symbols.length)]
       });
     }
     setParticles((prev) => [...prev, ...newParticles]);
@@ -222,12 +225,14 @@ export default function QuickCreatePage() {
 
     setLoading(true);
 
-    const coupleName = `${husbandName.trim()} & ${wifeName.trim()}`;
+    const sanitizedHusband = husbandName.trim().slice(0, 50);
+    const sanitizedWife = wifeName.trim().slice(0, 50);
+    const coupleName = `${sanitizedHusband} & ${sanitizedWife}`;
     const generatedTitle = `${coupleName}'s Feast Schedule `;
 
     const finalDietary = [...selectedDiet];
     if (customDiet.trim()) {
-      finalDietary.push(customDiet.trim());
+      finalDietary.push(customDiet.trim().slice(0, 100));
     }
 
     try {
