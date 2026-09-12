@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import { Types } from "mongoose";
 import bcrypt from "bcryptjs";
+import crypto from "crypto";
 import { AuthService } from "../services/auth.service";
 import { EventService } from "../services/event.service";
 import { UserModel } from "../models/User";
@@ -79,7 +80,7 @@ export class AuthController {
   quickRegister = asyncHandler(async (req: Request, res: Response) => {
     const input = quickRegisterSchema.parse(req.body);
 
-    const randomStr = Math.random().toString(36).substring(2, 10);
+    const randomStr = crypto.randomBytes(6).toString("hex");
     const anonymousEmail = `couple-${Date.now()}-${randomStr}@anonymous.bookmyvirunnu.com`;
     const passwordHash = await bcrypt.hash(`passwordless-${randomStr}`, 10);
     
