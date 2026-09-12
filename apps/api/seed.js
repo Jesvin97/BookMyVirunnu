@@ -10,7 +10,7 @@ async function seed() {
     const passwordHash = await bcrypt.hash("admin123", 10);
 
     const db = mongoose.connection.useDb("bookmyvirunnu");
-    const result = await db.collection("users").updateOne(
+    await db.collection("users").updateOne(
       { email: "jesvinsaji91@gmail.com" },
       {
         $set: {

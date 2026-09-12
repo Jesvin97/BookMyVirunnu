@@ -543,8 +543,9 @@ export default function QuickCreatePage() {
               <div style={{ display: "grid", gap: "24px", marginBottom: "36px" }}>
                 <div className={styles.formTwoCol}>
                   <div style={{ display: "grid", gap: "8px" }}>
-                    <label style={labelStyle}>Available From</label>
+                    <label htmlFor="startDate" style={labelStyle}>Available From</label>
                     <input
+                      id="startDate"
                       type="date"
                       required
                       value={startDate}
@@ -555,8 +556,9 @@ export default function QuickCreatePage() {
                     />
                   </div>
                   <div style={{ display: "grid", gap: "8px" }}>
-                    <label style={labelStyle}>Available Until</label>
+                    <label htmlFor="endDate" style={labelStyle}>Available Until</label>
                     <input
+                      id="endDate"
                       type="date"
                       required
                       value={endDate}
@@ -710,7 +712,7 @@ export default function QuickCreatePage() {
               <div style={{ display: "grid", gap: "28px", marginBottom: "36px", width: "100%" }}>
                 {/* Available Meals */}
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                  <label style={{ ...labelStyle, display: "block", marginBottom: "12px", textAlign: "center" }}>Available Meals</label>
+                  <span style={{ ...labelStyle, display: "block", marginBottom: "12px", textAlign: "center" }}>Available Meals</span>
                   <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "14px", width: "100%" }}>
                     {/* Breakfast */}
                     <button

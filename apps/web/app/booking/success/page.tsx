@@ -117,17 +117,24 @@ function BookingSuccessContent() {
 
 
 
-  return (
-    <main className={styles.shell} style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "24px 0" }}>
-      <div className={styles.backgroundGlow} aria-hidden="true" />
-
-      {error ? (
+  if (error) {
+    return (
+      <main className={styles.shell} style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "24px 0" }}>
+        <div className={styles.backgroundGlow} aria-hidden="true" />
         <div className={styles.panel} style={{ padding: "40px", textAlign: "center", maxWidth: "440px" }}>
           <h2 style={{ color: "#f87171", marginBottom: "12px", fontFamily: "var(--bv-font-display)" }}>Error</h2>
           <p style={{ color: "rgba(243, 252, 247, 0.7)", marginBottom: "28px" }}>{error}</p>
           <Link href="/" className={styles.secondaryButton} style={{ textDecoration: "none" }}>Return Home</Link>
         </div>
-      ) : cancelled ? (
+      </main>
+    );
+  }
+
+  return (
+    <main className={styles.shell} style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "24px 0" }}>
+      <div className={styles.backgroundGlow} aria-hidden="true" />
+
+      {cancelled ? (
         <div className={styles.panel} style={{ width: "min(520px, calc(100% - 32px))", padding: "clamp(20px, 6vw, 40px)", textAlign: "center" }}>
           <div style={{
             display: "inline-flex",

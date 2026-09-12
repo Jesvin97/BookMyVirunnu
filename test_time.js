@@ -4,5 +4,5 @@ const timeString = new Date(startAtStr).toLocaleTimeString("en-GB", {
   hour: "2-digit",
   minute: "2-digit"
 });
-const hour = parseInt(timeString.split(":")[0], 10);
+const hour = Number.parseInt(timeString.split(":")[0], 10);
 console.log("timeString:", timeString, "hour:", hour);

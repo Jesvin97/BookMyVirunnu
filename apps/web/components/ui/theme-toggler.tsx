@@ -10,7 +10,7 @@ export function ThemeTogglerButton() {
     const savedTheme = localStorage.getItem("bv_theme") as "dark" | "light" | null;
     if (savedTheme) {
       setTheme(savedTheme);
-      document.documentElement.setAttribute("data-theme", savedTheme);
+      document.documentElement.dataset.theme = savedTheme;
     }
   }, []);
 
@@ -18,7 +18,7 @@ export function ThemeTogglerButton() {
     const nextTheme = theme === "dark" ? "light" : "dark";
     setTheme(nextTheme);
     localStorage.setItem("bv_theme", nextTheme);
-    document.documentElement.setAttribute("data-theme", nextTheme);
+    document.documentElement.dataset.theme = nextTheme;
 
     // Apply simple visual variables change
     if (nextTheme === "light") {

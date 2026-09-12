@@ -536,10 +536,27 @@ export default function GuestBookingPage() {
                       {/* Filtered Slots List */}
                       {selectedDate && getSlotsByDate()[selectedDate] && (
                         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "14px", marginBottom: "36px" }}>
-                          {getSlotsByDate()[selectedDate].map((s, index) => {
+                          {getSlotsByDate()[selectedDate].map((s) => {
                             const isSelected = selectedSlot?._id === s._id;
                             const isLocked = s.status === "locked" || (s.capacity - s.reservedCount) <= 0;
                             const meal = getMealLabel(s.startAt);
+
+                            let slotBackground = "#f9fafb";
+                            let slotBorder = "1px solid #d1d5db";
+                            let slotColor = "#000";
+                            let slotStatusText = "Open Slot";
+
+                            if (isLocked) {
+                              slotBackground = "rgba(239, 68, 68, 0.05)";
+                              slotBorder = "1px solid #fecaca";
+                              slotColor = "#ef4444";
+                              slotStatusText = " Reserved / Blocked";
+                            } else if (isSelected) {
+                              slotBackground = "rgba(52, 211, 153, 0.08)";
+                              slotBorder = "2px solid #34d399";
+                              slotColor = "#065f46";
+                              slotStatusText = "Selected ";
+                            }
 
                             return (
                               <button
@@ -555,9 +572,9 @@ export default function GuestBookingPage() {
                                 style={{
                                   padding: "20px 16px",
                                   borderRadius: "16px",
-                                  background: isLocked ? "rgba(239, 68, 68, 0.05)" : isSelected ? "rgba(52, 211, 153, 0.08)" : "#f9fafb",
-                                  border: isLocked ? "1px solid #fecaca" : isSelected ? "2px solid #34d399" : "1px solid #d1d5db",
-                                  color: isLocked ? "#ef4444" : isSelected ? "#065f46" : "#000",
+                                  background: slotBackground,
+                                  border: slotBorder,
+                                  color: slotColor,
                                   cursor: isLocked ? "not-allowed" : "pointer",
                                   textAlign: "center",
                                   transition: "all 150ms ease",
@@ -571,11 +588,11 @@ export default function GuestBookingPage() {
                                   wordBreak: "break-word"
                                 }}
                               >
-                                <strong style={{ display: "block", fontSize: "1.05rem", marginBottom: "4px", color: isLocked ? "#ef4444" : isSelected ? "#065f46" : "#000" }}>
+                                <strong style={{ display: "block", fontSize: "1.05rem", marginBottom: "4px", color: slotColor }}>
                                   {meal.name}
                                 </strong>
-                                <span style={{ display: "block", fontSize: "0.75rem", marginTop: "12px", fontWeight: 600, color: isLocked ? "#ef4444" : isSelected ? "#065f46" : "#000" }}>
-                                  {isLocked ? " Reserved / Blocked" : isSelected ? "Selected " : "Open Slot"}
+                                <span style={{ display: "block", fontSize: "0.75rem", marginTop: "12px", fontWeight: 600, color: slotColor }}>
+                                  {slotStatusText}
                                 </span>
                               </button>
                             );
@@ -739,8 +756,15 @@ export default function GuestBookingPage() {
                             gap: "4px",
                             transition: "all 150ms ease"
                           }}
-                        >
-                          {locating ? " Pinpointing..." : locateError ? " Retry Locate Me" : " Locate Me"}
+                        {(() => {
+                          let locateText = " Locate Me";
+                          if (locating) {
+                            locateText = " Pinpointing...";
+                          } else if (locateError) {
+                            locateText = " Retry Locate Me";
+                          }
+                          return locateText;
+                        })()}
                         </button>
                       </div>
                       {locating ? (

@@ -220,65 +220,6 @@ export default function CoupleDashboard() {
     }
   };
 
-  const handleBlockSlot = async (slot: Slot) => {
-    if (!selectedEventId) return;
-    const start = new Date(slot.startAt);
-    const end = new Date(slot.endAt);
-    
-    const dateStr = start.toLocaleDateString("en-CA"); // YYYY-MM-DD local format safely
-    const startTime = start.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }); // HH:MM
-    const endTime = end.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }); // HH:MM
-
-    setActionLoading(slot._id);
-    try {
-      await api.post(`/events/${selectedEventId}/availability-rules`, {
-        ruleType: "specific_date",
-        date: dateStr,
-        startTime,
-        endTime,
-        isBlocked: true,
-        priority: 10,
-        reason: "Blocked by couple for private plans"
-      });
-      toast.success("Feast slot successfully blocked! ");
-      await refreshDashboardData(selectedEventId);
-    } catch (err: any) {
-      console.error("Failed to block slot:", err);
-      toast.error(err.message || "Failed to block slot.");
-    } finally {
-      setActionLoading(null);
-    }
-  };
-
-  const handleUnblockSlot = async (slot: Slot) => {
-    if (!selectedEventId) return;
-    const start = new Date(slot.startAt);
-    const dateStr = start.toLocaleDateString("en-CA");
-    
-    // Find the specific rule that blocks this date and time
-    const ruleToDelete = rules.find(
-      r => r.ruleType === "specific_date" && r.date === dateStr && r.isBlocked
-    );
-
-    if (!ruleToDelete) {
-      // If we can't find it locally, refresh anyway
-      await refreshDashboardData(selectedEventId);
-      return;
-    }
-
-    setActionLoading(slot._id);
-    try {
-      await api.delete(`/availability-rules/${ruleToDelete._id}`);
-      toast.success("Feast slot unblocked! ");
-      await refreshDashboardData(selectedEventId);
-    } catch (err: any) {
-      console.error("Failed to unblock slot:", err);
-      toast.error(err.message || "Failed to unblock slot.");
-    } finally {
-      setActionLoading(null);
-    }
-  };
-
   const handleLogout = () => {
     localStorage.removeItem("bv_token");
     localStorage.removeItem("bv_user");

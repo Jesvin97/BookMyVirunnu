@@ -74,7 +74,9 @@ export function Sidebar({ children }: { children: React.ReactNode }) {
     <>
       {/* Mobile Drawer Overlay */}
       {isMobile && open && (
-        <div
+        <button
+          type="button"
+          aria-label="Close Mobile Navigation Menu"
           onClick={() => setOpen(false)}
           style={{
             position: "fixed",
@@ -82,7 +84,12 @@ export function Sidebar({ children }: { children: React.ReactNode }) {
             zIndex: 90,
             background: "rgba(0, 0, 0, 0.6)",
             backdropFilter: "blur(4px)",
-            transition: "opacity 0.2s ease"
+            transition: "opacity 0.2s ease",
+            border: 0,
+            padding: 0,
+            width: "100%",
+            height: "100%",
+            cursor: "pointer"
           }}
         />
       )}

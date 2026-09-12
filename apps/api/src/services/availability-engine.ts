@@ -62,12 +62,12 @@ export class AvailabilityEngine {
       const prior = existingMap.get(key);
       const reservedCount = prior?.reservedCount ?? 0;
       const confirmedCount = prior?.confirmedCount ?? 0;
-      const status: "open" | "locked" =
-        prior?.status === "locked" && reservedCount === 0 && confirmedCount === 0
-          ? "locked"
-          : reservedCount >= slot.capacity
-            ? "locked"
-            : "open";
+      let status: "open" | "locked" = "open";
+      if (prior?.status === "locked" && reservedCount === 0 && confirmedCount === 0) {
+        status = "locked";
+      } else if (reservedCount >= slot.capacity) {
+        status = "locked";
+      }
       return {
         updateOne: {
           filter: { eventId: event._id, startAt: slot.startAt, endAt: slot.endAt },
@@ -97,7 +97,7 @@ export class AvailabilityEngine {
       .filter((slot) => !expectedKeys.has(this.slotKey(event._id, slot.startAt, slot.endAt)))
       .map((slot) => {
         if (slot.reservedCount > 0 || slot.confirmedCount > 0) {
-          const lockedStatus: "locked" = "locked";
+          const lockedStatus = "locked" as const;
           return {
             updateOne: {
               filter: { _id: slot._id },
@@ -105,7 +105,7 @@ export class AvailabilityEngine {
             }
           };
         }
-        const blockedStatus: "blocked" = "blocked";
+        const blockedStatus = "blocked" as const;
         return {
           updateOne: {
             filter: { _id: slot._id, status: { $ne: "blocked" as any } },

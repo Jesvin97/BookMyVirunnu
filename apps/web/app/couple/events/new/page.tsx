@@ -180,8 +180,9 @@ export default function NewEventPage() {
             </h3>
             <div style={{ display: "grid", gap: "20px" }}>
               <div style={{ display: "grid", gap: "8px" }}>
-                <label style={labelStyle}>Calendar Title</label>
+                <label htmlFor="eventTitle" style={labelStyle}>Calendar Title</label>
                 <input
+                  id="eventTitle"
                   type="text"
                   required
                   placeholder="Joyal & Anjali's Feast Schedule "
@@ -194,8 +195,9 @@ export default function NewEventPage() {
               </div>
 
               <div style={{ display: "grid", gap: "8px" }}>
-                <label style={labelStyle}>Feast Description (Optional)</label>
+                <label htmlFor="eventDesc" style={labelStyle}>Feast Description (Optional)</label>
                 <textarea
+                  id="eventDesc"
                   placeholder="e.g. We are excited to visit our family and friends! Feel free to book a convenient Lunch or Dinner slot..."
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
@@ -207,8 +209,9 @@ export default function NewEventPage() {
 
               <div className={styles.formTwoCol}>
                 <div style={{ display: "grid", gap: "8px" }}>
-                  <label style={labelStyle}>Available From (Start Date)</label>
+                  <label htmlFor="startDate" style={labelStyle}>Available From (Start Date)</label>
                   <input
+                    id="startDate"
                     type="date"
                     required
                     value={startDate}
@@ -219,8 +222,9 @@ export default function NewEventPage() {
                   />
                 </div>
                 <div style={{ display: "grid", gap: "8px" }}>
-                  <label style={labelStyle}>Available Until (End Date)</label>
+                  <label htmlFor="endDate" style={labelStyle}>Available Until (End Date)</label>
                   <input
+                    id="endDate"
                     type="date"
                     required
                     value={endDate}
@@ -310,8 +314,9 @@ export default function NewEventPage() {
               3. Privacy Control
             </h3>
             <div style={{ display: "grid", gap: "8px" }}>
-              <label style={labelStyle}>Booking Access Mode</label>
+              <label htmlFor="visibility" style={labelStyle}>Booking Access Mode</label>
               <select
+                id="visibility"
                 value={visibility}
                 onChange={(e) => setVisibility(e.target.value)}
                 style={{ ...inputStyle, cursor: "pointer" }}

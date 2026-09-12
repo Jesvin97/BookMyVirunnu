@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import { Types } from "mongoose";
 import bcrypt from "bcryptjs";
-import crypto from "crypto";
+import crypto from "node:crypto";
 import { AuthService } from "../services/auth.service";
 import { EventService } from "../services/event.service";
 import { UserModel } from "../models/User";
