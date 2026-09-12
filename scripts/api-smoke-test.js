@@ -1,5 +1,6 @@
 const { spawn } = require("child_process");
 const http = require("http");
+const crypto = require("crypto");
 
 async function wait(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -13,6 +14,7 @@ function request(url, options = {}, body = null) {
       port: parsedUrl.port,
       path: parsedUrl.pathname + parsedUrl.search,
       method: options.method || "GET",
+      timeout: 10000,
       headers: {
         "Content-Type": "application/json",
         ...(options.headers || {})
@@ -33,6 +35,10 @@ function request(url, options = {}, body = null) {
       });
     });
 
+    req.on("timeout", () => {
+      req.destroy(new Error("Request timed out after 10000ms"));
+    });
+
     req.on("error", (err) => {
       reject(err);
     });
@@ -47,13 +53,15 @@ function request(url, options = {}, body = null) {
 async function runTests() {
   console.log("🚀 Starting API Smoke Test Server...");
 
+  const jwtSecret = process.env.JWT_SECRET || crypto.randomBytes(32).toString("hex");
+
   const serverProcess = spawn("node", ["dist/server.js"], {
     cwd: "apps/api",
     env: {
       ...process.env,
       PORT: "4500",
       NODE_ENV: "development",
-      JWT_SECRET: "api-smoke-test-jwt-secret-must-be-32-chars-long", // gitleaks:allow
+      JWT_SECRET: jwtSecret,
       MONGODB_URI: "mongodb://127.0.0.1:27017/bookmyvirunnu" // will trigger auto-fallback to in-memory server
     }
   });
@@ -138,8 +146,15 @@ async function runTests() {
     success = false;
   } finally {
     console.log("\n🛑 Stopping API Smoke Test Server...");
-    serverProcess.kill("SIGTERM");
-    await wait(2000); // Wait for cleanup
+    try {
+      serverProcess.kill("SIGTERM");
+      await wait(1000);
+      if (!serverProcess.killed) {
+        serverProcess.kill("SIGKILL");
+      }
+    } catch (e) {
+      // Process already terminated
+    }
   }
 
   if (success) {
