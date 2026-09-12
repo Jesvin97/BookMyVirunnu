@@ -20,8 +20,8 @@
     "express-rate-limit": "^8.7.0",
     "helmet": "^8.0.0",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^9.8.0",
-    "zod": "^4.5.4"
+    "mongoose": "^9.9.5",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
