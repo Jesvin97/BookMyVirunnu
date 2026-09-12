@@ -592,7 +592,7 @@ export default function GuestBookingPage() {
                     className={styles.primaryButton}
                     style={{ width: "100%", border: 0, padding: "14px", fontSize: "1.05rem", cursor: !selectedSlot ? "not-allowed" : "pointer" }}
                   >
-                    Continue to Details ➔
+                    Continue to Details 
                   </button>
                 </div>
               )}
@@ -698,7 +698,7 @@ export default function GuestBookingPage() {
                       className={styles.primaryButton}
                       style={{ flex: 1, border: 0, padding: "14px", fontSize: "1.05rem" }}
                     >
-                      Continue to Location ➔
+                      Continue to Location 
                     </button>
                   </div>
                 </div>

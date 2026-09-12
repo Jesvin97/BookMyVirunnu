@@ -50,10 +50,10 @@ function request(url, options = {}, body = null) {
 // ----------------------------------------------------
 async function runQA() {
   console.log("==================================================================");
-  console.log("🌟 BookMyVirunnu Production-Level QA Test Suite (20 Automated Tests) 🌟");
+  console.log(" BookMyVirunnu Production-Level QA Test Suite (20 Automated Tests) ");
   console.log("==================================================================");
 
-  console.log("🚀 Spinning up API test server on port 4500...");
+  console.log(" Spinning up API test server on port 4500...");
   const serverProcess = spawn("node", ["dist/server.js"], {
     cwd: "apps/api",
     env: {
@@ -78,17 +78,17 @@ async function runQA() {
 
   function logPass(testNum, desc) {
     passCount++;
-    console.log(`✅ [Test ${testNum}] PASSED: ${desc}`);
+    console.log(` [Test ${testNum}] PASSED: ${desc}`);
   }
 
   function logFail(testNum, desc, err) {
     failCount++;
-    console.error(`❌ [Test ${testNum}] FAILED: ${desc}\n   Error: ${err.message || err}`);
+    console.error(` [Test ${testNum}] FAILED: ${desc}\n   Error: ${err.message || err}`);
   }
 
   try {
     // Wait for server health
-    console.log("\n⏳ Waiting for API Server to become healthy...");
+    console.log("\n Waiting for API Server to become healthy...");
     let healthy = false;
     for (let i = 0; i < 30; i++) {
       try {
@@ -107,13 +107,13 @@ async function runQA() {
     if (!healthy) {
       throw new Error("Server failed to report healthy within 60 seconds.");
     }
-    console.log("🟢 Server is online and ready for tests!");
+    console.log(" Server is online and ready for tests!");
 
     // Helper: Register a couple
-    async function registerCouple(name, emailPart, dietary = ["Vegetarian 🥬"]) {
+    async function registerCouple(name, emailPart, dietary = ["Vegetarian "]) {
       const registerBody = {
         coupleName: name,
-        title: `${name}'s Wedding Feast 🍛`,
+        title: `${name}'s Wedding Feast `,
         startDate: "2026-06-05T00:00:00.000Z",
         endDate: "2026-06-12T00:00:00.000Z",
         enableLunch: true,
@@ -132,9 +132,9 @@ async function runQA() {
     // ------------------------------------------------------------------
     // SET UP EVENTS FOR TEST GROUPS
     // ------------------------------------------------------------------
-    console.log("\n🔑 Creating Test Accounts and Events...");
+    console.log("\n Creating Test Accounts and Events...");
     const coupleABC = await registerCouple("Couple ABC", "abc");
-    const coupleXYZ = await registerCouple("Couple XYZ", "xyz", ["Non-Veg 🍗", "Cardamom Allergy 🚫"]);
+    const coupleXYZ = await registerCouple("Couple XYZ", "xyz", ["Non-Veg ", "Cardamom Allergy "]);
 
     const eventABCId = coupleABC.event.id;
     const tokenABC = coupleABC.token;
@@ -577,7 +577,7 @@ async function runQA() {
       const res = await request(`http://localhost:4500/api/events/${eventXYZId}`);
       const body = JSON.parse(res.body);
       assert.strictEqual(body.success, true);
-      assert.deepEqual(body.data.event.dietaryRestrictions, ["Non-Veg 🍗", "Cardamom Allergy 🚫"]);
+      assert.deepEqual(body.data.event.dietaryRestrictions, ["Non-Veg ", "Cardamom Allergy "]);
       logPass(15, "Custom Dietary Restriction Appending (Created event stores pre-selected and custom text typed rules)");
     } catch (e) {
       logFail(15, "Custom Dietary Restriction Appending failed", e);
@@ -589,7 +589,7 @@ async function runQA() {
       const res = await request(`http://localhost:4500/api/events/${eventXYZId}`);
       const body = JSON.parse(res.body);
       assert.strictEqual(body.success, true);
-      assert.deepEqual(body.data.event.dietaryRestrictions, ["Non-Veg 🍗", "Cardamom Allergy 🚫"], "Public API detail endpoint exposes restrictions list");
+      assert.deepEqual(body.data.event.dietaryRestrictions, ["Non-Veg ", "Cardamom Allergy "], "Public API detail endpoint exposes restrictions list");
       logPass(16, "Dietary Restrictions UI Visibility (Public preview event endpoint returns dietary needs for guest preview)");
     } catch (e) {
       logFail(16, "Dietary Restrictions UI Visibility failed", e);
@@ -711,7 +711,7 @@ async function runQA() {
     // ------------------------------------------------------------------
     // 9. Production Security Penetration & Vulnerability Tests
     // ------------------------------------------------------------------
-    console.log("\n🔒 Commencing Security Penetration & Vulnerability Audits...");
+    console.log("\n Commencing Security Penetration & Vulnerability Audits...");
 
     // Test 21: NoSQL Query Injection Prevention
     try {
@@ -774,26 +774,26 @@ async function runQA() {
     }
 
   } catch (err) {
-    console.error(`\n🚨 Critical Exception during QA Test execution: ${err.message}`);
+    console.error(`\n Critical Exception during QA Test execution: ${err.message}`);
     console.error(err.stack);
     failCount++;
   } finally {
-    console.log("\n🛑 Stopping API Test Server...");
+    console.log("\n Stopping API Test Server...");
     serverProcess.kill("SIGTERM");
     await wait(2000); // Wait for cleanup
   }
 
   console.log("\n==================================================================");
-  console.log(`📊 QA Test Execution Results Summary:`);
-  console.log(`   🟢 PASSED: ${passCount} / 24`);
-  console.log(`   🔴 FAILED: ${failCount} / 24`);
+  console.log(` QA Test Execution Results Summary:`);
+  console.log(`    PASSED: ${passCount} / 24`);
+  console.log(`    FAILED: ${failCount} / 24`);
   console.log("==================================================================");
 
   if (failCount === 0) {
-    console.log("🎉 Outstanding! All 24 Production-Level QA & Security Tests Passed Successfully! 🎉");
+    console.log(" Outstanding! All 24 Production-Level QA & Security Tests Passed Successfully! ");
     process.exit(0);
   } else {
-    console.error("🚨 QA & Security Test Failures Detected. Please review log errors.");
+    console.error(" QA & Security Test Failures Detected. Please review log errors.");
     process.exit(1);
   }
 }

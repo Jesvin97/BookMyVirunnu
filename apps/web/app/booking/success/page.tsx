@@ -183,7 +183,7 @@ function BookingSuccessContent() {
             marginBottom: "28px",
             boxShadow: "0 0 35px rgba(52, 211, 153, 0.2)"
           }}>
-            ✓
+            
           </div>
 
           <div className={styles.eyebrow} style={{ marginBottom: "16px" }}>Invitation Sent Successfully</div>

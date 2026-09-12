@@ -129,10 +129,10 @@ export function Toaster() {
             >
               <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                 {isSuccess && (
-                  <span style={{ color: "#34d399", fontSize: "1.1rem" }}>✓</span>
+                  <span style={{ color: "#34d399", fontSize: "1.1rem" }}></span>
                 )}
                 {isError && (
-                  <span style={{ color: "#f87171", fontSize: "1.1rem" }}>🛇</span>
+                  <span style={{ color: "#f87171", fontSize: "1.1rem" }}></span>
                 )}
                 {isWarning && (
                   <span style={{ color: "#fbbf24", fontSize: "1.1rem" }}></span>

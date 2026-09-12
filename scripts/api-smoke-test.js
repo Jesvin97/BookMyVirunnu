@@ -51,7 +51,7 @@ function request(url, options = {}, body = null) {
 }
 
 async function runTests() {
-  console.log("🚀 Starting API Smoke Test Server...");
+  console.log(" Starting API Smoke Test Server...");
 
   const jwtSecret = process.env.JWT_SECRET || crypto.randomBytes(32).toString("hex");
 
@@ -78,7 +78,7 @@ async function runTests() {
 
   try {
     // Poll /health until it returns 200 or 60 seconds elapsed
-    console.log("\n⏳ Waiting for API Server to become healthy...");
+    console.log("\n Waiting for API Server to become healthy...");
     let healthy = false;
     const maxRetries = 30; // 30 * 2s = 60 seconds max wait
     
@@ -101,27 +101,27 @@ async function runTests() {
     if (!healthy) {
       throw new Error("API Server failed to report healthy within 60 seconds.");
     }
-    console.log("✅ API Server is healthy and listening on port 4500!");
+    console.log(" API Server is healthy and listening on port 4500!");
 
     // 1. Health check endpoint check validation
-    console.log("\n🔍 Test 1: GET /health");
+    console.log("\n Test 1: GET /health");
     const healthRes = await request("http://localhost:4500/health");
     if (healthRes.statusCode !== 200) {
       throw new Error(`GET /health failed with status code ${healthRes.statusCode}`);
     }
-    console.log("✅ Test 1 Passed!");
+    console.log(" Test 1 Passed!");
 
     // 2. Quick Register endpoint (Newlywed Wizard setup)
-    console.log("\n🔍 Test 2: POST /api/auth/quick-register");
+    console.log("\n Test 2: POST /api/auth/quick-register");
     const registerBody = {
       coupleName: "Joyal & Anjali",
-      title: "Joyal & Anjali's Feast Schedule 🍛",
+      title: "Joyal & Anjali's Feast Schedule ",
       startDate: new Date().toISOString(),
       endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
       enableLunch: true,
       enableDinner: true,
       phone: "+919876543210",
-      dietaryRestrictions: ["Vegetarian 🥬"],
+      dietaryRestrictions: ["Vegetarian "],
       blockedDates: []
     };
 
@@ -139,13 +139,13 @@ async function runTests() {
     if (!registerData.success || !registerData.data.token || !registerData.data.event) {
       throw new Error("POST /api/auth/quick-register returned unexpected body data.");
     }
-    console.log("✅ Test 2 Passed!");
+    console.log(" Test 2 Passed!");
 
   } catch (err) {
-    console.error(`\n❌ Smoke tests failed: ${err.message}`);
+    console.error(`\n Smoke tests failed: ${err.message}`);
     success = false;
   } finally {
-    console.log("\n🛑 Stopping API Smoke Test Server...");
+    console.log("\n Stopping API Smoke Test Server...");
     try {
       serverProcess.kill("SIGTERM");
       await wait(1000);
@@ -158,10 +158,10 @@ async function runTests() {
   }
 
   if (success) {
-    console.log("\n🎉 All API Smoke Tests Passed Successfully!");
+    console.log("\n All API Smoke Tests Passed Successfully!");
     process.exit(0);
   } else {
-    console.log("\n🚨 API Smoke Tests Failed!");
+    console.log("\n API Smoke Tests Failed!");
     process.exit(1);
   }
 }
