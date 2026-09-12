@@ -8,13 +8,7 @@ on:
   pull_request:
 
 permissions:
-  contents: write
-  security-events: write
-  actions: read
-  issues: write
-  pull-requests: write
-  pages: write
-  id-token: write
+  contents: read
 
 env:
   NODE_VERSION: 20
@@ -28,6 +22,9 @@ jobs:
   security-scan:
     name: Security Scan (SCA & Secrets)
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
 
     steps:
       - name: Checkout Repository
@@ -204,6 +201,9 @@ jobs:
   static-analysis:
     name: Static Analysis (SAST & Code Quality)
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
 
     steps:
       - name: Checkout Repository
