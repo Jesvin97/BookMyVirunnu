@@ -17,7 +17,7 @@ function request(url, options = {}, body = null) {
       timeout: 10000,
       headers: {
         "Content-Type": "application/json",
-        ...(options.headers || {})
+        ...options.headers
       }
     };
 

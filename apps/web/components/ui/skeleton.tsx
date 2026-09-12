@@ -7,7 +7,7 @@ interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
   style?: React.CSSProperties;
 }
 
-export function Skeleton({ className, style, ...props }: SkeletonProps) {
+export function Skeleton({ className, style, ...props }: Readonly<SkeletonProps>) {
   return (
     <>
       <style dangerouslySetInnerHTML={{ __html: `

@@ -69,7 +69,7 @@ export function SidebarProvider({
   );
 }
 
-export function Sidebar({ children }: { children: React.ReactNode }) {
+export function Sidebar({ children }: Readonly<{ children: React.ReactNode }>) {
   const { open, isMobile, setOpen } = useSidebar();
 
   const desktopWidth = open ? "280px" : "80px";
@@ -134,7 +134,7 @@ export function Sidebar({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function SidebarHeader({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
+export function SidebarHeader({ children, style }: Readonly<{ children: React.ReactNode; style?: React.CSSProperties }>) {
   return (
     <div
       style={{
@@ -148,7 +148,7 @@ export function SidebarHeader({ children, style }: { children: React.ReactNode; 
   );
 }
 
-export function SidebarContent({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
+export function SidebarContent({ children, style }: Readonly<{ children: React.ReactNode; style?: React.CSSProperties }>) {
   return (
     <div
       style={{
@@ -166,7 +166,7 @@ export function SidebarContent({ children, style }: { children: React.ReactNode;
   );
 }
 
-export function SidebarFooter({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
+export function SidebarFooter({ children, style }: Readonly<{ children: React.ReactNode; style?: React.CSSProperties }>) {
   return (
     <div
       style={{
@@ -180,7 +180,7 @@ export function SidebarFooter({ children, style }: { children: React.ReactNode; 
   );
 }
 
-export function SidebarGroup({ children }: { children: React.ReactNode }) {
+export function SidebarGroup({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
       {children}
@@ -188,7 +188,7 @@ export function SidebarGroup({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function SidebarGroupLabel({ children }: { children: React.ReactNode }) {
+export function SidebarGroupLabel({ children }: Readonly<{ children: React.ReactNode }>) {
   const { open } = useSidebar();
   if (!open) return null;
   return (
@@ -207,7 +207,7 @@ export function SidebarGroupLabel({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function SidebarMenu({ children }: { children: React.ReactNode }) {
+export function SidebarMenu({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
       {children}
@@ -215,7 +215,7 @@ export function SidebarMenu({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function SidebarMenuItem({ children }: { children: React.ReactNode }) {
+export function SidebarMenuItem({ children }: Readonly<{ children: React.ReactNode }>) {
   return <div style={{ position: "relative" }}>{children}</div>;
 }
 
@@ -225,12 +225,12 @@ export function SidebarMenuButton({
   onClick,
   style,
   ...props
-}: {
+}: Readonly<{
   children: React.ReactNode;
   isActive?: boolean;
   onClick?: () => void;
   style?: React.CSSProperties;
-}) {
+}>) {
   return (
     <button
       onClick={onClick}
