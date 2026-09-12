@@ -198,7 +198,7 @@ export default function QuickCreatePage() {
       return;
     }
 
-    newBlocks.sort();
+    newBlocks.sort((a, b) => a.localeCompare(b));
     
     setBlockedDates(newBlocks);
     setRestDateInput("");
