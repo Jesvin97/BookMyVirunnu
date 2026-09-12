@@ -1,4 +1,8 @@
+"use client";
+
 import Link from "next/link";
+import { motion } from "framer-motion";
+import SmoothScroll from "./SmoothScroll";
 import styles from "./page.module.css";
 
 const what = {
@@ -31,35 +35,71 @@ const when = {
 };
 
 export default function HomePage() {
+  const staggerContainer = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.15
+      }
+    }
+  };
+
+  const fadeInUp = {
+    hidden: { opacity: 0, y: 40 },
+    show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 50, damping: 20 } }
+  };
+
   return (
+    <SmoothScroll>
     <main className={styles.shell}>
       <div className={styles.backgroundGlow} aria-hidden="true" />
-      <section className={styles.hero}>
-        <h1>BookOurVirunnu</h1>
-        <h2 className={styles.heroSubtitle}>The Kerala Ceremonial Hospitality Manager.</h2>
-        <p className={styles.lead}>
+      <motion.section 
+        className={styles.hero}
+        variants={staggerContainer}
+        initial="hidden"
+        animate="show"
+      >
+        <motion.img variants={fadeInUp} src="/logoBOV.svg" alt="BookOurVirunnu Logo" className={styles.logo} />
+        <motion.h1 variants={fadeInUp}>BookOurVirunnu</motion.h1>
+        <motion.h2 variants={fadeInUp} className={styles.heroSubtitle}>The Kerala Ceremonial Hospitality Manager.</motion.h2>
+        <motion.p variants={fadeInUp} className={styles.lead}>
           {what.copy}
-        </p>
+        </motion.p>
 
-        <div className={styles.actions}>
+        <motion.div variants={fadeInUp} className={styles.actions}>
           <Link className={styles.primaryButton} href="/couple/quick-create">
             Newlyweds: Curate Your Calendar
           </Link>
           <Link className={styles.secondaryButton} href="/login">
             Guest Login / Dashboard
           </Link>
-        </div>
-      </section>
+        </motion.div>
+      </motion.section>
 
-      <section className={styles.section} id="why">
+      <motion.section 
+        className={styles.section} 
+        id="why"
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ type: "spring", stiffness: 50, damping: 20 }}
+      >
         <div className={styles.sectionHeader}>
           <div className={styles.sectionKicker}>Why</div>
           <h2>{why.title}</h2>
           <p className={styles.lead} style={{ margin: "16px auto 0" }}>{why.copy}</p>
         </div>
-      </section>
+      </motion.section>
 
-      <section className={styles.section} id="how">
+      <motion.section 
+        className={styles.section} 
+        id="how"
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ type: "spring", stiffness: 50, damping: 20 }}
+      >
         <div className={styles.splitLayout}>
           <article className={styles.panel}>
             <div className={styles.sectionKicker}>How</div>
@@ -91,7 +131,8 @@ export default function HomePage() {
             </article>
           </div>
         </div>
-      </section>
+      </motion.section>
     </main>
+    </SmoothScroll>
   );
 }

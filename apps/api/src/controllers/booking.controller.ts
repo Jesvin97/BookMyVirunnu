@@ -1,5 +1,6 @@
 import type { Request, Response } from "express";
 import { Types } from "mongoose";
+import crypto from "crypto";
 import { BookingService } from "../services/booking.service";
 import { EventService } from "../services/event.service";
 import { UserModel } from "../models/User";
@@ -39,16 +40,17 @@ export class BookingController {
       let shadowUser = await UserModel.findOne({ phone: input.guestPhone.trim() });
       if (!shadowUser) {
         const cleanPhone = input.guestPhone.replace(/\D/g, "");
+        const randomStr = crypto.randomBytes(6).toString("hex");
         const emailLower = input.guestEmail
           ? input.guestEmail.toLowerCase().trim()
-          : `${cleanPhone || Math.random().toString(36).substring(2, 10)}@bookmyvirunnu-shadow.com`;
+          : `${cleanPhone || randomStr}@bookmyvirunnu-shadow.com`;
 
         shadowUser = await UserModel.create({
           role: "guest",
           name: input.guestName.trim(),
           email: emailLower,
           phone: input.guestPhone.trim(),
-          passwordHash: "shadow-guest-passwordless-" + Math.random().toString(),
+          passwordHash: "shadow-guest-passwordless-" + randomStr,
           status: "active",
           locale: "en",
           timezone: "Asia/Kolkata"
