@@ -108,7 +108,7 @@ export default function HomePage() {
               {how.steps.map((step, index) => {
                 const [boldPart, rest] = step.split(": ");
                 return (
-                  <li key={index}>
+                  <li key={step}>
                     <span>{String(index + 1).padStart(2, "0")}</span>
                     <p><strong>{boldPart}:</strong> {rest}</p>
                   </li>

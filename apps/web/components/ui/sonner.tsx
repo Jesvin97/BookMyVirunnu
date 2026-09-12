@@ -100,13 +100,14 @@ export function Toaster() {
           const isError = t.type === "error";
           const isWarning = t.type === "warning";
 
-          const accentColor = isSuccess
-            ? "#34d399"
-            : isError
-            ? "#f87171"
-            : isWarning
-            ? "#fbbf24"
-            : "#60a5fa";
+          let accentColor = "#60a5fa";
+          if (isSuccess) {
+            accentColor = "#34d399";
+          } else if (isError) {
+            accentColor = "#f87171";
+          } else if (isWarning) {
+            accentColor = "#fbbf24";
+          }
 
           return (
             <div

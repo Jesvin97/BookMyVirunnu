@@ -179,23 +179,13 @@ export default function QuickCreatePage() {
       }
     }
 
-    const newBlocks = [...blockedDates];
-    let addedAny = false;
-    
-    datesToAdd.forEach(d => {
-      if (!newBlocks.includes(d)) {
-        newBlocks.push(d);
-        addedAny = true;
-      }
-    });
-
-    if (!addedAny) {
+    const newBlocks = Array.from(new Set([...blockedDates, ...datesToAdd]));
+    if (newBlocks.length === blockedDates.length) {
       setError(datesToAdd.length === 1 ? "This date is already blocked." : "All dates in this range are already blocked.");
       return;
     }
 
     newBlocks.sort((a, b) => a.localeCompare(b));
-    
     setBlockedDates(newBlocks);
     setRestDateInput("");
     setRestDateEnd("");
@@ -573,7 +563,10 @@ export default function QuickCreatePage() {
                     opacity: !backendConnected ? 0.6 : 1
                   }}
                 >
-                  {backendConnected ? "Continue" : pinging ? "Connecting..." : "Awaiting..."}
+                  {(() => {
+                    if (backendConnected) return "Continue";
+                    return pinging ? "Connecting..." : "Awaiting...";
+                  })()}
                 </button>
               </div>
             </div>

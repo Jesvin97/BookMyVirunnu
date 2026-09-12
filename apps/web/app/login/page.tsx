@@ -231,7 +231,10 @@ export default function LoginPage() {
             className={styles.primaryButton}
             style={{ width: "100%", border: "0", cursor: loading ? "not-allowed" : "pointer", marginTop: "10px", color: "#fff" }}
           >
-            {loading ? "Verifying..." : activeTab === "password" ? "Sign in to account" : "Access Feast Dashboard"}
+          {(() => {
+            if (loading) return "Verifying...";
+            return activeTab === "password" ? "Sign in to account" : "Access Feast Dashboard";
+          })()}
           </button>
         </form>
 

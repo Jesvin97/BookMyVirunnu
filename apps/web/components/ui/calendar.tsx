@@ -74,13 +74,25 @@ export function Calendar({ selected, onSelect, className, availableDates = [] }:
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: "4px", textAlign: "center" }}>
         {days.map((day, i) => {
-          if (!day) return <div key={i} />;
+          if (!day) return <div key={`empty-${currentMonth.toISOString()}-${i}`} />;
           const selectedFlag = isSelected(day);
           const availableFlag = isAvailable(day);
 
+          let bg = "transparent";
+          if (selectedFlag) {
+            bg = "rgba(52, 211, 153, 0.1)";
+          } else if (availableFlag) {
+            bg = "#f3fcf7";
+          }
+
+          let color = "#d1d5db";
+          if (availableFlag) {
+            color = selectedFlag ? "#065f46" : "#000";
+          }
+
           return (
             <button
-              key={i}
+              key={day.toISOString()}
               type="button"
               disabled={!availableFlag}
               onClick={() => {
@@ -90,8 +102,8 @@ export function Calendar({ selected, onSelect, className, availableDates = [] }:
                 padding: "8px",
                 borderRadius: "8px",
                 border: selectedFlag ? "2px solid #34d399" : "1px solid transparent",
-                background: selectedFlag ? "rgba(52, 211, 153, 0.1)" : availableFlag ? "#f3fcf7" : "transparent",
-                color: availableFlag ? (selectedFlag ? "#065f46" : "#000") : "#d1d5db",
+                background: bg,
+                color,
                 cursor: availableFlag ? "pointer" : "not-allowed",
                 fontWeight: selectedFlag ? 700 : 500,
                 fontSize: "0.9rem",

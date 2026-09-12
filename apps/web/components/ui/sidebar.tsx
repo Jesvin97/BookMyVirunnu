@@ -44,10 +44,15 @@ export function SidebarProvider({
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  const toggleSidebar = () => setOpen((prev) => !prev);
+  const toggleSidebar = React.useCallback(() => setOpen((prev) => !prev), []);
+
+  const value = React.useMemo(
+    () => ({ open, setOpen, toggleSidebar, isMobile }),
+    [open, toggleSidebar, isMobile]
+  );
 
   return (
-    <SidebarContext.Provider value={{ open, setOpen, toggleSidebar, isMobile }}>
+    <SidebarContext.Provider value={value}>
       <div
         style={{
           display: "flex",
@@ -226,7 +231,6 @@ export function SidebarMenuButton({
   onClick?: () => void;
   style?: React.CSSProperties;
 }) {
-  const { open } = useSidebar();
   return (
     <button
       onClick={onClick}

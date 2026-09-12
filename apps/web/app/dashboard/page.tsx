@@ -64,8 +64,6 @@ export default function AdminDashboard() {
   const router = useRouter();
   const [data, setData] = useState<AdminDashboardData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState<{ name: string; role: string } | null>(null);
-
   useEffect(() => {
     if (typeof window !== "undefined") {
       const checkAuthAndFetch = async () => {
@@ -84,8 +82,6 @@ export default function AdminDashboard() {
             return;
           }
 
-          setUser(parsedUser);
-          
           const response = await api.get<AdminDashboardData>("/admin/dashboard");
           if (response) {
             setData(response);
