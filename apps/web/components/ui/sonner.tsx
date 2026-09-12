@@ -15,7 +15,9 @@ let listeners: Array<(toasts: Toast[]) => void> = [];
 let memoryToasts: Toast[] = [];
 
 export const toast = (message: string, options?: { type?: ToastType; description?: string }) => {
-  const id = Math.random().toString(36).substring(2, 9);
+  const id = typeof window !== "undefined" && window.crypto && window.crypto.randomUUID
+    ? window.crypto.randomUUID()
+    : `t-${Date.now()}`;
   const newToast: Toast = {
     id,
     message,
