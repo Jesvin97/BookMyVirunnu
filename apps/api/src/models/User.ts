@@ -4,6 +4,8 @@ import type { UserRole, DomainUser } from "@bookmyvirunnu/shared";
 export interface UserDocument extends Document, Omit<DomainUser, "_id"> {
   _id: import("mongoose").Types.ObjectId;
   role: UserRole;
+  accessKeyHash?: string;
+  isShadow?: boolean;
 }
 
 const UserSchema = new Schema<UserDocument>(
@@ -13,6 +15,8 @@ const UserSchema = new Schema<UserDocument>(
     email: { type: String, required: true, trim: true, lowercase: true, unique: true },
     phone: { type: String, trim: true, index: true, sparse: true },
     passwordHash: { type: String, required: false, select: false },
+    accessKeyHash: { type: String, required: false, select: false },
+    isShadow: { type: Boolean, default: false },
     status: {
       type: String,
       enum: ["active", "blocked", "pending_verification"],

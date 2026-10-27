@@ -38,13 +38,13 @@ export default function LoginPage() {
           }
         }
       } else {
-        if (!eventId || eventId.trim().length !== 24) {
-          throw new Error("Please enter a valid 24-character Feast ID.");
+        if (!/^[a-fA-F0-9]{24}-[a-fA-F0-9]{64}$/.test(eventId.trim())) {
+          throw new Error("Please enter your full Feast ID.");
         }
         
         const response = await api.post<{ token: string; user: { role: string; name: string } }>(
           "/auth/access-id",
-          { eventId: eventId.trim() }
+          { accessId: eventId.trim() }
         );
 
         if (response && response.token) {
@@ -220,7 +220,7 @@ export default function LoginPage() {
                 onBlur={(e) => e.target.style.borderColor = "rgba(52, 211, 153, 0.2)"}
               />
               <span style={{ fontSize: "0.8rem", color: "#8b9e6c", marginTop: "4px" }}>
-                Enter the unique 24-character Feast ID generated when you created your calendar.
+                Enter the full Feast ID generated when you created your calendar.
               </span>
             </div>
           )}

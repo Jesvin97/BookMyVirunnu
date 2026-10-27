@@ -8,6 +8,8 @@ import { asyncHandler, sendSuccess } from "../utils/http";
 import { toParam } from "../utils/params";
 import { bookingActionSchema, createBookingSchema, availabilityPreviewSchema } from "../validators/booking";
 import { objectIdSchema } from "../validators/common";
+import { BookingConflictError } from "../errors";
+import { generateSecret } from "../utils/secrets";
 
 const bookingService = new BookingService();
 const eventService = new EventService();
@@ -37,20 +39,26 @@ export class BookingController {
         return;
       }
 
-      let shadowUser = await UserModel.findOne({ phone: input.guestPhone.trim() });
+      const guestPhone = input.guestPhone.trim();
+      // Only reuse accounts created by this anonymous flow; never bind to a registered user.
+      let shadowUser = await UserModel.findOne({
+        phone: guestPhone,
+        $or: [{ isShadow: true }, { email: /@bookmyvirunnu-shadow\.com$/ }]
+      });
       if (!shadowUser) {
-        const cleanPhone = input.guestPhone.replace(/\D/g, "");
+        if (await UserModel.exists({ phone: guestPhone })) {
+          throw new BookingConflictError(
+            "phone_registered",
+            "This phone number belongs to a registered account. Please log in to book."
+          );
+        }
         const randomStr = crypto.randomBytes(6).toString("hex");
-        const emailLower = input.guestEmail
-          ? input.guestEmail.toLowerCase().trim()
-          : `${cleanPhone || randomStr}@bookmyvirunnu-shadow.com`;
-
         shadowUser = await UserModel.create({
           role: "guest",
           name: input.guestName.trim(),
-          email: emailLower,
-          phone: input.guestPhone.trim(),
-          passwordHash: "shadow-guest-passwordless-" + randomStr,
+          email: `shadow-${randomStr}@bookmyvirunnu-shadow.com`,
+          phone: guestPhone,
+          isShadow: true,
           status: "active",
           locale: "en",
           timezone: "Asia/Kolkata"
@@ -59,6 +67,7 @@ export class BookingController {
       guestUserId = shadowUser._id;
     }
 
+    const accessToken = generateSecret(24);
     const booking = await bookingService.createBooking({
       eventId: new Types.ObjectId(input.eventId),
       guestUserId,
@@ -67,6 +76,7 @@ export class BookingController {
       partySize: input.partySize ?? 1,
       specialRequests: input.specialRequests,
       idempotencyKey: input.idempotencyKey,
+      accessToken,
       venue: {
         name: input.guestName ?? "Host Family",
         address: input.venueAddress,
@@ -74,7 +84,7 @@ export class BookingController {
       }
     });
 
-    sendSuccess(res, { booking: maskBookingAddress(booking, req.auth?.id) }, 201);
+    sendSuccess(res, { booking: maskBookingAddress(booking, req.auth?.id), accessToken }, 201);
   });
 
   listMine = asyncHandler(async (req: Request, res: Response) => {
@@ -88,7 +98,8 @@ export class BookingController {
 
   getOne = asyncHandler(async (req: Request, res: Response) => {
     const bookingId = objectIdSchema.parse(toParam(req.params.bookingId));
-    const booking = await bookingService.getBookingById(bookingId, req.auth?.id);
+    const token = typeof req.query.token === "string" ? req.query.token : undefined;
+    const booking = await bookingService.getBookingById(bookingId, req.auth?.id, token);
     sendSuccess(res, { booking: maskBookingAddress(booking, req.auth?.id) });
   });
 
@@ -147,7 +158,8 @@ export class BookingController {
 
   publicCancel = asyncHandler(async (req: Request, res: Response) => {
     const bookingId = objectIdSchema.parse(toParam(req.params.bookingId));
-    const booking = await bookingService.publicCancelBooking(new Types.ObjectId(bookingId));
+    const token = typeof req.query.token === "string" ? req.query.token : undefined;
+    const booking = await bookingService.publicCancelBooking(new Types.ObjectId(bookingId), token);
     sendSuccess(res, { booking });
   });
 }

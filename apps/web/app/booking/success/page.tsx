@@ -29,6 +29,7 @@ function BookingSuccessContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const bookingId = searchParams.get("bookingId");
+  const accessToken = searchParams.get("token") ?? "";
 
   const [booking, setBooking] = useState<Booking | null>(null);
   const [event, setEvent] = useState<Event | null>(null);
@@ -75,7 +76,7 @@ function BookingSuccessContent() {
   const fetchBookingDetails = async () => {
     try {
       setLoading(true);
-      const response = await api.get<{ booking: Booking }>(`/bookings/${bookingId}`);
+      const response = await api.get<{ booking: Booking }>(`/bookings/${bookingId}?token=${encodeURIComponent(accessToken)}`);
       if (response?.booking) {
         setBooking(response.booking);
         
@@ -97,7 +98,7 @@ function BookingSuccessContent() {
 
     try {
       setCancelling(true);
-      await api.post(`/bookings/${bookingId}/public-cancel`);
+      await api.post(`/bookings/${bookingId}/public-cancel?token=${encodeURIComponent(accessToken)}`);
       setCancelled(true);
     } catch (err: any) {
       alert(err.message || "Failed to cancel reservation.");

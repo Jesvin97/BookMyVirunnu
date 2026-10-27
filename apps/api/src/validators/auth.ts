@@ -38,6 +38,6 @@ export const quickRegisterSchema = z.object({
 });
 
 export const accessIdSchema = z.object({
-  eventId: z.string().regex(/^[a-f\d]{24}$/i, "Invalid MongoDB ObjectId.")
+  accessId: z.string().regex(/^[a-f\d]{24}-[a-f\d]{64}$/i, "Invalid Feast ID.")
 });
 

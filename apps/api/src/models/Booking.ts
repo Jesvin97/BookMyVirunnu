@@ -7,6 +7,12 @@ export interface BookingDocument extends Document, Omit<DomainBooking, "_id" | "
   guestUserId: Types.ObjectId;
   slotId: Types.ObjectId;
   status: BookingStatus;
+  accessTokenHash?: string;
+}
+
+function stripSecrets(_doc: unknown, ret: Record<string, unknown>): Record<string, unknown> {
+  delete ret.accessTokenHash;
+  return ret;
 }
 
 const BookingSchema = new Schema<BookingDocument>(
@@ -32,12 +38,17 @@ const BookingSchema = new Schema<BookingDocument>(
     },
     isActive: { type: Boolean, required: true, default: true, index: true },
     idempotencyKey: { type: String, trim: true },
+    accessTokenHash: { type: String, select: false },
     holdExpiresAt: { type: Date, index: true },
     rejectionReason: { type: String, trim: true, maxlength: 500 },
     confirmedAt: { type: Date },
     cancelledAt: { type: Date }
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    toJSON: { transform: stripSecrets },
+    toObject: { transform: stripSecrets }
+  }
 );
 
 BookingSchema.index({ idempotencyKey: 1 }, { unique: true, sparse: true });

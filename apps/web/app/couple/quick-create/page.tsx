@@ -225,6 +225,7 @@ export default function QuickCreatePage() {
       const response = await api.post<{
         token: string;
         user: { role: string; name: string };
+        accessId: string;
         event: { id: string; title: string };
       }>("/auth/quick-register", {
         coupleName,
@@ -244,9 +245,9 @@ export default function QuickCreatePage() {
         localStorage.setItem("bv_user", JSON.stringify(response.user));
 
         setSuccessData({
-          eventId: response.event.id,
+          eventId: response.accessId,
           bookingUrl: `/book/${response.event.id}`,
-          dashboardUrl: `/couple?id=${response.event.id}`
+          dashboardUrl: `/couple?id=${response.accessId}`
         });
       }
     } catch (err: any) {

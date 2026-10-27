@@ -311,7 +311,7 @@ export default function GuestBookingPage() {
         ? `${sanitizedAddress}\nLandmark: ${sanitizedLandmark}`
         : sanitizedAddress;
 
-      const response = await api.post<{ booking: { _id: string; status: string } }>(
+      const response = await api.post<{ booking: { _id: string; status: string }; accessToken: string }>(
         "/bookings",
         {
           eventId,
@@ -332,7 +332,7 @@ export default function GuestBookingPage() {
           localStorage.setItem("bv_last_host_phone", guestPhone.trim());
         }
         toast.success("Feast invitation successfully sent to couple! ");
-        router.push(`/booking/success?bookingId=${response.booking._id}`);
+        router.push(`/booking/success?bookingId=${response.booking._id}&token=${response.accessToken}`);
       }
     } catch (err: any) {
       setError(err.message || "Booking failed. The slot may have been locked or filled.");

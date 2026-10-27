@@ -93,7 +93,7 @@ export default function CoupleDashboard() {
             setLoading(true);
             const response = await api.post<{ token: string; user: { role: string; name: string } }>(
               "/auth/access-id",
-              { eventId: queryId.trim() }
+              { accessId: queryId.trim() }
             );
             if (response?.token) {
               localStorage.setItem("bv_token", response.token);
@@ -386,18 +386,9 @@ export default function CoupleDashboard() {
                   <div className={styles.panelAccent} style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: "16px", padding: "12px 16px", marginBottom: "32px", background: "#fef2f2", border: "1px solid #fecaca", minWidth: 0, maxWidth: "100%", flexShrink: 1, boxSizing: "border-box", overflowWrap: "anywhere", wordBreak: "break-word" }}>
                     <div style={{ minWidth: 0, flexShrink: 1 }}>
                       <strong style={{ display: "block", color: "#ef4444", marginBottom: "4px" }}>Feast ID & Private Dashboard Manager </strong>
-                      <span style={{ fontSize: "0.85rem", color: "#000" }}>Bookmark this link to access your dashboard passwordlessly on other devices:</span>
+                      <span style={{ fontSize: "0.85rem", color: "#000" }}>Your private access link was shown once when this calendar was created. Keep it safe; it cannot be shown again.</span>
                     </div>
-                    <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap", minWidth: 0, flexShrink: 1 }}>
-                      <code style={{ background: "#fff", padding: "4px 8px", borderRadius: "8px", border: "1px solid #fca5a5", fontSize: "0.75rem", color: "#ef4444", minWidth: 0, flexShrink: 1, overflowWrap: "anywhere", wordBreak: "break-all", whiteSpace: "normal" }}>
-                        {activeEvent._id}
-                      </code>
-                      <CopyButton
-                        content={typeof window !== "undefined" ? `${window.location.origin}/couple?id=${activeEvent._id}` : `${activeEvent._id}`}
-                        successMessage="Private Manage Link copied successfully! "
-                        style={{ padding: "0 14px", minHeight: "32px", fontSize: "0.8rem", border: "1px solid #fca5a5", background: "#fff", color: "#ef4444" }}
-                      />
-                    </div>
+
                   </div>
 
                   {/* Bookings & Visits Schedule */}

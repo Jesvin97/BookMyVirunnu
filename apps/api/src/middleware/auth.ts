@@ -30,7 +30,8 @@ export function authenticate(req: Request, res: Response, next: NextFunction): v
   try {
     const decoded = jwt.verify(token, env.jwtSecret, {
       issuer: env.jwtIssuer,
-      audience: env.jwtAudience
+      audience: env.jwtAudience,
+      algorithms: ["HS256"]
     }) as AuthenticatedUser;
     req.auth = decoded;
     next();
@@ -50,7 +51,8 @@ export function optionalAuthenticate(req: Request, res: Response, next: NextFunc
   try {
     const decoded = jwt.verify(token, env.jwtSecret, {
       issuer: env.jwtIssuer,
-      audience: env.jwtAudience
+      audience: env.jwtAudience,
+      algorithms: ["HS256"]
     }) as AuthenticatedUser;
     req.auth = decoded;
     next();
