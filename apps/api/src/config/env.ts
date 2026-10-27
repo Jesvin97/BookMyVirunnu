@@ -44,6 +44,10 @@ if (env.nodeEnv === "production" && env.corsOrigin === "*") {
   throw new Error("CORS_ORIGIN must be explicitly set in production.");
 }
 
+if (env.nodeEnv === "production" && (!process.env.JWT_SECRET || env.jwtSecret === defaultJwtSecret)) {
+  throw new Error("JWT_SECRET must be explicitly set to a unique value in production.");
+}
+
 if (env.jwtSecret.length < 32) {
   throw new Error("JWT_SECRET must be at least 32 characters long.");
 }

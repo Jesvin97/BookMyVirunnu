@@ -74,7 +74,8 @@ export function errorHandler(err: unknown, req: Request, res: Response, next: Ne
     success: false,
     error: {
       code: "internal_error",
-      message: maybeError?.message ?? "Unexpected server error."
+      message:
+        process.env.NODE_ENV === "production" ? "Unexpected server error." : (maybeError?.message ?? "Unexpected server error.")
     }
   });
 }

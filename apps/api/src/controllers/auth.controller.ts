@@ -9,6 +9,8 @@ import { EventModel } from "../models/Event";
 import { AvailabilityRuleModel } from "../models/AvailabilityRule";
 import { loginSchema, registerSchema, quickRegisterSchema, accessIdSchema } from "../validators/auth";
 import { asyncHandler, sendSuccess } from "../utils/http";
+import { generateSecret, hashSecret, secretMatches } from "../utils/secrets";
+import { UnauthorizedError } from "../errors";
 
 const authService = new AuthService();
 
@@ -83,6 +85,7 @@ export class AuthController {
     const randomStr = crypto.randomBytes(6).toString("hex");
     const anonymousEmail = `couple-${Date.now()}-${randomStr}@anonymous.bookmyvirunnu.com`;
     const passwordHash = await bcrypt.hash(`passwordless-${randomStr}`, 10);
+    const accessKey = generateSecret(32);
     
     // Create shadow couple user
     const [user] = await UserModel.create([
@@ -92,6 +95,7 @@ export class AuthController {
         email: anonymousEmail,
         phone: input.phone?.trim(),
         passwordHash,
+        accessKeyHash: hashSecret(accessKey),
         timezone: "Asia/Kolkata",
         locale: "en",
         status: "active"
@@ -207,6 +211,8 @@ export class AuthController {
     sendSuccess(res, {
       token,
       user: serializeUser(user),
+      // Shown once: the only credential that can resume this passwordless account.
+      accessId: `${event._id.toString()}-${accessKey}`,
       event: {
         id: event._id.toString(),
         title: event.title,
@@ -217,18 +223,16 @@ export class AuthController {
   });
 
   loginWithFeastId = asyncHandler(async (req: Request, res: Response) => {
-    const { eventId } = accessIdSchema.parse(req.body);
+    const { accessId } = accessIdSchema.parse(req.body);
+    const [eventId, accessKey] = accessId.split("-");
+    const invalid = new UnauthorizedError("Invalid Feast ID.");
 
     const event = await EventModel.findById(new Types.ObjectId(eventId));
-    if (!event) {
-      res.status(404).json({ success: false, error: { code: "not_found", message: "Feast Calendar not found." } });
-      return;
-    }
+    if (!event) throw invalid;
 
-    const user = await UserModel.findById(event.hostUserId);
-    if (!user) {
-      res.status(404).json({ success: false, error: { code: "not_found", message: "Associated couple user not found." } });
-      return;
+    const user = await UserModel.findById(event.hostUserId).select("+accessKeyHash");
+    if (!user || user.role !== "couple" || user.status !== "active" || !secretMatches(user.accessKeyHash, accessKey)) {
+      throw invalid;
     }
 
     const token = authService.sign(user);

@@ -5,6 +5,7 @@ import { EventModel, type EventDocument } from "../models/Event";
 import { AvailabilityEngine } from "./availability-engine";
 import { BookingConflictError, NotFoundError } from "../errors";
 import { differenceInMinutes } from "../utils/timezone";
+import { hashSecret, secretMatches } from "../utils/secrets";
 
 export interface CreateBookingInput {
   eventId: Types.ObjectId;
@@ -14,6 +15,7 @@ export interface CreateBookingInput {
   partySize: number;
   specialRequests?: string;
   idempotencyKey?: string;
+  accessToken?: string;
   venue?: {
     name?: string;
     address?: string;
@@ -60,7 +62,7 @@ export class BookingService {
 
       await session.withTransaction(async () => {
         if (input.idempotencyKey) {
-          const existing = await BookingModel.findOne({ idempotencyKey: input.idempotencyKey }).session(session);
+          const existing = await BookingModel.findOne({ idempotencyKey: input.idempotencyKey, guestUserId: input.guestUserId }).session(session);
           if (existing) {
             createdBooking = existing;
             return;
@@ -94,9 +96,7 @@ export class BookingService {
         }).session(session);
 
         if (existingActive) {
-          throw new BookingConflictError("duplicate_booking", "This guest already has an active booking for the event.", {
-            bookingId: existingActive._id.toString()
-          });
+          throw new BookingConflictError("duplicate_booking", "This guest already has an active booking for the event.");
         }
 
         const confirmed = event.bookingMode === "instant" || event.bookingRules.allowAutoApprove;
@@ -111,6 +111,7 @@ export class BookingService {
               partySize: input.partySize,
               specialRequests: input.specialRequests,
               idempotencyKey: input.idempotencyKey,
+              accessTokenHash: input.accessToken ? hashSecret(input.accessToken) : undefined,
               status: confirmed ? "confirmed" : "pending",
               isActive: true,
               confirmedAt: confirmed ? new Date() : undefined,
@@ -150,7 +151,7 @@ export class BookingService {
       const mongoError = error as { code?: number };
       if (mongoError?.code === 11000) {
         if (input.idempotencyKey) {
-          const existing = await BookingModel.findOne({ idempotencyKey: input.idempotencyKey });
+          const existing = await BookingModel.findOne({ idempotencyKey: input.idempotencyKey, guestUserId: input.guestUserId });
           if (existing) return existing;
         }
         throw new BookingConflictError("duplicate_booking", "A conflicting booking already exists for this guest and event.");
@@ -175,11 +176,14 @@ export class BookingService {
     return BookingModel.find({ eventId: event._id }).sort({ createdAt: -1 }).exec();
   }
 
-  async getBookingById(bookingId: string, actorUserId?: string): Promise<BookingDocument> {
-    const booking = await BookingModel.findById(new Types.ObjectId(bookingId)).exec();
+  async getBookingById(bookingId: string, actorUserId?: string, accessToken?: string): Promise<BookingDocument> {
+    const booking = await BookingModel.findById(new Types.ObjectId(bookingId)).select("+accessTokenHash").exec();
     if (!booking) throw new NotFoundError("Booking not found.");
 
-    if (actorUserId) {
+    if (!actorUserId) {
+      // Anonymous callers must present the per-booking access token issued at creation.
+      if (!secretMatches(booking.accessTokenHash, accessToken)) throw new NotFoundError("Booking not found.");
+    } else {
       const event = await EventModel.findById(booking.eventId).exec();
       if (!event) throw new NotFoundError("Event not found.");
 
@@ -270,13 +274,13 @@ export class BookingService {
     });
   }
 
-  async publicCancelBooking(bookingId: Types.ObjectId): Promise<BookingDocument> {
+  async publicCancelBooking(bookingId: Types.ObjectId, accessToken?: string): Promise<BookingDocument> {
     const session = await mongoose.startSession();
     try {
       session.startTransaction();
-      const booking = await BookingModel.findById(bookingId).session(session);
-      if (!booking) {
-        throw new BookingConflictError("event_not_bookable", "Booking not found.");
+      const booking = await BookingModel.findById(bookingId).select("+accessTokenHash").session(session);
+      if (!booking || !secretMatches(booking.accessTokenHash, accessToken)) {
+        throw new NotFoundError("Booking not found.");
       }
       if (booking.status === "cancelled" || booking.status === "rejected") {
         throw new BookingConflictError("event_not_bookable", "This booking is no longer active.");
